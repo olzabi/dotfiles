@@ -1,0 +1,8 @@
+Aloxaf/fzf-tab
+hadenlabs/zsh-goenv
+luismayta/zsh-pyenv
+zsh-users/zsh-syntax-highlighting
+zsh-users/zsh-autosuggestions
+
+lukechilds/zsh-better-npm-completion
+chrisands/zsh-yarn-completions

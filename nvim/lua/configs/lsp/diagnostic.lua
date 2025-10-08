@@ -1,0 +1,71 @@
+return function()
+  local signs = require("utils.icons").diagnostic
+  for type, icon in pairs(signs) do
+    local hl = "DiagnosticSign" .. type
+    vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
+  end
+
+  local original_sign_handler = vim.diagnostic.handlers.signs
+  vim.diagnostic.handlers.signs = {
+    show = function(ns, bufnr, diagnostics, opts)
+      if diagnostics then
+        local new_diagnostics = {}
+        for _, diagnostic in ipairs(diagnostics) do
+          if
+            diagnostic.message:match("Unexpected statement, found '<<'")
+            and diagnostic.severity == vim.diagnostic.severity.WARN
+          then
+          -- Remove these warnings...
+          elseif
+            diagnostic.message:match("Unexpected statement, found '<<'")
+            and diagnostic.severity == vim.diagnostic.severity.ERROR
+          then
+            diagnostic.message = "Git conflict detected."
+            table.insert(new_diagnostics, diagnostic)
+          else
+            table.insert(new_diagnostics, diagnostic)
+          end
+        end
+        diagnostics = new_diagnostics
+      end
+      original_sign_handler.show(ns, bufnr, diagnostics, opts)
+    end,
+    hide = original_sign_handler.hide,
+  }
+
+  -- Global diagnostic settings
+  vim.diagnostic.config({
+    title = false,
+    underline = true,
+    update_in_insert = false,
+    virtual_text = true,
+    severity_sort = true,
+    sigs = true,
+    float = {
+      source = "if_many",
+      header = "",
+      border = "rounded",
+      style = "minimal",
+      prefix = "",
+      format = function(diagnostic)
+        local severity_symbols = {
+          [vim.diagnostic.severity.ERROR] = "✘",
+          [vim.diagnostic.severity.WARN] = " ",
+          [vim.diagnostic.severity.INFO] = "",
+          [vim.diagnostic.severity.HINT] = "",
+        }
+        local msg = diagnostic.message
+        local sym = severity_symbols[diagnostic.severity] or ""
+        return string.format("%s\n%s", sym, msg)
+      end,
+    },
+    signs = {
+      text = {
+        [vim.diagnostic.severity.ERROR] = "✘",
+        [vim.diagnostic.severity.WARN] = " ",
+        [vim.diagnostic.severity.INFO] = "",
+        [vim.diagnostic.severity.HINT] = "",
+      },
+    },
+  })
+end

@@ -1,0 +1,26 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
+notARepository: "quit"
+git:
+  paging:
+    colorArg: always
+    # pager: delta --features=gruvmax-fang --paging=never
+    # pager: delta --features=arctic-fox --paging=never
+    # pager: delta --features=corvus --paging=never
+    # pager: delta --features=weeping-willow --paging=never
+    pager: delta --features=colibri --paging=never
+  autoFetch: false
+  autoRefresh: false
+  disableForcePushing: true
+  commit:
+    autoWrapCommitMessage: true
+    autoWrapWidth: 80
+update:
+  method: never
+gui:
+  language: en
+  border: single
+customCommands:
+  - key: "<c-R>"
+    command: "gh pr create --fill --web"
+    context: "global"
+    loadingText: "Creating pull request on GitHub"
