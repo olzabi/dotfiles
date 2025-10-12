@@ -69,7 +69,6 @@ config = {
 	enable_wayland = true, -- X11
 	enable_kitty_graphics = true,
 	prefer_egl = true,
-	enable_osc52_clipboard  = true,
 
 	-- Cursor
 	default_cursor_style = "SteadyUnderline",
