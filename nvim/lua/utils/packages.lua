@@ -206,6 +206,7 @@ M.treesitter = {
   "rust",
   "toml",
   "fish",
+  "diff",
 }
 
 return M

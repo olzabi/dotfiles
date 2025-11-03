@@ -1,12 +1,15 @@
-local schemastore = require("schemastore")
-
 return {
+  cmd = { "yaml-language-server", "--stdio" },
+
   schemastore = { enable = true },
   settings = {
     redhat = { telemetry = { enabled = false } },
     yaml = {
-      schemas = schemastore.yaml.schemas(),
+      schemas = require("schemastore").yaml.schemas(),
       schemaStore = { enable = false, url = "" },
+      validate = true,
+      keyOrdering = false,
+      format = { enalbe = true },
     },
   },
   filetypes = { "yaml", "yml" },

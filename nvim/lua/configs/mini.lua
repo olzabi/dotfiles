@@ -90,23 +90,24 @@ M.dependencies = {
 
   { "echasnovski/mini.snippets", event = "InsertEnter" },
 
-  -- {
-  --   "echasnovski/mini.files",
-  --   event = { "BufReadPost", "BufNewFile" },
-  --   dependencies = { "echasnovski/mini.icons" },
-  --   opts = {
-  --     show_dotfiles = true,
-  --     windows = {
-  --       preview = true,
-  --       width_preview = 30,
-  --       width_focus = 30,
-  --     },
-  --     options = {
-  --       permanent_delete = false,
-  --       use_as_default_explorer = false,
-  --     },
-  --   },
-  -- },
+  {
+    "echasnovski/mini.files",
+    event = { "BufReadPost", "BufNewFile" },
+    dependencies = { "echasnovski/mini.icons" },
+    enabled = false,
+    opts = {
+      show_dotfiles = true,
+      windows = {
+        preview = true,
+        width_preview = 30,
+        width_focus = 30,
+      },
+      options = {
+        permanent_delete = false,
+        use_as_default_explorer = false,
+      },
+    },
+  },
 
   {
     "echasnovski/mini.icons",
@@ -137,38 +138,53 @@ M.dependencies = {
     end,
   },
 
-  -- {
-  --   "echasnovski/mini.statusline",
-  --   config = function()
-  --     require("mini.statusline").setup({ set_vim_settings = false })
-  --   end,
-  -- },
+  {
+    "echasnovski/mini.statusline",
+    enabled = false,
+    config = function()
+      require("mini.statusline").setup({ set_vim_settings = false })
+    end,
+  },
 
-  -- {
-  --   "echasnovski/mini.bufremove",
-  --   keys = {
-  --     -- Smart bufremove
-  --     -- reference: https://github.com/LazyVim/LazyVim/blob/7f9219162b54a717b7da5cb543ab1e778c9a124b/lua/lazyvim/plugins/editor.lua#L423-L434
-  --     {
-  --       "<leader>bd",
-  --       function()
-  --         local bd = require("mini.bufremove").delete
-  --         if vim.bo.modified then
-  --           local choice = vim.fn.confirm(("Save changes to %q?"):format(vim.fn.bufname()), "&Yes\n&No\n&Cancel")
-  --           if choice == 1 then -- Yes
-  --             vim.cmd.write()
-  --             bd(0)
-  --           elseif choice == 2 then -- No
-  --             bd(0, true)
-  --           end
-  --         else
-  --           bd(0)
-  --         end
-  --       end,
-  --       desc = "Delete Buffer",
-  --     },
-  --   },
-  -- },
+  {
+    "echasnovski/mini.bufremove",
+    enabled = false,
+    keys = {
+      -- Smart bufremove
+      -- reference: https://github.com/LazyVim/LazyVim/blob/7f9219162b54a717b7da5cb543ab1e778c9a124b/lua/lazyvim/plugins/editor.lua#L423-L434
+      {
+        "<leader>bd",
+        function()
+          local bd = require("mini.bufremove").delete
+          if vim.bo.modified then
+            local choice = vim.fn.confirm(("Save changes to %q?"):format(vim.fn.bufname()), "&Yes\n&No\n&Cancel")
+            if choice == 1 then -- Yes
+              vim.cmd.write()
+              bd(0)
+            elseif choice == 2 then -- No
+              bd(0, true)
+            end
+          else
+            bd(0)
+          end
+        end,
+        desc = "Delete Buffer",
+      },
+    },
+  },
+
+  { "echasnovski/mini.comment" },
+
+  {
+    -- WARN: mini.pairs unexpected behavior was replaced by "windwp/nvim-autopairs"
+    "echasnovski/mini.pairs",
+    enabled = true,
+  },
+
+  { "echasnovski/mini.splitjoin" },
+  { "echasnovski/mini.operators" },
+  { "echasnovski/mini.jump" },
+  { "echasnovski/mini.clue" },
 }
 
 return M

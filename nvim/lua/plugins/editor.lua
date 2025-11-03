@@ -70,19 +70,10 @@ return {
   },
 
   {
-    -- Code actions preview
-    "aznhe21/actions-preview.nvim",
-    config = function()
-      -- code actions on ..
-      vim.keymap.set({ "v", "n" }, "..", require("actions-preview").code_actions)
-    end,
-  },
-
-  {
     -- TODO:
     "Wansmer/symbol-usage.nvim",
     -- event = "LspAttach", -- need run before LspAttach if you use nvim 0.9. On 0.10 use 'LspAttach'
-    enabled = true,
+    enabled = false,
     config = require("configs.symbol-usage").config,
     keymaps = require("keymaps").symbol_usage(),
   },
@@ -97,13 +88,15 @@ return {
     -- TODO:
     "numToStr/Comment.nvim",
     event = { "CursorHold" },
-    config = true,
+    config = function()
+      require("Comment").setup()
+    end,
   },
 
   {
-    -- TODO: setup better
     "folke/todo-comments.nvim",
     lazy = false,
+    enabled = false,
     event = { "CursorHold", "CursorHoldI" },
     cmd = { "TodoTrouble", "TodoTelescope" },
     opts = require("configs.todo-comments").opts,
@@ -254,9 +247,9 @@ return {
   },
 
   {
-    -- TODO:
     "Wansmer/treesj",
     lazy = false,
+    enabled = false,
     opts = { use_default_keymaps = false },
     config = function(_, opts)
       require("treesj").setup(opts)
@@ -271,6 +264,7 @@ return {
 
   {
     "gbprod/yanky.nvim",
+    enabled = false,
     event = "BufReadPost",
     opts = {},
     dependencies = { "folke/snacks.nvim" },

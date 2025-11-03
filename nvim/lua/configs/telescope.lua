@@ -61,15 +61,15 @@ local pickers = {
 }
 
 local extensions = {
-  ["ui-select"] = {
-    -- require("telescope.themes").get_dropdown({}),
-  },
+  ["ui-select"] = {},
+
   fzf = {
     fuzzy = true, -- false will only do exact matching
     override_generic_sorter = true, -- override the generic sorter
     override_file_sorter = true, -- override the file sorter
     case_mode = "smart_case",
   },
+
   undo = {
     use_delta = true,
     use_custom_command = nil, -- setting this implies `use_delta = false`. Accepted format is: { "bash", "-c", "echo '$DIFF' | delta" }
@@ -81,10 +81,12 @@ local extensions = {
     time_format = "",
     saved_only = false,
   },
+
   media_files = {
     filetypes = { "png", "webp", "jpg", "jpeg" },
     find_cmd = "rg",
   },
+
   file_browser = {
     theme = "dropdown",
     hijack_netrw = true,
@@ -100,7 +102,7 @@ M.dependencies = {
   { "nvim-telescope/telescope-github.nvim" },
   { "nvim-telescope/telescope-ui-select.nvim" },
   { "nvim-telescope/telescope-media-files.nvim" },
-  { "chip/telescope-software-licenses.nvim" },
+  -- { "chip/telescope-software-licenses.nvim" },
   { "debugloop/telescope-undo.nvim" },
   { "benfowler/telescope-luasnip.nvim" },
   { "crispgm/telescope-heading.nvim" },
@@ -120,30 +122,35 @@ M.config = function()
     extensions = extensions,
   })
 
-  -- NOTE: not works
-  -- WARN: check rm or not
-  telescope.load_extension("fzf") -- NOTE
-  telescope.load_extension("git_worktree")
-  telescope.load_extension("noice")
-  telescope.load_extension("fidget") -- WARN
-  telescope.load_extension("projects")
-  telescope.load_extension("notify") -- WARN
-  telescope.load_extension("ui-select") -- NOTE
-  telescope.load_extension("refactoring") -- NOTE:
-  telescope.load_extension("git_branch") -- WARN
-  telescope.load_extension("undo")
-  telescope.load_extension("import") -- WARN ??
-  telescope.load_extension("luasnip") -- WARN  rm?
-  telescope.load_extension("software-licenses")
-  -- telescope.load_extension("repo")
-  telescope.load_extension("heading") -- NOTE
-  telescope.load_extension("env")
-  telescope.load_extension("dap") -- NOTE:
-  telescope.load_extension("frecency") -- WARN ?
-  telescope.load_extension("fzy_native") -- NOTE
-  telescope.load_extension("gh") -- NOTE
-  telescope.load_extension("media_files")
-  telescope.load_extension("file_browser") -- NOTE:
+  local extensions_to_load = {
+    "fzf",
+    "git_worktree",
+    "noice",
+    "fidget",
+    "projects",
+    "notify",
+    "ui-select",
+    "refactoring",
+    "git_branch",
+    "undo",
+    "import",
+    "luasnip",
+    "heading",
+    "env",
+    "dap",
+    "frecency",
+    "fzy_native",
+    "gh",
+    "media_files",
+    "file_browser",
+  }
+
+  for _, ext in ipairs(extensions_to_load) do
+    local ok, err = pcall(telescope.load_extension, ext)
+    if not ok then
+      vim.notify("Failed to load telescope extension: " .. ext .. "\n" .. err, vim.log.levels.WARN)
+    end
+  end
 
   -- keys
   -- vim.keymap.set("n", ";sw", function()

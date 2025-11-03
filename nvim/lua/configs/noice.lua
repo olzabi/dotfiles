@@ -100,7 +100,7 @@ M.opts = {
   presets = {
     long_message_to_split = true,
     lsp_doc_border = false,
-    inc_rename = false,
+    inc_rename = true,
     command_palette = false,
     bottom_search = false,
   },

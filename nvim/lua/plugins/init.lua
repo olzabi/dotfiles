@@ -1,32 +1,6 @@
 return {
 
   {
-    "williamboman/mason.nvim",
-    build = ":MasonUpdate",
-    cmd = { "Mason", "MasonInstall" },
-    lazy = false,
-    dependencies = {
-      {
-        "williamboman/mason-lspconfig.nvim",
-        lazy = false,
-        config = function() require("configs.lsp").mason_setup() end,
-      },
-    },
-    opts = {
-      ensure_installed = require("utils.packages").lsp_packages,
-      ui = { border = "single" },
-    },
-  },
-
-  {
-    "hrsh7th/nvim-cmp",
-    event = { "InsertEnter", "CmdlineEnter" },
-    dependencies = require("configs.cmp").dependencies,
-    ---@param config cmp.ConfigSchema
-    config = require("configs.cmp").config,
-  },
-
-  {
     -- popular language parser for syntax highlighting
     "nvim-treesitter/nvim-treesitter",
     event = { "BufReadPre" },
@@ -58,25 +32,7 @@ return {
   {
     "3rd/image.nvim",
     enabled = true,
-    opts = {
-      backend = "viu",
-      -- backend = "ueberzug",
-      processor = "magick_cli",
-      -- hijack_file_patterns = { "*.png", "*.jpg", "*.jpeg", "*.gif", "*.webp", "*.svg" },
-      integrations = {
-        markdown = {
-          enabled = true,
-          clear_in_insert_mode = false,
-          download_remote_images = true,
-          only_render_image_at_cursor = false,
-          filetypes = { "markdown", "vimwiki", "quarto" },
-        },
-      },
-      max_width = nil,
-      max_height = nil,
-      max_width_window_percentage = math.huge,
-      max_height_window_percentage = math.huge,
-    },
+    config = require("configs.image"),
   },
 
   {

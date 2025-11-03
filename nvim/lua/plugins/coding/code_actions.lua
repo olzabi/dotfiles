@@ -7,7 +7,10 @@ return {
     end,
   },
 
-  { "folke/ts-comments.nvim" }, -- "gc" to comment visual regions/lines
+  {
+    "folke/ts-comments.nvim",
+    enabled = false
+  }, -- "gc" to comment visual regions/lines
 
 
 }

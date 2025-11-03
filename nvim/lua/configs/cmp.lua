@@ -108,6 +108,7 @@ M.dependencies = {
     "windwp/nvim-autopairs",
     event = "InsertEnter",
     config = true,
+    opts = {}
   },
   -- cmp sources
   { "hrsh7th/cmp-nvim-lsp-signature-help" },

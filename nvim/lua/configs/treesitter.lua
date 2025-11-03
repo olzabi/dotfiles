@@ -97,6 +97,7 @@ M.dependencies = {
   },
   {
     "windwp/nvim-ts-autotag",
+    enabled = false,
     after = "nvim-treesitter",
     event = "InsertEnter",
     filetype = { "typescriptreact", "typescript", "javascript", "markdown", "html", "jsx", "tsx", "xml" },

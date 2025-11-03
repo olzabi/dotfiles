@@ -33,7 +33,8 @@ M.lint = function()
     typescript = { "eslint_d" },
     javascriptreact = { "eslint_d" },
     typescriptreact = { "eslint_d" },
-    terraform = {},
+
+    terraform = { "terraform_validate", "tflint", "tfsec" },
     cmake = { "cmakelint", "cmakelang" },
     json = { "eslint_d" },
     yaml = { "yamllint" },
@@ -43,6 +44,8 @@ M.lint = function()
     python = { "ruff", "pylint" },
     sh = { "shellcheck" },
     -- markdown = { "markdownlint-cli2" },
+
+    go = { "golangcilint" },
   }
 
   eslint.args = {
@@ -61,6 +64,36 @@ M.lint = function()
     "-q",
     "--report=json",
     "-",
+  }
+
+  lint.linters.golangcilint = {
+    cmd = "golangci-lint",
+    args = {
+      "run",
+      "--output.json.path=stdout",
+      -- Overwrite values possibly set in .golangci.yml
+      "--output.text.path=",
+      "--output.tab.path=",
+      "--output.html.path=",
+      "--output.checkstyle.path=",
+      "--output.code-climate.path=",
+      "--output.junit-xml.path=",
+      "--output.teamcity.path=",
+      "--output.sarif.path=",
+      "--issues-exit-code=0",
+      "--show-stats=false",
+      -- Get absolute path of the linted file
+      "--path-mode=abs",
+      function()
+        return vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":h")
+      end,
+    },
+    stdin = false,
+    stream = "stdout",
+    ignore_exitcode = true,
+    -- parser = require("lint.parser").from_json({
+    --   source = "golangci-lint",
+    -- }),
   }
 
   -- Auto-lint
