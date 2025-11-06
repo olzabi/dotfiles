@@ -45,11 +45,13 @@ return {
 
   {
     "f-person/git-blame.nvim",
-    keys = require('keymaps.plugins').git_blame
+    keys = require("keymaps.plugins").git_blame,
   },
 
   {
+    -- this -> mini
     "lewis6991/gitsigns.nvim",
+    enabled = false,
     event = { "CursorHold", "CursorHoldI" },
     config = true,
     keys = require("keymaps").gitsigns,

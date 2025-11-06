@@ -40,6 +40,7 @@ return {
   {
     -- TODO: sessions manager
     "folke/persistence.nvim",
+    enabled = false,
     event = "BufReadPre",
     lazy = false,
     config = require("configs.persistence").config,

@@ -46,7 +46,7 @@ return {
 
   {
     -- TODO:
-    "echasnovski/mini.nvim",
+    "nvim-mini/mini.nvim",
     dependencies = require("configs.mini").dependencies,
   },
 
