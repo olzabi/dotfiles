@@ -2,7 +2,7 @@ local M = {}
 
 M.dependencies = {
   {
-    "echasnovski/mini.ai",
+    "nvim-mini/mini.ai",
     opts = {
       -- custom_textobjects = {
       --   o = require("mini.ai").gen_spec.treesitter({
@@ -56,7 +56,7 @@ M.dependencies = {
     -- TODO:
     -- alt nvim-surround
     -- https://github.com/kylechui/nvim-surround
-    "echasnovski/mini.surround",
+    "nvim-mini/mini.surround",
     event = { "CursorHold", "CursorHoldI" },
     opts = {
       highlight_duration = 500,
@@ -71,10 +71,10 @@ M.dependencies = {
     },
   },
 
-  { "echasnovski/mini.operators" },
+  { "nvim-mini/mini.operators" },
 
   {
-    "echasnovski/mini.pairs",
+    "nvim-mini/mini.pairs",
     event = "InsertEnter",
     keys = require("keymaps").mini_pairs,
     opts = {
@@ -86,14 +86,14 @@ M.dependencies = {
     },
   },
 
-  { "echasnovski/mini.bracketed" },
+  { "nvim-mini/mini.bracketed" },
 
-  { "echasnovski/mini.snippets", event = "InsertEnter" },
+  { "nvim-mini/mini.snippets", event = "InsertEnter" },
 
   {
-    "echasnovski/mini.files",
+    "nvim-mini/mini.files",
     event = { "BufReadPost", "BufNewFile" },
-    dependencies = { "echasnovski/mini.icons" },
+    dependencies = { "nvim-mini/mini.icons" },
     enabled = false,
     opts = {
       show_dotfiles = true,
@@ -110,7 +110,7 @@ M.dependencies = {
   },
 
   {
-    "echasnovski/mini.icons",
+    "nvim-mini/mini.icons",
     lazy = true,
     opts = {
       file = {
@@ -139,7 +139,7 @@ M.dependencies = {
   },
 
   {
-    "echasnovski/mini.statusline",
+    "nvim-mini/mini.statusline",
     enabled = false,
     config = function()
       require("mini.statusline").setup({ set_vim_settings = false })
@@ -147,7 +147,7 @@ M.dependencies = {
   },
 
   {
-    "echasnovski/mini.bufremove",
+    "nvim-mini/mini.bufremove",
     enabled = false,
     keys = {
       -- Smart bufremove
@@ -173,18 +173,25 @@ M.dependencies = {
     },
   },
 
-  { "echasnovski/mini.comment" },
+  { "nvim-mini/mini.comment" },
 
   {
     -- WARN: mini.pairs unexpected behavior was replaced by "windwp/nvim-autopairs"
-    "echasnovski/mini.pairs",
+    "nvim-mini/mini.pairs",
     enabled = true,
   },
 
-  { "echasnovski/mini.splitjoin" },
-  { "echasnovski/mini.operators" },
-  { "echasnovski/mini.jump" },
-  { "echasnovski/mini.clue" },
+  { "nvim-mini/mini.splitjoin" },
+  { "nvim-mini/mini.operators" },
+  { "nvim-mini/mini.jump" },
+  { "nvim-mini/mini.clue" },
+  { "nvim-mini/mini.deps" },
+  { "nvim-mini/mini.diff" },
+  { "nvim-mini/mini-git" },
+  { "nvim-mini/mini.pick" },
+  { "nvim-mini/mini.visits" },
+  { "nvim-mini/mini.sessions" },
+  { "nvim-mini/mini.basics" },
 }
 
 return M
