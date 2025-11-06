@@ -24,7 +24,8 @@ Thumbs.db
 .idea/
 
 #* custom
-zsh/.oh-my-zsh
+zsh/.oh-my-zsh/*
+!zsh/.oh-my-zsh/.git
 
 yazi/flavors
 

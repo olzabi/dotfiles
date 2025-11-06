@@ -7,17 +7,18 @@ alias quit=exit
 alias sudo='sudo '
 alias view="explorer.exe"
 alias ls='eza --color=always --icons --group-directories-first'
-alias rm='trash'
+# alias rm='trash'
 alias y='yazi'
 alias n='nvim'
 alias leet='nvim leetcode.nvim'
+alias monkey='smassh' # inspired by monkeytype
 
 # Docker
 # ---------
-alias dc='docker compose'
-alias dcb='docker compose build'
-alias dcu='docker compose up -d'
-alias dcd='docker compose down'
+# alias dc='docker compose'
+# alias dcb='docker compose build'
+# alias dcu='docker compose up -d'
+# alias dcd='docker compose down'
 
 
 #* git
@@ -31,11 +32,6 @@ alias lq='lazysql'
 # ---------
 alias clearswap="sudo swapoff -a && sudo swapon -a"
 alias dirty='watch -n1 "cat /proc/meminfo | grep Dirty"'
-
-#* nix
-# ---------
-alias nixgc="nix-collect-garbage -d"
-alias nixup="nix-channel --update && nix-env -u '*'"
 
 function meme() {
 	yt-dlp "$1" -o "/mnt/d/ayaya/%(title)s.%(ext)s"

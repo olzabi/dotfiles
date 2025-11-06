@@ -2,7 +2,7 @@
 
 #* nvim
 # ---------
-export PATH="/usr/local/bin:$PATH"
+# export PATH="/usr/local/bin:$PATH"
 
 # ---------
 if [[ -n $SSH_CONNECTION ]]; then
@@ -51,9 +51,9 @@ export PATH="$HOME/bin:/usr/local/bin:$PATH"
 #* zsh
 # ---------
 export ZSH="$DOTFILES_PATH/zsh/.oh-my-zsh"
-export ZSH_CUSTOM="$ZSH/custom"
+export ZSH_CUSTOM="$DOTFILES_PATH/zsh/custom"
 export ZSH_COMPDUMP="$XDG_CACHE_HOME/zsh/.zcomdump-$HOST"
-export PATH="$DOTFILES_PATH/zsh/git-fuzzy/bin:$PATH"
+export PATH="$ZSH_CUSTOM/plugins/git-fuzzy/bin:$PATH"
 
 # ---------
 export ANSIBLE_HOME="$XDG_CONFIG_HOME/.ansible"
@@ -164,7 +164,7 @@ PERL_MM_OPT="INSTALL_BASE=$XDG_CONFIG_HOME/perl5"; export PERL_MM_OPT;
 
 # Setup fzf
 # ---------
-export FZF_BASE=$DOTFILES_PATH/zsh/fzf
+export FZF_BASE=$DOTFILES_PATH/zsh/custom/plugins/fzf
 if [[ ! "$PATH" == *$FZF_BASE/bin* ]]; then
   PATH="${PATH:+${PATH}:}$FZF_BASE/bin"
 fi
@@ -183,3 +183,5 @@ export FZF_DEFAULT_OPTS=" \
 # ---------
 export EZA_COLORS="di=1;34:ln=36:ex=1;32"
 
+export GIT_EMAIL="olzabi14@gmail.com"
+export GIT_NAME="olzabi"
