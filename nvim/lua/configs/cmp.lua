@@ -1,74 +1,4 @@
 local M = {}
--- local function is_in_start_tag()
---   local ts_utils = require("nvim-treesitter.ts_utils")
---   local node = ts_utils.get_node_at_cursor()
---   if not node then
---     return false
---   end
---
---   local types = { "start_tag", "self_closing_tag", "directive_attribute" }
---   return vim.tbl_contains(types, node:type())
--- end
---
--- local vue_entry_filter = function(entry, ctx)
---   if ctx.filetype ~= "vue" then
---     return true
---   end
---
---   local bufnr = ctx.bufnr
---   -- Use a buffer-local cache to avoid rechecking Tree-sitter for every entry
---   local in_start_tag = vim.b[bufnr]._vue_ts_cached_is_in_start_tag
---   if in_start_tag == nil then
---     in_start_tag = is_in_start_tag()
---     vim.b[bufnr]._vue_ts_cached_is_in_start_tag = in_start_tag
---   end
---
---   -- If not in a start tag (e.g., inside script block), show everything
---   if not in_start_tag then
---     return true
---   end
---
---   local label = entry.completion_item.label
---   local text = ctx.cursor_before_line
---
---   -- Filtering for @ (events)
---   if text:sub(-1) == "@" then
---     return label:match("^@")
---   end
---
---   -- Filtering for : (props but not events)
---   if text:sub(-1) == ":" then
---     return label:match("^:") and not label:match("^:on%-")
---   end
---
---   return true
--- end
-
-local format = function(entry, vim_item)
-  local cmp_icons = require("utils.icons").cmp
-  -- Setup icons and names depending on type
-  vim_item.kind = string.format("%s %s", cmp_icons[vim_item.kind], vim_item.kind)
-  vim_item.menu = ({
-    nvim_lsp = "[LSP]",
-    luasnip = "[Snippet]",
-    buffer = "[Buffer]",
-    path = "[Path]",
-  })[entry.source.name]
-
-  -- Remove duplicates entry
-  vim_item.dup = ({
-    buffer = 0,
-    path = 0,
-    nvim_lsp = 0,
-    luasnip = 0,
-  })[entry.source.name] or 0
-
-  -- require("lspkind").cmp_format({
-  --   before = require("tailwind-tools.cmp").lspkind_format,
-  -- })
-
-  return vim_item
-end
 
 local matching = {
   disallow_fuzzy_matching = true,
@@ -78,37 +8,12 @@ local matching = {
   disallow_prefix_unmatching = true,
 }
 
-local get_bufnrs = function()
-  local bufs = {}
-  local mins = 20
-
-  for _, win in ipairs(vim.api.nvim_list_wins()) do
-    bufs[vim.api.nvim_win_get_buf(win)] = true
-  end
-
-  local recentBufs = vim
-    .iter(vim.fn.getbufinfo({ buflisted = 1 }))
-    :filter(function(buf)
-      return os.time() - buf.lastused < mins * 60
-    end)
-    :map(function(buf)
-      return buf.bufnr
-    end)
-    :totable()
-
-  for _, bufnr in ipairs(recentBufs) do
-    bufs[bufnr] = true
-  end
-
-  return vim.tbl_keys(bufs)
-end
-
 M.dependencies = {
   {
     "windwp/nvim-autopairs",
     event = "InsertEnter",
     config = true,
-    opts = {}
+    opts = {},
   },
   -- cmp sources
   { "hrsh7th/cmp-nvim-lsp-signature-help" },
@@ -145,15 +50,6 @@ M.dependencies = {
     "garymjr/nvim-snippets",
     opts = { friendly_snippets = true, create_cmp_source = true, highlight_preview = true },
   },
-  -- {
-  --   "roobert/tailwindcss-colorizer-cmp.nvim",
-  --   -- optionally, override the default options:
-  --   config = function()
-  --     require("tailwindcss-colorizer-cmp").setup({
-  --       color_square_width = 2,
-  --     })
-  --   end,
-  -- },
 }
 
 M.config = function()
@@ -174,39 +70,7 @@ M.config = function()
 
   local auto_select = true
 
-  local cmp_sorting = {
-    -- sorting = {
-    --   priority_weight = 1,
-    --   comparators = {
-    --     require("cmp-under-comparator").under,
-    --     cmp.config.compare.locality,
-    --     cmp.config.compare.offset,
-    --     cmp.config.compare.order,
-    --     cmp.config.compare.score,
-    --     cmp.config.compare.recently_used,
-    --     cmp.config.compare.exact,
-    --   },
-    -- },
-
-    priority_weight = 2,
-    comparators = {
-      function(...)
-        return require("cmp_buffer"):compare_locality(...)
-      end,
-      cmp_compare.offset,
-      cmp_compare.exact,
-      cmp_compare.score,
-      cmp_compare.sort_text,
-      cmp_compare.recently_used,
-      require("cmp-under-comparator").under,
-      -- compare.locality,
-      cmp_compare.kind,
-      cmp_compare.length,
-      cmp_compare.order,
-    },
-    matching = matching,
-  }
-  local cmp_sources = cmp.config.sources({
+  local sources = cmp.config.sources({
     { name = "lazydev", group_index = 0 },
     {
       name = "nvim_lsp",
@@ -216,15 +80,39 @@ M.config = function()
     { name = "luasnip", priority = 6 },
     { name = "path", priority = 3 },
     { name = "treesitter" },
+    { name = "laravel" },
     { name = "render-markdown" },
     { name = "vim-dadbod-completion", priority = 1 },
     { name = "nvim_lsp_signature_help" },
-  }, {
+    { name = "nvim_lsp" },
     {
       name = "buffer",
       priority = 8,
       option = {
-        get_bufnrs = get_bufnrs,
+        get_bufnrs = function()
+          local bufs = {}
+          local mins = 20
+
+          for _, win in ipairs(vim.api.nvim_list_wins()) do
+            bufs[vim.api.nvim_win_get_buf(win)] = true
+          end
+
+          local recentBufs = vim
+            .iter(vim.fn.getbufinfo({ buflisted = 1 }))
+            :filter(function(buf)
+              return os.time() - buf.lastused < mins * 60
+            end)
+            :map(function(buf)
+              return buf.bufnr
+            end)
+            :totable()
+
+          for _, bufnr in ipairs(recentBufs) do
+            bufs[bufnr] = true
+          end
+
+          return vim.tbl_keys(bufs)
+        end,
         max_item_count = 4,
         max_indexed_line_length = 100,
       },
@@ -249,7 +137,31 @@ M.config = function()
         cmp.ItemField.Kind,
         cmp.ItemField.Menu,
       },
-      format = format,
+      format = function(entry, vim_item)
+        local cmp_icons = require("utils.icons").cmp
+        -- Setup icons and names depending on type
+        vim_item.kind = string.format("%s %s", cmp_icons[vim_item.kind], vim_item.kind)
+        vim_item.menu = ({
+          nvim_lsp = "[LSP]",
+          luasnip = "[Snippet]",
+          buffer = "[Buffer]",
+          path = "[Path]",
+        })[entry.source.name]
+
+        -- Remove duplicates entry
+        vim_item.dup = ({
+          buffer = 0,
+          path = 0,
+          nvim_lsp = 0,
+          luasnip = 0,
+        })[entry.source.name] or 0
+
+        -- require("lspkind").cmp_format({
+        --   before = require("tailwind-tools.cmp").lspkind_format,
+        -- })
+
+        return vim_item
+      end,
     },
     performance = {
       filtering_context_budget = 3,
@@ -262,9 +174,27 @@ M.config = function()
     },
     preselect = auto_select and cmp.PreselectMode.Item or cmp.PreselectMode.none,
     completion = { completeopt = "menu,menuone,noinsert" .. (auto_select and "" or ",noselect") },
-    sorting = cmp_sorting,
+    sorting = {
+      priority_weight = 2,
+      comparators = {
+        function(...)
+          return require("cmp_buffer"):compare_locality(...)
+        end,
+        cmp_compare.offset,
+        cmp_compare.exact,
+        cmp_compare.score,
+        cmp_compare.sort_text,
+        cmp_compare.recently_used,
+        require("cmp-under-comparator").under,
+        -- compare.locality,
+        cmp_compare.kind,
+        cmp_compare.length,
+        cmp_compare.order,
+      },
+      matching = matching,
+    },
     mapping = cmp.mapping.preset.insert(require("keymaps").cmp_mapping()),
-    sources = cmp_sources,
+    sources = sources,
     experimental = {
       ghost_text = true,
     },
@@ -311,14 +241,6 @@ M.config = function()
     },
     matching = matching,
   })
-
-  -- cmp.setup.cmdline("/", {
-  --   sources = cmp.config.sources({
-  --     { name = "nvim_lsp_document_symbol" },
-  --   }, {
-  --     { name = "buffer" },
-  --   }),
-  -- })
 
   vim.api.nvim_create_autocmd("BufRead", {
     desc = "Setup cmp buffer crates source",

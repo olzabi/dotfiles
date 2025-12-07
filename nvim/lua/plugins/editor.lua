@@ -57,6 +57,7 @@ return {
 
   {
     "rachartier/tiny-code-action.nvim",
+    enabled = false,
     event = "LspAttach",
     keymaps = {
       {
@@ -152,6 +153,9 @@ return {
     "MagicDuck/grug-far.nvim",
     opts = { headerMaxWidth = 80 },
     keys = require("keymaps").grug_far,
+    config = function ()
+      require('grug-far').setup()
+    end
   },
 
   {

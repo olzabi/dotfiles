@@ -10,6 +10,7 @@ alias ls='eza --color=always --icons --group-directories-first'
 # alias rm='trash'
 alias y='yazi'
 alias n='nvim'
+alias zw='zellij --layout config.kdl'
 alias leet='nvim leetcode.nvim'
 alias monkey='smassh' # inspired by monkeytype
 
@@ -142,3 +143,21 @@ kill_port() {
 	echo "Killing process $PID on port $PORT..."
 	kill -9 $PID && echo "Killed."
 }
+
+# Laravel
+# ---------
+# artisan() {
+#   if [ -f bin/artisan ]; then
+#     php bin/artisan "$@"
+#   else
+#     php artisan "$@"
+#   fi
+# }
+
+alias serve="artisan serve"
+alias tinker="artisan tinker"
+alias cu='composer update'
+alias ci='composer install'
+
+
+

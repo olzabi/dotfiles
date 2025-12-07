@@ -68,10 +68,6 @@ return {
       },
     },
 
-    -- config = function()
-    --   -- code actions on ..
-    --   vim.keymap.set({ "v", "n" }, "..", require("actions-preview").code_actions)
-    -- end,
     keys = {
       {
         "..",

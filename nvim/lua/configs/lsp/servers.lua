@@ -1,22 +1,6 @@
 local M = {}
 
 M.servers = {
-  angularls = {},
-  eslint = { settings = { packageManager = "npm" } },
-  emmet_ls = { filetypes = { "css", "sass", "scss" } },
-  svelte = {},
-
-  taplo = {}, -- toml
-  sqlls = {},
-
-  rust_analyzer = { filetypes = { "rust" } },
-  pyright = {
-    filetypes = "python",
-    settings = { python = { pythonPath = require("utils").get_python_path() } },
-  },
-  prismals = {},
-  graphql = {},
-  docker_compose_language_service = {},
 }
 
 M.setup_servers = function(capabilities, on_attach)
@@ -38,24 +22,34 @@ M.setup_servers = function(capabilities, on_attach)
 
   -- nvim version 0.11
   vim.lsp.enable({
-    "vtsls",
-    "vue_ls",
-    "lua_ls",
-    "intelephense",
-    "nginx_language_server",
+    "angular",
+    "ansible",
+    "bash",
     "cmake",
     "clangd",
-    "json",
-    "yaml",
-    "go",
-    "html",
-    "terraform",
-    "ansible",
     "css",
-    "bash",
+    "docker",
+    "docker_compose_ls",
+    "eslint",
+    "emmet_ls",
+    "gopls",
+    "graphql",
+    "html",
+    "intelephense",
+    "json",
+    "lua_ls",
+    "nginx_language_server",
+    "pyright",
+    "rust_analyzer",
     "svelte",
+    "sqls",
+    "terraformls",
+    "toml",
+    "vtsls",
+    "vue_ls",
+    "yaml",
   })
-  vim.lsp.enable(M.servers)
+  -- vim.lsp.enable(M.servers)
 
   local lsp_pkg = require("utils.packages").lsp
   vim.lsp.enable(lsp_pkg)

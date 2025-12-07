@@ -185,3 +185,5 @@ export EZA_COLORS="di=1;34:ln=36:ex=1;32"
 
 export GIT_EMAIL="olzabi14@gmail.com"
 export GIT_NAME="olzabi"
+
+export ZELLIJ_CONFIG_DIR="$DOTFILES_PATH/zellij"

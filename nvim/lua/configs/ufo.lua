@@ -47,11 +47,9 @@ M.config = function()
     dynamicRegistration = false,
     lineFoldingOnly = true,
   }
-  for _, ls in ipairs(require("configs.lsp.servers")) do
-    require("lspconfig")[ls].setup({
-      capabilities = capabilities,
-    })
-  end
+  vim.lsp.config('*', {
+    capabilities = capabilities,
+  })
 
   local ufo = require("ufo")
   ufo.setup({

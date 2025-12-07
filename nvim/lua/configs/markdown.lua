@@ -37,11 +37,11 @@ M.opts = {
   },
   html = { enabled = true,  },
   -- css = { enabled = true },
-  file_types = { "markdown", "FzfPreview" },
+  file_types = { "markdown", "FzfPreview", "Avante" },
 }
 
 M.dependencies = {
-  "echasnovski/mini.nvim",
+  "nvim-mini/mini.nvim",
   "nvim-tree/nvim-web-devicons",
   { "3rd/image.nvim", lazy = true, opts = {} },
   -- { "OXY2DEV/markview.nvim", priority = 1000},

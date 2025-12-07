@@ -19,3 +19,6 @@
 [submodule "zsh/custom/plugins/fzf"]
 	path = zsh/custom/plugins/fzf
 	url = https://github.com/junegunn/fzf.git
+[submodule "zsh/custom/plugins/artisan"]
+	path = zsh/custom/plugins/artisan
+	url = https://github.com/jessarcher/zsh-artisan.git

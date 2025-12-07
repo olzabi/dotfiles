@@ -17,10 +17,14 @@ zstyle ':omz:plugins:nvm' autoload yes
 
 plugins=(
 	aws
+	artisan
+	composer
 	branch
 	docker
 	docker-compose
+	direnv
 	encode64
+	eza
 	sudo
 	fzf
 	fzf-tab
@@ -63,7 +67,6 @@ plugins=(
 	laravel
 	jsontools
 	golang
-
 )
 
 export RUSTFLAGS="-C opt-level=3 -C target-cpu=native" # Rust app build optimization

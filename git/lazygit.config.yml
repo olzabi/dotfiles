@@ -14,6 +14,8 @@ git:
   commit:
     autoWrapCommitMessage: true
     autoWrapWidth: 80
+  push:
+    force: true
 update:
   method: never
 gui:

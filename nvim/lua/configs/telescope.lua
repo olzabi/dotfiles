@@ -2,21 +2,33 @@ local M = {}
 
 local defaults = {
   -- color_devicons = true,
-  -- file_ignore_patterns = {
-  --   "node_modules/",
-  --   ".git/",
-  --   "dist/",
-  --   "build/",
-  --   "package-lock.json",
-  --   "yarn.lock",
-  --   "bun.lockb",
-  --   ".*_virt/.*",
-  --   ".*__pycache__/.*",
-  --   "*env*",
-  --   ".venv",
-  --   "*undo*",
-  --   ".cache",
-  -- },
+  file_ignore_patterns = {
+    "vendor/",
+    "%.blade.php",
+    "node_modules/",
+    "package-lock.json",
+    "yarn.lock",
+    "bun.lockb",
+    -- ".git/",
+    -- "dist/",
+    -- "build/",
+    -- ".*_virt/.*",
+    -- ".*__pycache__/.*",
+    -- "*env*",
+    -- ".venv",
+    -- "*undo*",
+    -- ".cache",
+  },
+  pickers = {
+    find_files = {
+      no_ignore = false,
+    }
+  },
+  live_grep = {
+    additional_args = function (opts)
+      return { "hidden" }
+    end
+  }
   -- path_display = {
   --   "smart",
   --   -- filename_first = {
