@@ -33,20 +33,34 @@ return {
       "hrsh7th/nvim-cmp",
     },
     ft = { "blade", "php" },
+    opts = {
+      close_tag_on_complete = true,
+    },
   },
 
   {
     "adalessa/laravel.nvim",
     lazy = false,
+    event = { "VeryLazy" },
     cmd = { "Laravel", "Artisan", "Composer", "Sail", "Npm", "Yarn" },
+    filetypes = { "blade", "php" },
     dependencies = {
       "tpope/vim-dotenv",
       "MunifTanjim/nui.nvim",
       "kevinhwang91/promise-async",
+      "nvim-neotest/nvim-nio",
     },
-    config = function(_, opts)
-      require("laravel").setup(opts)
-    end,
+    opts = {
+      lsp_server = "intelephense",
+      features = {
+        pickers = {
+          provider = "snacks", -- "snacks | telescope | fzf-lua | ui-select"
+        },
+      },
+      extensions = {
+        override = false,
+      }
+    },
     keys = require("keymaps").laravel,
   },
 

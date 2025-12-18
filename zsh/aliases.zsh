@@ -10,7 +10,7 @@ alias ls='eza --color=always --icons --group-directories-first'
 # alias rm='trash'
 alias y='yazi'
 alias n='nvim'
-alias zw='zellij --layout config.kdl'
+alias zw='zellij --layout layout.kdl'
 alias leet='nvim leetcode.nvim'
 alias monkey='smassh' # inspired by monkeytype
 

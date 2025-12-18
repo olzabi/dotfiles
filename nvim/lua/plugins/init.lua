@@ -31,6 +31,7 @@ return {
 
   {
     "3rd/image.nvim",
+    dependencies = { "luarocks.nvim" },
     enabled = true,
     config = require("configs.image"),
   },

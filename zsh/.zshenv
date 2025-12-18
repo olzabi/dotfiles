@@ -89,8 +89,8 @@ export PATH="$PATH:$GOROOT/bin:$GOPATH/bin"
 # ---------
 export RUSTUP_HOME="$XDG_CONFIG_HOME/.rustup"
 export CARGO_HOME="$XDG_CONFIG_HOME/.cargo"
-export RUST_SRC_PATH="$(rustc --print sysroot)/lib/rustlib/src/rust/src"
 export PATH="$CARGO_HOME/bin:$PATH"
+export RUST_SRC_PATH="$(rustc --print sysroot)/lib/rustlib/src/rust/src"
 [ -f "$CARGO_HOME/env" ] && source "$CARGO_HOME/env"
 
 #* aws

@@ -112,7 +112,6 @@ M.formatters = {
 
 M.lsp_packages = {
   "eslint_d@13.1.2",
-  -- linter
   "ansible-lint",
   "cmakelint",
   "cspell",
@@ -125,8 +124,6 @@ M.lsp_packages = {
   "pydocstyle",
   "pylint",
   "clangd",
-
-  -- formatters
   "markdownlint-cli2",
   "markdown-toc",
   "jq",
@@ -145,7 +142,6 @@ M.lsp_packages = {
   "phpcs",
   "phpstan",
   "pint",
-  --
   "ast-grep",
   "buf",
   "cmakelang",
@@ -154,7 +150,7 @@ M.lsp_packages = {
   "vue_ls",
   "vtsls",
   "html-lsp",
-  -- "tailwindcss-language-server",
+  "tailwindcss-language-server",
   "intelephense",
   "delve",
   "shellcheck",
@@ -208,5 +204,44 @@ M.treesitter = {
   "fish",
   "diff",
 }
+
+M.mason_tools = {
+  "eslint_d@13.1.2",
+  "ansible-lint",
+  "cmakelint",
+  "cspell",
+  "clang-format",
+  "yamllint",
+  "jsonlint",
+  "gitleaks",
+  "tflint",
+  "ruff",
+  "pydocstyle",
+  "pylint",
+  "markdownlint-cli2",
+  "markdown-toc",
+  "jq",
+  "goimports",
+  "golines",
+  "gofumpt",
+  "sqlfmt",
+  "sql-formatter",
+  "stylua",
+  "shfmt",
+  "prettier",
+  "prettierd",
+  "blade-formatter",
+  "php-cs-fixer",
+  "phpcs",
+  "phpstan",
+  "pint",
+  "ast-grep",
+  "buf",
+  "cmakelang",
+  "php-debug-adapter",
+  "delve",
+  "shellcheck",
+}
+
 
 return M

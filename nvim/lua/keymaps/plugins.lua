@@ -4,10 +4,97 @@ local nmap = require("keymaps.utils").nmap
 -- PHP
 -------------
 M.laravel = {
-  { ";La", "<cmd>Laravel artisan<cr>", desc = "Laravel - Artisan" },
-  { ";Lr", "<cmd>Laravel routes<cr>", desc = "Laravel - Routes" },
+  -- { ";La", "<cmd>Laravel artisan<cr>", desc = "Laravel - Artisan" },
+  -- { ";Lr", "<cmd>Laravel routes<cr>", desc = "Laravel - Routes" },
   { ";Li", "<cmd>Laravel install<cr>", desc = "Laravel Install" },
   { ";LR", "<cmd>Laravel related<cr>", desc = "Laravel - Related" },
+
+  {
+    ";Ll",
+    function()
+      Laravel.pickers.laravel()
+    end,
+    desc = "Laravel: Open Laravel Picker",
+  },
+  {
+    "<c-g>",
+    function()
+      Laravel.commands.run("view:finder")
+    end,
+    desc = "Laravel: Open View Finder",
+  },
+  {
+    ";La",
+    function()
+      Laravel.pickers.artisan()
+    end,
+    desc = "Laravel: Artisan",
+  },
+  {
+    ";Lt",
+    function()
+      Laravel.commands.run("actions")
+    end,
+    desc = "Laravel: Actions",
+  },
+  {
+    ";Lr",
+    function()
+      Laravel.pickers.routes()
+    end,
+    desc = "Laravel: Routes",
+  },
+  {
+    ";Lh",
+    function()
+      Laravel.run("artisan docs")
+    end,
+    desc = "Laravel: Documentation",
+  },
+  {
+    ";Lm",
+    function()
+      Laravel.pickers.make()
+    end,
+    desc = "Laravel: Make",
+  },
+  {
+    ";Lc",
+    function()
+      Laravel.pickers.commands()
+    end,
+    desc = "Laravel: Commands",
+  },
+  {
+    ";Lo",
+    function()
+      Laravel.pickers.resources()
+    end,
+    desc = "Laravel: Resources",
+  },
+  {
+    ";Lp",
+    function()
+      Laravel.commands.run("command_center")
+    end,
+    desc = "Laravel: Command Center",
+  },
+  -- {
+  --   "gf",
+  --   function()
+  --     local ok, res = pcall(function()
+  --       if Laravel.app("gf").cursorOnResource() then
+  --         return "<cmd>lua Laravel.commands.run('gf')<cr>"
+  --       end
+  --     end)
+  --     if not ok or not res then
+  --       return "gf"
+  --     end
+  --     return res
+  --   end,
+  --   expr = true,
+  --   noremap = true,
+  -- },
 }
 
 M.phptools_ide_helper_mapping = function()

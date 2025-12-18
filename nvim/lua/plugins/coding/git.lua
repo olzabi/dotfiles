@@ -51,9 +51,14 @@ return {
   {
     -- this -> mini
     "lewis6991/gitsigns.nvim",
-    enabled = false,
+    enabled = true,
     event = { "CursorHold", "CursorHoldI" },
-    config = true,
+    config = function ()
+      require("gitsigns").setup({
+        numhl = true
+      })
+
+    end,
     keys = require("keymaps").gitsigns,
   },
 

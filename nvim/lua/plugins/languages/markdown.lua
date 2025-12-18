@@ -12,6 +12,7 @@ local obisidan_workspaces = {
 return {
   {
     "epwalsh/obsidian.nvim",
+    enabled = false,
     opts = {
       ui = { enable = false },
       workspaces = obisidan_workspaces,
