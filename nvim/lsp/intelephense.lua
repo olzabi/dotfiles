@@ -1,14 +1,5 @@
--- local status_ok, _ = pcall(require, "lspconfig")
--- if not status_ok then
--- 	return
--- end
-
-local on_attach = require("configs.lsp.on_attach")
--- local capabilities = require("lsp.capabilities")
 
 return {
-  on_attach = on_attach,
-
   capabilities = {
     textDocument = {
       codeLens = {

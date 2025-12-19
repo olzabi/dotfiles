@@ -255,19 +255,23 @@ M.setup = function()
 end
 
 M.mason = function()
-  local mason_lspconfig = require("mason-lspconfig")
   local mason = require("mason")
-  local server_list = require("utils.packages").lsp
+  local server_list = require("utils.packages").lsp_packages
+
   mason.setup({
-    registries = { "github:crashdummyy/mason-registry", "github:mason-org/mason-registry" },
+    registries = {
+      "github:crashdummyy/mason-registry",
+      "github:mason-org/mason-registry",
+    },
   })
 
-  mason_lspconfig.setup({
-    automatic_enable = false,
-    automatic_installation = true,
-    ensure_installed = vim.tbl_keys(server_list),
-    handlers = server_list,
-  })
+  local registry = require("mason-registry")
+  for _, server_name in ipairs(server_list) do
+    local ok, pkg = pcall(registry.get_package, server_name)
+    if ok and not pkg:is_installed() then
+      pkg:install()
+    end
+  end
 end
 
 return M

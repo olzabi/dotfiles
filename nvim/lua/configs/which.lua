@@ -15,6 +15,7 @@ M.config = function()
     { "<leader>f", group = "Find" },
     { "<leader>s", group = "Search" },
     { "<leader>n", group = "Notifications" },
+    { "<leader>ms", group = "MiniSessions" },
 
     { "<leader>u", group = "UI" },
     { "<leader>uG", group = "Git" },

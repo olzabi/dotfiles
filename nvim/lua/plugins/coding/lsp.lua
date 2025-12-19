@@ -9,20 +9,14 @@ return {
     build = ":MasonUpdate",
     cmd = { "Mason", "MasonInstall" },
     lazy = false,
-    dependencies = {
-      {
-        -- NOTE: can be removed after moving to native lsp setup  >v0.11
-        "williamboman/mason-lspconfig.nvim",
-        lazy = false,
-        config = function()
-          require("configs.lsp").mason()
-        end,
-      },
-    },
     opts = {
       ensure_installed = require("utils.packages").lsp_packages,
       ui = { border = "single" },
     },
+    config = function()
+      require("mason").setup(opts)
+      require("configs.lsp").mason()
+    end,
   },
 
   {
