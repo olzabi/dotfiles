@@ -24,6 +24,7 @@ M.dependencies = {
   -- "hrsh7th/cmp-vsnip",
   -- "hrsh7th/vim-vsnip",
   {
+    -- NOTE: can be removed after moving to native lsp setup  >v0.11
     "hrsh7th/cmp-nvim-lsp",
     event = { "BufReadPre", "BufNewFile" },
     lazy = false,

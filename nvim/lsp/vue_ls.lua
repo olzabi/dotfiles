@@ -1,6 +1,3 @@
-local on_attach = require("configs.lsp.on_attach")
-local capabilities = require("configs.lsp.capabilities")
-
 local tsdk_path = vim.fn.stdpath("data") .. "/mason/packages/typescript-language-server/node_modules/typescript/lib"
 local tsdk = { tsdk = tsdk_path }
 
@@ -42,6 +39,4 @@ return {
     -- NOTE: typescript disabled
     -- typescript = { tsdk = tsdk_path },
   },
-  on_attach = on_attach,
-  capabilities = capabilities,
 }

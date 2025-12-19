@@ -1,6 +1,3 @@
-local capabilities = require("configs.lsp.capabilities")
-local on_attach = require("configs.lsp.on_attach")
-
 --- https://github.com/regen100/cmake-language-server
 ---
 return {
@@ -10,6 +7,4 @@ return {
   init_options = {
     buildDirectory = "build",
   },
-  capabilities = capabilities,
-  on_attach = on_attach,
 } --[[@as vim.lsp.Config]]

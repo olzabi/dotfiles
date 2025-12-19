@@ -1,3 +1,7 @@
+-- diagnostic
+-- cmp icons
+-- cmp capabilities, on_attach
+
 return {
 
   {
@@ -7,10 +11,11 @@ return {
     lazy = false,
     dependencies = {
       {
+        -- NOTE: can be removed after moving to native lsp setup  >v0.11
         "williamboman/mason-lspconfig.nvim",
         lazy = false,
         config = function()
-          require("configs.lsp").mason_setup()
+          require("configs.lsp").mason()
         end,
       },
     },
@@ -21,6 +26,7 @@ return {
   },
 
   {
+    -- NOTE: can be removed after moving to native lsp setup  >v0.11
     "hrsh7th/nvim-cmp",
     event = { "InsertEnter", "CmdlineEnter" },
     dependencies = require("configs.cmp").dependencies,
@@ -77,4 +83,6 @@ return {
       },
     },
   },
+
+  { "artemave/workspace-diagnostics.nvim" },
 }

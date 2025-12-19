@@ -1,5 +1,4 @@
-local capabilities = require("configs.lsp.capabilities")
-local on_attach = require("configs.lsp.on_attach")
+local lsp = require("configs.lsp")
 local opts = {
   filetypes = {
     "javascript",
@@ -27,8 +26,8 @@ local opts = {
     publish_diagnostic_on = "insert_leave",
     composite_mode = 'separate_diagnostic',
   },
-  capabilities = capabilities,
-  on_attach = on_attach,
+  capabilities = lsp.capabilities,
+  on_attach = lsp.on_attach,
 }
 
 return {

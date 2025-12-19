@@ -2,7 +2,8 @@
 return {
   cmd = { "gopls" },
   filetypes = { "go", "gomod", "go.sum", "gowork", "gotmpl" },
-  root_markers = { "go", ".git" },
+  root_markers = { ".git", "go.mod", "go.work", vim.uv.cwd() },
+
   single_file_support = true,
   settings = {
     telemetry = false,
@@ -35,7 +36,11 @@ return {
         rangeVariableTypes = true,
       },
     },
+    ["ui.inlayhint.hints"] = {
+      compositeLiteralFields = true,
+      constantValues = true,
+      parameterNames = true,
+      rangeVariableTypes = true,
+    },
   },
-  on_attach = require("configs.lsp.on_attach"),
-  capabilities = require("configs.lsp.capabilities"),
 }

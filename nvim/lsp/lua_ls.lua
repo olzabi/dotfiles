@@ -1,6 +1,3 @@
-local on_attach = require("configs.lsp.on_attach")
-local capabilities = require("configs.lsp.capabilities")
-
 local lua_runtime_path = vim.split(package.path, ";")
 table.insert(lua_runtime_path, "lua/?.lua")
 table.insert(lua_runtime_path, "lua/?/init.lua")
@@ -51,7 +48,4 @@ return {
       },
     },
   },
-
-  on_attach = on_attach,
-  capabilities = capabilities,
 }
