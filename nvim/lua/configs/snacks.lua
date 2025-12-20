@@ -45,7 +45,11 @@ M.opts = {
   profiler = { enabled = false },
   quickfile = { enabled = false },
 
-  bigfile = { enabled = true },
+  bigfile = {
+    enabled = true,
+    notify = false,
+    size = 1.5 * 1024 * 1024,
+  },
   indent = { enabled = true },
   input = { enabled = true },
   scratch = { enabled = true },

@@ -19,13 +19,12 @@ local highlight_disable = function(lang, buf)
 end
 
 local opts = {
+  auto_tag = { enable = true },
   ensure_installed = require("utils.packages").treesitter,
-  modules = {},
   sync_install = false,
   auto_install = true,
   indent = { enable = true },
   highlight = {
-    -- `false` will disable the whole extension
     enable = true,
     disable = highlight_disable,
     keymaps = {
@@ -33,7 +32,12 @@ local opts = {
       node_incremental = "<C-space>",
       scope_incremental = false,
     },
-    additional_vim_regex_highlighting = { "markdown" },
+    additional_vim_regex_highlighting = false,
+  },
+  query_linter = {
+    enable = true,
+    use_virtual_text = true,
+    lint_events = { "BufWrite", "CursorHold" },
   },
   textobjects = {
     select = {

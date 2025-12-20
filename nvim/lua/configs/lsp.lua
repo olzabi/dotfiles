@@ -167,7 +167,7 @@ M.setup = function()
       end
 
       vim.api.nvim_create_autocmd("BufWritePre", {
-        buffer = args.buf,
+        buffer = buf,
         callback = function()
           -- if client:supports_method("textDocument/formatting") then
           --   vim.lsp.buf.format({ bufnr = args.buf, id = client.id })
@@ -191,24 +191,20 @@ M.setup = function()
 
       ---@diagnostic disable-next-line need-check-nil
       if client.server_capabilities.completionProvider then
-        vim.bo[bufnr].omnifunc = "v:lua.vim.lsp.omnifunc"
-        -- vim.bo[bufnr].omnifunc = "v:lua.MiniCompletion.completefunc_lsp"
+        vim.bo[buf].omnifunc = "v:lua.vim.lsp.omnifunc"
       end
       ---@diagnostic disable-next-line need-check-nil
       if client.server_capabilities.definitionProvider then
-        vim.bo[bufnr].tagfunc = "v:lua.vim.lsp.tagfunc"
+        vim.bo[buf].tagfunc = "v:lua.vim.lsp.tagfunc"
       end
 
-      local bufopts = { noremap = true, silent = true, buffer = event.buf }
+      local bufopts = { noremap = true, silent = true, buffer = buf }
       vim.keymap.set("n", "<Leader>gi", "<cmd>Telescope lsp_implementations<CR>", bufopts)
       vim.keymap.set("n", "<Leader>gd", "<cmd>Telescope lsp_definitions<CR>", bufopts)
       vim.keymap.set("n", "<Leader>gr", "<cmd>Telescope lsp_references<CR>", bufopts)
       vim.keymap.set("n", "<Leader>es", "<cmd>Telescope diagnostics bufnr=0<CR>", bufopts)
-      vim.keymap.set("n", "<Leader>gD", buf.declaration, bufopts)
-      -- vim.keymap.set("n", "<leader>rn", buf.rename, bufopts)
+      vim.keymap.set("n", "<Leader>gD", vim.lsp.buf.declaration, bufopts)
       vim.keymap.set("n", "<leader>rs", "<cmd>LspRestart<CR>", bufopts)
-      -- vim.keymap.set("n", "[d", vim.diagnostic.goto_prev)
-      -- vim.keymap.set("n", "]d", vim.diagnostic.goto_next)
       vim.keymap.set("n", "<Leader>ee", function()
         vim.diagnostic.open_float(nil, { scope = "line" })
       end, bufopts)
@@ -216,7 +212,7 @@ M.setup = function()
   })
 
   vim.lsp.config("*", {
-    capabilities = M.capabilities,
+    capabilities = M.capabilities(),
     on_attach = M.on_attach,
   })
 

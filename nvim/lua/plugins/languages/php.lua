@@ -57,9 +57,6 @@ return {
           provider = "snacks", -- "snacks | telescope | fzf-lua | ui-select"
         },
       },
-      extensions = {
-        override = false,
-      }
     },
     keys = require("keymaps").laravel,
   },
