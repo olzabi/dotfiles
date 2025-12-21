@@ -4,10 +4,8 @@ local tsdk = { tsdk = tsdk_path }
 return {
   cmd = { "vue-language-server", "--stdio" },
   filetypes = { "vue" },
-  root_markers = { "package.json", ".git", "javascript" },
-  init_options = {
-    typescript = tsdk,
-  },
+  root_markers = { "package.json" },
+  init_options = { typescript = tsdk },
   -- vue3
   on_init = function(client)
     client.handlers["tsserver/request"] = function(_, result, context)
@@ -35,7 +33,10 @@ return {
     end
   end,
   settings = {
-    vue = { format = { enable = true }, hybridMode = false },
+    vue = {
+      format = { enable = true },
+      hybridMode = false,
+    },
     -- NOTE: typescript disabled
     -- typescript = { tsdk = tsdk_path },
   },

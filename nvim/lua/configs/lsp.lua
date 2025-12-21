@@ -244,6 +244,7 @@ M.setup = function()
     "vtsls",
     "vue_ls",
     "yaml",
+    "laravel_ls",
   })
 
   local lsp_pkg = require("utils.packages").lsp
@@ -252,7 +253,7 @@ end
 
 M.mason = function()
   local mason = require("mason")
-  local server_list = require("utils.packages").lsp_packages
+  local mason_tools = require("utils.packages").mason_tools
 
   mason.setup({
     registries = {
@@ -262,7 +263,7 @@ M.mason = function()
   })
 
   local registry = require("mason-registry")
-  for _, server_name in ipairs(server_list) do
+  for _, server_name in ipairs(mason_tools) do
     local ok, pkg = pcall(registry.get_package, server_name)
     if ok and not pkg:is_installed() then
       pkg:install()

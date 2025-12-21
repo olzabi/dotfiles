@@ -15,12 +15,14 @@ local globalPlugins = { vue_plugin }
 -- ---@class vim.lsp.ClientConfig
 return {
   cmd = { "vtsls", "--stdio" },
-  -- NOTE: jsx, tsx turned off, might be unappropriate
   filetypes = {
-    -- "vue",
+    "vue",
     "typescriptreact",
     "typescript",
     "javascript",
+    "javascriptreact",
+    "html",
+    "templ",
   },
   root_markers = { "tsconfig.json", "package.json", "jsconfig.json", ".git" },
   settings = {

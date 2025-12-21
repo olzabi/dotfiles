@@ -43,12 +43,16 @@ return {
     lazy = false,
     event = { "VeryLazy" },
     cmd = { "Laravel", "Artisan", "Composer", "Sail", "Npm", "Yarn" },
-    filetypes = { "blade", "php" },
+    ft = { "blade", "php" },
+    cond = function()
+      return vim.fn.filereadable(vim.fn.getcwd() .. "/artisan") == 1
+    end,
     dependencies = {
       "tpope/vim-dotenv",
       "MunifTanjim/nui.nvim",
       "kevinhwang91/promise-async",
       "nvim-neotest/nvim-nio",
+      "hrsh7th/nvim-cmp",
     },
     opts = {
       lsp_server = "intelephense",
@@ -56,8 +60,42 @@ return {
         pickers = {
           provider = "snacks", -- "snacks | telescope | fzf-lua | ui-select"
         },
+        route_info = {
+          enable = true,
+          position = "top",
+        },
+      },
+      register = {
+        views = false,
+        configs = true,
+        model_field_completion = true,
+        routes = true,
       },
     },
+    config = function(_, opts)
+      require("laravel").setup(opts)
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = { "php", "blade" },
+        callback = function()
+          vim.lsp.start({
+            name = "laravel-ls",
+
+            -- if laravel ls is in your $PATH
+            cmd = { "laravel-ls" },
+
+            -- Absolute path
+            -- cmd = { '/path/to/laravel-ls/build/laravel-ls' },
+
+            -- if you want to recompile everytime
+            -- the language server is started.
+            -- cmd = { '/path/to/laravel-ls/start.sh' },
+
+            root_dir = vim.fn.getcwd(),
+          })
+        end,
+      })
+    end,
+
     keys = require("keymaps").laravel,
   },
 
@@ -74,10 +112,10 @@ return {
 
   "barryvdh/laravel-ide-helper",
 
-  -- {
-  --   "phpactor/phpactor",
-  --   build = "composer install --no-dev --optimize-autoloader",
-  --   ft = "php",
-  --   keys = require("keymaps").phpactor,
-  -- },
+  {
+    "phpactor/phpactor",
+    build = "composer install --no-dev --optimize-autoloader",
+    ft = "php",
+    keys = require("keymaps").phpactor,
+  },
 }

@@ -236,6 +236,10 @@ M.mason_tools = {
   "php-debug-adapter",
   "delve",
   "shellcheck",
+  "yamlfmt",
+  "yamlls",
+  "gitlab-ci-ls",
+  "phpactor",
 }
 
 
