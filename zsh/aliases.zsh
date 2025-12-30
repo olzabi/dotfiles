@@ -98,25 +98,20 @@ gtrm() {
 #* yazi
 # ---------
 function y() {
-	if [ -n "$YAZI_LEVEL" ]; then
-		exit
-	fi
-
 	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
 	yazi "$@" --cwd-file="$tmp"
-	if cwd="$(command bat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
-		builtin cd -- "$cwd"
-	fi
+	IFS= read -r -d '' cwd < "$tmp"
+	[ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
 	rm -f -- "$tmp"
 }
 
-# Change Yazi's CWD to PWD on subshell exit
-if [[ -n "$YAZI_ID" ]]; then
-	function _yazi_cd() {
-		ya emit cd "$PWD"
-	}
-	add-zsh-hook zshexit _yazi_cd
-fi
+# # Change Yazi's CWD to PWD on subshell exit
+# if [[ -n "$YAZI_ID" ]]; then
+# 	function _yazi_cd() {
+# 		ya emit cd "$PWD"
+# 	}
+# 	add-zsh-hook zshexit _yazi_cd
+# fi
 
 function note() {
 	if [[ -z $1 ]]; then

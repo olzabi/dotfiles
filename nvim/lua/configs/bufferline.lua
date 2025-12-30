@@ -5,10 +5,10 @@ local opts = {
     themable = true,
     hover = { enabled = true, reveal = { "close" }, delay = 50 },
     offsets = {
-      { filetype = "NvimTree", text = "File Explorer", highlight = "Directory", text_align = "left" },
-      { filetype = "NvimTree", highlight = "NvimTreeNormal" },
+      -- { filetype = "NvimTree", text = "File Explorer", highlight = "Directory", text_align = "left" },
+      -- { filetype = "NvimTree", highlight = "NvimTreeNormal" },
       { filetype = "Outline", text = "Symbols Outline", highlight = "TSType", text_align = "left" },
-      { filetype = "neo-tree", text = "Explorer", highlight = "Directory", text_align = "center", separator = true },
+      -- { filetype = "neo-tree", text = "Explorer", highlight = "Directory", text_align = "center", separator = true },
       { filetype = "dbui", text = "Database Manager", text_align = "center", separator = true },
     },
 

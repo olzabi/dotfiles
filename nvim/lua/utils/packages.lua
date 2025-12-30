@@ -11,9 +11,7 @@ M.lazy_dev_libs = {
 
 M.lsp = {
   "vtsls",
-  "vue_ls",
   "lua_ls",
-  "postgres_lsp",
   "svelte",
   "ruff",
   "prismals",
@@ -41,8 +39,6 @@ M.lsp = {
   "pyright",
   "rust_analyzer",
   "somesass_ls",
-  "sqlls",
-  "sqls",
   "tailwindcss",
   "taplo",
   "terraformls",
@@ -50,6 +46,15 @@ M.lsp = {
   "vimls",
   "yamlls",
   "zls",
+  "angular",
+  "ansible",
+  "bash",
+  "cmake",
+  "json",
+  "sql",
+  "toml",
+  "vue_ls",
+  "yaml",
 }
 
 M.debug = {
@@ -240,7 +245,11 @@ M.mason_tools = {
   "yamlls",
   "gitlab-ci-ls",
   "phpactor",
+  "laravel-ls",
+  "sqls",
+  "postgres_lsp",
 }
+
 
 
 return M

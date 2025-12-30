@@ -92,20 +92,23 @@ M.dependencies = {
 
   {
     "nvim-mini/mini.files",
-    event = { "BufReadPost", "BufNewFile" },
+    cmd = { "MiniFiles" },
     dependencies = { "nvim-mini/mini.icons" },
-    enabled = false,
+    enabled = true,
     opts = {
       show_dotfiles = true,
       windows = {
         preview = true,
-        width_preview = 30,
+        width_preview = 120,
         width_focus = 30,
       },
       options = {
         permanent_delete = false,
         use_as_default_explorer = false,
       },
+    },
+    keys = {
+      { ";a", "<cmd>lua MiniFiles.open()<cr>", desc = "MiniFiles" },
     },
   },
 

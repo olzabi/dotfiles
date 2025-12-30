@@ -100,4 +100,32 @@ return {
       },
     },
   },
+
+  {
+    "vyfor/cord.nvim",
+    build = ":Cord update",
+    opts = {
+      editor = {},
+      display = {
+        theme = "catppuccin",
+        flavor = "accent",
+        swap_fields = false,
+        swap_icons = true,
+        show_repository = false,
+        workspace_blacklist = {},
+      },
+      lsp = {
+        show_problem_count = true,
+        severity = 3,
+        scope = "workspace",
+      },
+      idle = {
+        timeout = 90 * 1000,
+        show_status = false,
+      },
+    },
+    keys = {
+      { "<leader>upc", "<cmd>Cord toggle<cr>", desc = "Discord Presence" },
+    },
+  },
 }

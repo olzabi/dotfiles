@@ -1,7 +1,3 @@
--- diagnostic
--- cmp icons
--- cmp capabilities, on_attach
-
 return {
 
   {

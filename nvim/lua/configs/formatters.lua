@@ -123,9 +123,15 @@ M.conform = {
         "false",
       },
     },
+    taplo = {
+      command = "taplo",
+      args = { "format", "-" },
+      stdin = true,
+    },
   },
 
   formatters_by_ft = {
+    ["*"] = { "trim_whitespace" },
     go = { "gofumpt", "golines" },
     c = { "clang-format" },
     cpp = { "clang-format" },
@@ -148,7 +154,7 @@ M.conform = {
     vue = prettier,
     markdown = { "prettier", "markdownlint-cli2", "markdown-toc" },
     ["markdown.mdx"] = { "prettier", "markdownlint-cli2", "markdown-toc" },
-    ["*"] = { "trim_whitespace" },
+    toml = { "taplo" },
   },
 
   -- format_on_save = function(n)

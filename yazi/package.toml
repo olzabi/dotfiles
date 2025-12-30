@@ -2,4 +2,4 @@
 deps = []
 
 [flavor]
-deps = [{ use = "Chromium-3-Oxide/everforest-medium", rev = "65bc09b" }]
+deps = [{ use = "Chromium-3-Oxide/everforest-medium", rev = "0158f0f" }]

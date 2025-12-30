@@ -216,39 +216,7 @@ M.setup = function()
     on_attach = M.on_attach,
   })
 
-  -- nvim version 0.11
-  vim.lsp.enable({
-    "angular",
-    "ansible",
-    "bash",
-    "cmake",
-    "clangd",
-    "css",
-    "docker",
-    "docker_compose_ls",
-    "eslint",
-    "emmet_ls",
-    "gopls",
-    "graphql",
-    "html",
-    "intelephense",
-    "json",
-    "lua_ls",
-    "nginx_language_server",
-    "pyright",
-    "rust_analyzer",
-    "svelte",
-    "sqls",
-    "terraformls",
-    "toml",
-    "vtsls",
-    "vue_ls",
-    "yaml",
-    "laravel_ls",
-  })
-
-  local lsp_pkg = require("utils.packages").lsp
-  vim.lsp.enable(lsp_pkg)
+  vim.lsp.enable(require("utils.packages").lsp)
 end
 
 M.mason = function()

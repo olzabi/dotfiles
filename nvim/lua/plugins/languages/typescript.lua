@@ -1,34 +1,4 @@
 local lsp = require("configs.lsp")
-local opts = {
-  filetypes = {
-    "javascript",
-    "javascriptreact",
-    "typescript",
-    "typescriptreact",
-    -- "vue",
-  },
-  settings = {
-    tsserver_file_preferences = {
-      importModuleSpecifierPreference = "non-relative",
-      includeCompletionsForModuleExports = true,
-    },
-    jsx_close_tag = {
-      enable = false,
-      filetypes = {
-        "javascriptreact",
-        "typescriptreact",
-      },
-    },
-    tsserver_plugins = { "@vue/typescript-plugin" },
-    tsserver_max_memory = "auto",
-    expose_as_code_action = "all",
-    separate_diagnostic_server = true,
-    publish_diagnostic_on = "insert_leave",
-    composite_mode = 'separate_diagnostic',
-  },
-  capabilities = lsp.capabilities,
-  on_attach = lsp.on_attach,
-}
 
 return {
   {
@@ -42,8 +12,38 @@ return {
       "BufRead *.js,*.jsx,*.mjs,*.cjs,*.ts,*.tsx",
       "BufNewFile *.js,*.jsx,*.mjs,*.cjs,*.ts,*.tsx",
     },
+    opts = {
+      filetypes = {
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact",
+        -- "vue",
+      },
+      settings = {
+        tsserver_file_preferences = {
+          importModuleSpecifierPreference = "non-relative",
+          includeCompletionsForModuleExports = true,
+        },
+        jsx_close_tag = {
+          enable = false,
+          filetypes = {
+            "javascriptreact",
+            "typescriptreact",
+          },
+        },
+        tsserver_plugins = { "@vue/typescript-plugin" },
+        tsserver_max_memory = "auto",
+        expose_as_code_action = "all",
+        separate_diagnostic_server = true,
+        publish_diagnostic_on = "insert_leave",
+        composite_mode = "separate_diagnostic",
+      },
+      capabilities = lsp.capabilities,
+      on_attach = lsp.on_attach,
+    },
     code_lens = "all",
-    config = function()
+    config = function(_, opts)
       require("typescript-tools").setup(opts)
 
       vim.api.nvim_create_autocmd("BufWritePre", {
