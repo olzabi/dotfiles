@@ -67,6 +67,8 @@ plugins=(
 	laravel
 	jsontools
 	golang
+	ng
+	nestjs
 )
 
 export RUSTFLAGS="-C opt-level=3 -C target-cpu=native" # Rust app build optimization
@@ -78,6 +80,4 @@ export RUSTFLAGS="-C opt-level=3 -C target-cpu=native" # Rust app build optimiza
 eval "$(phpenv init -)"
 eval "$(pyenv init - zsh)"
 
-
-# Load Angular CLI autocompletion.
-source <(ng completion script)
+# source <(ng completion script)
