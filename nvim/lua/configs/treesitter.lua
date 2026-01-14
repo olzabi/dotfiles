@@ -153,6 +153,13 @@ M.config = function()
     pattern = { [".*%.blade%.php"] = "phtml" },
   })
 
+  -- parser_config.zsh = {
+  --   install_command = "git clone github.com",
+  --   filetype = "zsh",
+  --   used_by = { "zsh" },
+  --   url = "https://github.com/georgeharker/tree-sitter-zsh",
+  -- }
+
   local bladeGrp
   vim.api.nvim_create_augroup("BladeFiltypeRelated", { clear = true })
   vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
@@ -172,6 +179,7 @@ M.config = function()
   -- MDX
   vim.filetype.add({ extension = { mdx = "mdx" } })
   vim.treesitter.language.register("markdown", "mdx")
+  -- vim.treesitter.language.register("zsh", "zsh")
 end
 
 return M

@@ -1,6 +1,6 @@
 return {
   cmd = { "gh-actions-language-server", "--stdio" },
-  filetypes = { "yaml" },
+  filetypes = { "yaml", "yml", "yaml.github" },
 
   -- `root_dir` ensures that the LSP does not attach to all yaml files
   root_dir = function(bufnr, on_dir)

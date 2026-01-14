@@ -1,10 +1,15 @@
 local M = {}
 
+local utils = require("utils.packages")
+
 M.capabilities = function()
   local client_capabilities = vim.lsp.protocol.make_client_capabilities()
 
   client_capabilities.textDocument.completion.completionItem.snippetSupport = true
   client_capabilities.textDocument.semanticTokens.multilineTokenSupport = true
+
+  client_capabilities.workspace.didChangeWorkspaceFolders = { dynamicRegistration = false }
+  client_capabilities.workspace.didChangeConfiguration = { dynamicRegistration = false }
 
   client_capabilities.textDocument.foldingRange = {
     dynamicRegistration = true,
@@ -34,46 +39,52 @@ M.capabilities = function()
 end
 
 M.on_attach = function(client, bufnr) -- client, buffer
-  -- Enable completion triggered by <c-x><c-o>
-  vim.bo[bufnr].omnifunc = "v:lua.vim.lsp.omnifunc"
-
-  local ok, wd = pcall(require, "workspace-diagnostics")
-  if ok then
-    wd.populate_workspace_diagnostics(client, bufnr)
-  end
-
-  if client.supports_method("textDocument/inlayHint") then
-    vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
-  end
-
-  if client.supports_method("textDocument/definition") then
-    vim.keymap.set("n", "<C-]>", vim.lsp.buf.definition, { buffer = bufnr })
-  end
-
-  if client.supports_method("textDocument/implementation") then
-    vim.keymap.set("n", "<space>&", vim.lsp.buf.implementation, { buffer = bufnr })
-  end
-
-  if client.supports_method("textDocument/hover") then
-    vim.keymap.set("n", "<CR>", function()
-      vim.lsp.buf.hover({ border = vim.g.floating_window_border_dark })
-    end, { buffer = bufnr })
-  end
-
-  if client.supports_method("textDocument/definition") then
-    vim.keymap.set("n", "<Space>*", function()
-      require("lists").change_active("Quickfix")
-      vim.lsp.buf.references()
-    end, { buffer = bufnr })
-  end
-
-  if client.supports_method("textDocument/signatureHelp") then
-    vim.keymap.set("i", "<C-k>", vim.lsp.buf.signature_help, { buffer = bufnr, desc = "Signature help" })
-  end
-
-  -- if client.supports_method("textDocument/rename") then
-  --   vim.keymap.set("n", "<Space>rn", vim.lsp.buf.rename, { buffer = bufnr })
+  -- if not vim.api.nvim_buf_is_loaded(bufnr) then
+  --   return
   -- end
+
+  local ok, err = pcall(function()
+    -- Enable completion triggered by <c-x><c-o>
+    vim.bo[bufnr].omnifunc = "v:lua.vim.lsp.omnifunc"
+
+    local ok, wd = pcall(require, "workspace-diagnostics")
+    if ok then
+      wd.populate_workspace_diagnostics(client, bufnr)
+    end
+
+    if client.supports_method("textDocument/inlayHint") then
+      vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+    end
+
+    if client.supports_method("textDocument/definition") then
+      vim.keymap.set("n", "<C-]>", vim.lsp.buf.definition, { buffer = bufnr })
+    end
+
+    if client.supports_method("textDocument/implementation") then
+      vim.keymap.set("n", "<space>&", vim.lsp.buf.implementation, { buffer = bufnr })
+    end
+
+    if client.supports_method("textDocument/hover") then
+      vim.keymap.set("n", "<CR>", function()
+        vim.lsp.buf.hover({ border = vim.g.floating_window_border_dark })
+      end, { buffer = bufnr })
+    end
+
+    if client.supports_method("textDocument/definition") then
+      vim.keymap.set("n", "<Space>*", function()
+        require("lists").change_active("Quickfix")
+        vim.lsp.buf.references()
+      end, { buffer = bufnr })
+    end
+
+    if client.supports_method("textDocument/signatureHelp") then
+      vim.keymap.set("i", "<C-k>", vim.lsp.buf.signature_help, { buffer = bufnr, desc = "Signature help" })
+    end
+  end)
+
+  if not ok then
+    vim.notify("Error in LSP on_attach: " .. tostring(err), vim.log.levels.ERROR)
+  end
 end
 
 M.diagnostic = function()
@@ -216,12 +227,12 @@ M.setup = function()
     on_attach = M.on_attach,
   })
 
-  vim.lsp.enable(require("utils.packages").lsp)
+  vim.lsp.enable(utils.lsp)
 end
 
 M.mason = function()
   local mason = require("mason")
-  local mason_tools = require("utils.packages").mason_tools
+  local mason_tools = utils.mason_tools
 
   mason.setup({
     registries = {
@@ -234,7 +245,10 @@ M.mason = function()
   for _, server_name in ipairs(mason_tools) do
     local ok, pkg = pcall(registry.get_package, server_name)
     if ok and not pkg:is_installed() then
+      vim.notify("Installing " .. server_name, vim.log.levels.INFO)
       pkg:install()
+    elseif not ok then
+      vim.notify("Package not found: " .. server_name, vim.log.levels.WARN)
     end
   end
 end
