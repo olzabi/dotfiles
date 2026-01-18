@@ -11,6 +11,8 @@ else
   export EDITOR='nvim'
 fi
 
+export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
+
 # ---------
 export LANG="en_US.UTF-8"
 export LC_ALL="${LANG}"
@@ -170,13 +172,12 @@ if [[ ! "$PATH" == *$FZF_BASE/bin* ]]; then
 fi
 
 export FZF_CTRL_T_OPTS="
-  --preview 'bat -n --color=always {}'
+  --preview 'cat -n --color=always {}'
   --bind 'ctrl-/:change-preview-window(down|hidden|)'"
 export FZF_DEFAULT_COMMAND='rg --hidden -l ""' # Include hidden files
 
 
 export FZF_DEFAULT_OPTS=" \
-  --tmux bottom,20% --height 20% --style minimal \
   --layout=reverse --border top \
   --bind=ctrl-space:accept"
 
