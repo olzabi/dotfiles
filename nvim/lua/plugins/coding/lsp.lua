@@ -5,12 +5,7 @@ return {
     build = ":MasonUpdate",
     cmd = { "Mason", "MasonInstall" },
     lazy = false,
-    opts = {
-      ensure_installed = require("utils.packages").lsp_packages,
-      ui = { border = "single" },
-    },
     config = function()
-      require("mason").setup(opts)
       require("configs.lsp").mason()
     end,
   },

@@ -1,50 +1,51 @@
-local lsp = require("configs.lsp")
-
 return {
   {
     -- It's used instead of ts_ls, tsserver and vtsls
     -- due to poor optimization
     "pmizio/typescript-tools.nvim",
-    build = "yarn add global @vue/typescript-plugin",
-    lazy = false,
+    dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
     event = {
       -- "BufEnter",
       "BufRead *.js,*.jsx,*.mjs,*.cjs,*.ts,*.tsx",
       "BufNewFile *.js,*.jsx,*.mjs,*.cjs,*.ts,*.tsx",
     },
-    opts = {
-      filetypes = {
-        "javascript",
-        "javascriptreact",
-        "typescript",
-        "typescriptreact",
-        -- "vue",
-      },
-      settings = {
-        tsserver_file_preferences = {
-          importModuleSpecifierPreference = "non-relative",
-          includeCompletionsForModuleExports = true,
-        },
-        jsx_close_tag = {
-          enable = false,
-          filetypes = {
-            "javascriptreact",
-            "typescriptreact",
-          },
-        },
-        tsserver_plugins = { "@vue/typescript-plugin" },
-        tsserver_max_memory = "auto",
-        expose_as_code_action = "all",
-        separate_diagnostic_server = true,
-        publish_diagnostic_on = "insert_leave",
-        composite_mode = "separate_diagnostic",
-      },
-      capabilities = lsp.capabilities,
-      on_attach = lsp.on_attach,
+    ft = {
+      "javascript",
+      "javascriptreact",
+      "typescript",
+      "typescriptreact",
     },
     code_lens = "all",
-    config = function(_, opts)
-      require("typescript-tools").setup(opts)
+    config = function()
+      local lsp = require("configs.lsp")
+      require("typescript-tools").setup({
+        filetypes = {
+          "javascript",
+          "typescript",
+          "vue",
+        },
+        settings = {
+          tsserver_file_preferences = {
+            importModuleSpecifierPreference = "non-relative",
+            includeCompletionsForModuleExports = true,
+          },
+          jsx_close_tag = {
+            enable = false,
+            filetypes = {
+              "javascriptreact",
+              "typescriptreact",
+            },
+          },
+          tsserver_plugins = { "@vue/typescript-plugin" },
+          tsserver_max_memory = "auto",
+          expose_as_code_action = "all",
+          separate_diagnostic_server = true,
+          publish_diagnostic_on = "insert_leave",
+          composite_mode = "separate_diagnostic",
+        },
+        capabilities = lsp.capabilities(),
+        on_attach = lsp.on_attach,
+      })
 
       vim.api.nvim_create_autocmd("BufWritePre", {
         pattern = "*.ts,*.tsx,*.jsx,*.js",
