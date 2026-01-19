@@ -8,14 +8,11 @@ sort_by = "alphabetical"
 linemode = "mtime"
 sort_sensitive = true
 sort_dir_first = true
-ratio = [1, 2, 5]
-
+ratio = [1, 2, 6]
 
 [preview]
 wrap = "no"
 tab_size = 2
-# max_width = 800
-# max_height = 1200
 
 [tasks]
 micro_workers = 10

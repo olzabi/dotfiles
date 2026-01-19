@@ -27,8 +27,3 @@ hash = "99aa06d3014798d86001c324468d497f"
 use = "yazi-rs/plugins:fzf"
 rev = "de33976"
 hash = "99aa06d3014798d86001c324468d497f"
-
-[[flavor.deps]]
-use = "Chromium-3-Oxide/everforest-medium"
-rev = "0158f0f"
-hash = "a7c36abf0b13289aceb1c20a17c6a63e"
