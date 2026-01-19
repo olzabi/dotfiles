@@ -57,6 +57,7 @@ plugins=(
 	qrcode
 	you-should-use
 	zsh-autosuggestions
+	zsh-completions
 	zsh-syntax-highlighting
 	fancy-ctrl-z
 	python

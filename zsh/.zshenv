@@ -103,8 +103,16 @@ export AWS_SHARED_CREDENTIALS_FILE="$AWS_HOME/credentials"
 
 #* python
 # ---------
-export PYENV_ROOT="$XDG_CONFIG_HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
+export PYENV_ROOT="${PYENV_ROOT:-${XDG_CONFIG_HOME:-$HOME/.config}/.pyenv}"
+
+if [ -d "$PYENV_ROOT/bin" ]; then
+    export PATH="$PYENV_ROOT/bin:$PATH"
+fi
+
+if command -v pyenv >/dev/null; then
+    export PIPENV_PYTHON="$PYENV_ROOT/shims/python"
+    export PYENV_VIRTUALENV_DISABLE_PROMPT=1
+fi
 
 #* npm
 # ---------
@@ -183,8 +191,14 @@ export FZF_DEFAULT_OPTS=" \
 
 # ---------
 export EZA_COLORS="di=1;34:ln=36:ex=1;32"
-
-export GIT_EMAIL="olzabi14@gmail.com"
-export GIT_NAME="olzabi"
-
 export ZELLIJ_CONFIG_DIR="$DOTFILES_PATH/zellij"
+
+# Unused
+# ---------
+# export NPM_PATH="$XDG_CONFIG_HOME/node_modules"
+# export NPM_BIN="$XDG_CONFIG_HOME/node_modules/bin"
+# export NPM_CONFIG_PREFIX="$XDG_CONFIG_HOME/node_modules"
+# export PATH="$COMPOSER_HOME/vendor/bin:$PATH" # COMPOSER
+# export PATH="$NPM_BIN:$PATH" # NPM
+
+
