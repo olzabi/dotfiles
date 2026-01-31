@@ -3,6 +3,7 @@
 #* nvim
 # ---------
 # export PATH="/usr/local/bin:$PATH"
+export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
 
 # ---------
 if [[ -n $SSH_CONNECTION ]]; then
@@ -10,8 +11,6 @@ if [[ -n $SSH_CONNECTION ]]; then
 else
   export EDITOR='nvim'
 fi
-
-export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
 
 # ---------
 export LANG="en_US.UTF-8"
@@ -40,15 +39,11 @@ export DEV="$HOME/dev"
 export WORK="$DEV/work"
 
 #* history
-export HISTFILE="$XDG_DATA_HOME/bash/.bash_history"
-export PSQL_HISTORY="$XDG_DATA_HOME/psql/.psql_history"
-export MYSQL_HISTFILE="$XDG_DATA_HOME/mysql/.mysql_history"
-export PYTHON_HISTORY="$XDG_DATA_HOME/python/history"
-
-#* for local binaries (e.g. cmd tools)
-# ---------
-export PATH="$XDG_LOCAL_HOME/bin:$PATH"
-export PATH="$HOME/bin:/usr/local/bin:$PATH"
+export HIST_DIR="$XDG_DATA_HOME/histfiles"
+export HISTFILE="$HIST_DIR/.zsh_history"
+export PSQL_HISTORY="$HIST_DIR/.psql_history"
+export MYSQL_HISTFILE="$HIST_DIR/.mysql_history"
+export PYTHON_HISTORY="$HIST_DIR/.python_history"
 
 #* zsh
 # ---------
@@ -57,6 +52,7 @@ export ZSH_CUSTOM="$DOTFILES_PATH/zsh/custom"
 export ZSH_COMPDUMP="$XDG_CACHE_HOME/zsh/.zcomdump-$HOST"
 export PATH="$ZSH_CUSTOM/plugins/git-fuzzy/bin:$PATH"
 
+export ANTIDOTE_HOME="$XDG_CONFIG_HOME/.antidote"
 # ---------
 export ANSIBLE_HOME="$XDG_CONFIG_HOME/.ansible"
 export YAZI_CONFIG_HOME="$DOTFILES_PATH/yazi"
@@ -77,8 +73,11 @@ export CC="${commands[clang]:-$CC}"
 export CXX="${commands[g++]:-$CXX}"
 export CXX="${commands[clang++]:-$CXX}"
 
-#* docker
+export CMAKE_CONFIG_DIR="$XDG_CONFIG_HOME/.cmake"
+
+#* docker & k8
 export DOCKER_CONFIG="$XDG_CONFIG_HOME/.docker"
+export MINIKUBE_HOME="$XDG_CONFIG_HOME/.minikube"
 
 #* golang
 # ---------
@@ -113,11 +112,6 @@ if command -v pyenv >/dev/null; then
     export PIPENV_PYTHON="$PYENV_ROOT/shims/python"
     export PYENV_VIRTUALENV_DISABLE_PROMPT=1
 fi
-
-#* npm
-# ---------
-# export NPM_CONFIG_CACHE="$XDG_CACHE_HOME/npm"
-# export NPM_CONFIG_DEVDIR="$XDG_CACHE_HOME/node-gyp"
 
 #* pnpm
 # ---------
@@ -164,14 +158,6 @@ PERL_LOCAL_LIB_ROOT="$XDG_CONFIG_HOME/perl5${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_
 PERL_MB_OPT="--install_base \"$XDG_CONFIG_HOME/perl5\""; export PERL_MB_OPT;
 PERL_MM_OPT="INSTALL_BASE=$XDG_CONFIG_HOME/perl5"; export PERL_MM_OPT;
 
-#* nix
-# ---------
-# export NIX_HOME="$XDG_CONFIG_HOME/nix"
-# export NIX_USER_PROFILE_DIR="$NIX_HOME/profile"
-# export NIX_PATH="nixpkgs=$NIX_HOME/defexpr/channels/nixpkgs:$NIX_HOME/defexpr/channels"
-# export NIX_PROFILES="$NIX_PATH/.nix-profile $NIX_USER_PROFILE_DIR"
-# export PATH="$NIX_USER_PROFILE_DIR/bin:$PATH"
-
 # Setup fzf
 # ---------
 export FZF_BASE=$DOTFILES_PATH/zsh/custom/plugins/fzf
@@ -201,4 +187,16 @@ export ZELLIJ_CONFIG_DIR="$DOTFILES_PATH/zellij"
 # export PATH="$COMPOSER_HOME/vendor/bin:$PATH" # COMPOSER
 # export PATH="$NPM_BIN:$PATH" # NPM
 
+#* nix
+# ---------
+# export NIX_HOME="$XDG_CONFIG_HOME/nix"
+# export NIX_USER_PROFILE_DIR="$NIX_HOME/profile"
+# export NIX_PATH="nixpkgs=$NIX_HOME/defexpr/channels/nixpkgs:$NIX_HOME/defexpr/channels"
+# export NIX_PROFILES="$NIX_PATH/.nix-profile $NIX_USER_PROFILE_DIR"
+# export PATH="$NIX_USER_PROFILE_DIR/bin:$PATH"
 
+
+#* npm
+# ---------
+# export NPM_CONFIG_CACHE="$XDG_CACHE_HOME/npm"
+# export NPM_CONFIG_DEVDIR="$XDG_CACHE_HOME/node-gyp"
