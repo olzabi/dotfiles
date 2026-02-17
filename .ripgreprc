@@ -1,0 +1,9 @@
+-l ""
+--files
+--hidden
+--follow
+
+--glob=!.{git,svn,svg,ttf,}
+--glob=!{node_modules,Trash,vendor}
+--glob=!*.{lock}
+--glob=!{package-lock.json}

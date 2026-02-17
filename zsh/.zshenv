@@ -44,6 +44,7 @@ export HISTFILE="$HIST_DIR/.zsh_history"
 export PSQL_HISTORY="$HIST_DIR/.psql_history"
 export MYSQL_HISTFILE="$HIST_DIR/.mysql_history"
 export PYTHON_HISTORY="$HIST_DIR/.python_history"
+export PSYSH_CONFIG="$HIST_DIR/psysh_history"
 
 #* zsh
 # ---------
@@ -164,16 +165,8 @@ export FZF_BASE=$DOTFILES_PATH/zsh/custom/plugins/fzf
 if [[ ! "$PATH" == *$FZF_BASE/bin* ]]; then
   PATH="${PATH:+${PATH}:}$FZF_BASE/bin"
 fi
-
-export FZF_CTRL_T_OPTS="
-  --preview 'cat -n --color=always {}'
-  --bind 'ctrl-/:change-preview-window(down|hidden|)'"
-export FZF_DEFAULT_COMMAND='rg --hidden -l ""' # Include hidden files
-
-
-export FZF_DEFAULT_OPTS=" \
-  --layout=reverse --border top \
-  --bind=ctrl-space:accept"
+# ---------
+export RIPGREP_CONFIG_PATH="$DOTFILES_PATH/.ripgreprc"
 
 # ---------
 export EZA_COLORS="di=1;34:ln=36:ex=1;32"

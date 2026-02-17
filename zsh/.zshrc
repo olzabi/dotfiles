@@ -74,11 +74,25 @@ plugins=(
 
 export RUSTFLAGS="-C opt-level=3 -C target-cpu=native" # Rust app build optimization
 
+# ---------
+#`FZF_DEFAULT_OPTS_FILE`
+export FZF_DEFAULT_COMMAND='rg --files' # Include hidden files
+export FZF_DEFAULT_OPTS=" \
+  --layout=reverse --border top \
+  --bind=ctrl-space:accept"
+
+export FZF_CTRL_T_OPTS="
+  --preview 'cat -n --color=always {}'
+  --reverse
+  --bind 'ctrl-/:change-preview-window(down|hidden|)'"
+
+# ---------
+. "$XDG_LOCAL_HOME/bin/env"
 . "$ZSH/oh-my-zsh.sh"
 
 [ -f "$ZSH/../aliases.zsh" ] && source "$ZSH/../aliases.zsh"
 
-eval "$(phpenv init -)"
-eval "$(pyenv init - zsh)"
+[ -x "$(command -v zoxide)" ] && eval "$(zoxide init zsh)"
+[ -x "$(command -v phpenv)" ] && eval "$(phpenv init -)"
+[ -x "$(command -v pyenv)" ]  && eval "$(pyenv init - zsh)"
 
-# source <(ng completion script)
