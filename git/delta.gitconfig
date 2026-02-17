@@ -1,0 +1,24 @@
+[core]
+	pager = delta
+
+[delta]
+	navigate = true
+  side-by-side = true
+  line-numbers = true
+  decorations = true
+	white-space-error-style = 22 reverse
+	features = decorations
+
+[pager]
+  diff = delta
+  log = delta
+  reflog = delta
+  show = delta
+
+[merge]
+	conflictStyle = zdiff3
+
+[interactive]
+	diffFilter = delta --color-only --features=interactive
+
+# vim: filetype=gitconfig

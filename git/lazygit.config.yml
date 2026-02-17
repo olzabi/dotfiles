@@ -1,28 +1,54 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
-notARepository: "quit"
+---
 git:
   paging:
     colorArg: always
-    # pager: delta --features=gruvmax-fang --paging=never
-    # pager: delta --features=arctic-fox --paging=never
-    # pager: delta --features=corvus --paging=never
-    # pager: delta --features=weeping-willow --paging=never
-    pager: delta --features=colibri --paging=never
-  autoFetch: false
+    # pager: delta --features=colibri --paging=never
+    pager: delta --features=collared-trogon --paging=never
+  autoFetch: true
   autoRefresh: false
   disableForcePushing: true
   commit:
     autoWrapCommitMessage: true
-    autoWrapWidth: 80
-  push:
-    force: true
-update:
-  method: never
+    autoWrapWidth: 90
 gui:
   language: en
   border: single
-customCommands:
-  - key: "<c-R>"
-    command: "gh pr create --fill --web"
-    context: "global"
-    loadingText: "Creating pull request on GitHub"
+  nerdFontsVersion: "3"
+  showRandomTip: false
+  showCommandLog: false
+  expandFocusedSidePanel: true
+  sidePanelWidth: 0.20
+  commitLength:
+    show: true
+  showListFooter: true
+  tabWidth: 2
+  showIcons: true
+  filterMode: fuzzy
+  splitDiff: auto
+  portraitMode: never
+  theme:
+    activeBorderColor:
+      - magenta
+      - bold
+    inactiveBorderColor:
+      - white
+    searchingActiveBorderColor:
+      - cyan
+      - bold
+    optionsTextColor:
+      - white
+    selectedLineBgColor:
+      - "#453461"
+    cherryPickedCommitBgColor:
+      - cyan
+    cherryPickedCommitFgColor:
+      - blue
+    markedBaseCommitBgColor:
+      - yellow
+    markedBaseCommitFgColor:
+      - blue
+    unstagedChangesColor:
+      - white
+    defaultFgColor:
+      - default
