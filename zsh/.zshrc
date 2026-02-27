@@ -8,12 +8,24 @@ DISABLE_LS_COLORS=true
 ZSH_DOTENV_PROMPT=false
 HISTSIZE=100000
 HISTFILESIEZE=10000
+FUNCNEST=500
+
+setopt append_history
+setopt extended_history
+setopt hist_expire_dups_first
+setopt hist_ignore_dups # ignore duplication command history list
+setopt hist_ignore_space
+setopt hist_verify
+setopt inc_append_history
+setopt share_history # share command history data
 
 zstyle ':omz:update' mode auto # update automatically without asking
 zstyle ':omz:plugins:ssh-agent' agent-forwarding on
 zstyle ':completion:*' rehash true
 
 zstyle ':omz:plugins:nvm' autoload yes
+zstyle ':omz:plugins:nvm' silent-autoload yes
+
 
 plugins=(
 	aws
@@ -27,6 +39,7 @@ plugins=(
 	eza
 	sudo
 	fzf
+	zsh-autosuggestions
 	fzf-tab
 	gh
 	git
@@ -56,9 +69,7 @@ plugins=(
 	react-native
 	qrcode
 	you-should-use
-	zsh-autosuggestions
 	zsh-completions
-	zsh-syntax-highlighting
 	fancy-ctrl-z
 	python
 	pip
@@ -70,29 +81,18 @@ plugins=(
 	golang
 	ng
 	nestjs
+	zsh-syntax-highlighting
 )
 
 export RUSTFLAGS="-C opt-level=3 -C target-cpu=native" # Rust app build optimization
-
 # ---------
-#`FZF_DEFAULT_OPTS_FILE`
-export FZF_DEFAULT_COMMAND='rg --files' # Include hidden files
-export FZF_DEFAULT_OPTS=" \
-  --layout=reverse --border top \
-  --bind=ctrl-space:accept"
 
-export FZF_CTRL_T_OPTS="
-  --preview 'cat -n --color=always {}'
-  --reverse
-  --bind 'ctrl-/:change-preview-window(down|hidden|)'"
-
-# ---------
-. "$XDG_LOCAL_HOME/bin/env"
 . "$ZSH/oh-my-zsh.sh"
-
-[ -f "$ZSH/../aliases.zsh" ] && source "$ZSH/../aliases.zsh"
+. "$XDG_LOCAL_HOME/bin/env"
+. "$ZSH/../aliases.zsh"
+. "$ZSH/../fzf.zsh"
 
 [ -x "$(command -v zoxide)" ] && eval "$(zoxide init zsh)"
 [ -x "$(command -v phpenv)" ] && eval "$(phpenv init -)"
-[ -x "$(command -v pyenv)" ]  && eval "$(pyenv init - zsh)"
+[ -x "$(command -v pyenv)"  ] && eval "$(pyenv init - zsh)"
 

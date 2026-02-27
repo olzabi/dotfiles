@@ -3,8 +3,8 @@
 git:
   paging:
     colorArg: always
-    # pager: delta --features=colibri --paging=never
-    pager: delta --features=collared-trogon --paging=never
+    pager: delta --dark --paging=never --features=collared-coracias-caudatus --diff-so-fancy
+    # pager: delta --features=collared-trogon --paging=never
   autoFetch: true
   autoRefresh: false
   disableForcePushing: true

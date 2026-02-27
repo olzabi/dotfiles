@@ -1,0 +1,31 @@
+[package]
+name = "dotfiles"
+version = "0.1.0"
+edition = "2024"
+
+publish = false
+
+[dependencies]
+cargo-edit = "=0.13.8"
+cargo-expand = "=1.0.121"
+cargo-make = "=0.37.24"
+cargo-seek = "=0.1.0"
+cargo-tarpaulin = "=0.35.2"
+cargo-tree = "=0.29.0"
+cargo-udeps = "=0.1.60"
+cargo-update = "=18.1.0"
+cord-nvim = "=2.2.7"
+csvlens = "=0.11.0"
+dysk = "=3.1.0"
+eza = "=0.20.18"
+fd-find = "=10.2.0"
+git-delta = "=0.18.2"
+netscanner = "=0.6.2"
+ripgrep = "=15.1.0"
+tlrc = "=1.12.0"
+viu = "=1.5.1"
+yazi-build = "=26.1.4"
+yazi-cli = "=26.1.4"
+yazi-fm = "=26.1.4"
+zellij = "=0.43.1"
+zoxide = "=0.9.9"

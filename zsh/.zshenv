@@ -34,9 +34,8 @@ export XDG_BIN_HOME="$XDG_LOCAL_HOME/bin"
 export XDG_DATA_HOME="$XDG_LOCAL_HOME/share"
 
 export DOTFILES_PATH="$XDG_CONFIG_HOME/dotfiles"
-export NOTES_PATH="$HOME/vaults/notes"
 export DEV="$HOME/dev"
-export WORK="$DEV/work"
+export NOTES_PATH="$HOME/vaults"
 
 #* history
 export HIST_DIR="$XDG_DATA_HOME/histfiles"
@@ -165,6 +164,10 @@ export FZF_BASE=$DOTFILES_PATH/zsh/custom/plugins/fzf
 if [[ ! "$PATH" == *$FZF_BASE/bin* ]]; then
   PATH="${PATH:+${PATH}:}$FZF_BASE/bin"
 fi
+
+# Yaml
+# ---------
+export YAMLLINT_CONFIG_FILE="$DOTFILES_PATH/yamllint/.yamllint.yml"
 # ---------
 export RIPGREP_CONFIG_PATH="$DOTFILES_PATH/.ripgreprc"
 

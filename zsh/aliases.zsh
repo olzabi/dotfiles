@@ -8,19 +8,11 @@ alias sudo='sudo '
 alias view="explorer.exe"
 alias ls='eza --color=always --icons --group-directories-first'
 # alias rm='trash'
-alias y='yazi'
+alias y='yy'
 alias n='nvim'
 alias zw='zellij --layout layout.kdl'
 alias leet='nvim leetcode.nvim'
 alias monkey='smassh' # inspired by monkeytype
-
-# Docker
-# ---------
-# alias dc='docker compose'
-# alias dcb='docker compose build'
-# alias dcu='docker compose up -d'
-# alias dcd='docker compose down'
-
 
 #* git
 # ---------
@@ -97,62 +89,56 @@ gtrm() {
 
 #* yazi
 # ---------
-function y() {
-	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+function yy() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
 	yazi "$@" --cwd-file="$tmp"
-	IFS= read -r -d '' cwd < "$tmp"
-	[ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
+	if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+		cd -- "$cwd"
+	fi
 	rm -f -- "$tmp"
 }
 
-# # Change Yazi's CWD to PWD on subshell exit
-# if [[ -n "$YAZI_ID" ]]; then
-# 	function _yazi_cd() {
-# 		ya emit cd "$PWD"
-# 	}
-# 	add-zsh-hook zshexit _yazi_cd
-# fi
-
 function note() {
 	if [[ -z $1 ]]; then
-		$EDITOR $HOME/vaults/notes/$1
+		$EDITOR $NOTES_PATH/notes/$1
 	else
-		$EDITOR $HOME/vaults/notes/$(date "+%D")
+		$EDITOR $NOTES_PATH/notes/$(date "+%D")
 	fi
 }
 
 kill_port() {
-	if [ -z "$1" ]; then
-		echo "Usage: kill_port <port_number>"
-		return 1
-	fi
+  if [ -z "$1" ]; then
+    echo "Usage: kill_port <port_number>"
+    return 1
+  fi
 
-	PORT=$1
-	PID=$(lsof -ti tcp:$PORT)
+  PORT=$1
+  PID=$(lsof -ti tcp:$PORT)
 
-	if [ -z "$PID" ]; then
-		echo "No process found running on port $PORT."
-		return 1
-	fi
+  if [ -z "$PID" ]; then
+    echo "No process found running on port $PORT."
+    return 1
+  fi
 
-	echo "Killing process $PID on port $PORT..."
-	kill -9 $PID && echo "Killed."
+  echo "Killing process $PID on port $PORT..."
+  kill -9 $PID && echo "Killed."
 }
 
-# Laravel
+# PHP
 # ---------
-# artisan() {
-#   if [ -f bin/artisan ]; then
-#     php bin/artisan "$@"
-#   else
-#     php artisan "$@"
-#   fi
-# }
-
 alias serve="artisan serve"
 alias tinker="artisan tinker"
 alias cu='composer update'
 alias ci='composer install'
 
+# TODO:
 
+# Docker
+# ---------
+# alias dc='docker compose'
+# alias dcb='docker compose build'
+# alias dcu='docker compose up -d'
+# alias dcd='docker compose down'
+# alias dockerclean="docker ps -a | grep 'days ago\|weeks ago' | awk '{print $1}' | gxargs --no-run-if-empty docker rm"
+# alias dockercleani="docker images | grep '<none>' | awk '{print $3}' | gxargs --no-run-if-empty docker rmi -f"
 

@@ -41,3 +41,6 @@ foo.*
 data
 
 .venv
+
+node_modules
+lazysql/config.toml
