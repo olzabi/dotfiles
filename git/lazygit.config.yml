@@ -1,10 +1,8 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
----
 git:
-  paging:
-    colorArg: always
-    pager: delta --dark --paging=never --features=collared-coracias-caudatus --diff-so-fancy
-    # pager: delta --features=collared-trogon --paging=never
+  pagers:
+    - colorArg: always
+      pager: delta --dark --paging=never --features=collared-coracias-caudatus --diff-so-fancy
   autoFetch: true
   autoRefresh: false
   disableForcePushing: true

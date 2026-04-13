@@ -1,5 +1,5 @@
 # ---------
-FZF_DEFAULT_COMMAND='rg --files --follow --no-ignore-vcs --hidden -g "!{node_modules/*,.git/*,target/*,bzl-build/*,}"'
+FZF_DEFAULT_COMMAND='rg --follow --no-ignore-vcs --hidden -g "!{node_modules/*,.git/*,target/*,bzl-build/*,}"'
 FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS --bind 'ctrl-p:change-preview-window(down|hidden|)'"
 
 FZF_DEFAULT_OPTS=""

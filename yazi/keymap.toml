@@ -139,6 +139,7 @@ keymap = [
 
 prepend_keymap = [
     { on = ['c', 'm'], run = "plugin chmod", desc = "Chmod on selected files" },
+    { on = ['g', 'l'], run = 'shell -- ya emit reveal "$(readlink -f "$0")"', desc = "Follow hovered symlink"},
     { on = "<Enter>", run = "plugin --sync smart-enter", desc = "Enter the child directory, or open the file" },
     { on = "<A-p>", run = "plugin --sync hide-preview", desc = "Hide or show preview" },
     { on = "M", run = "plugin --sync max-preview", desc = "Maximize or restore preview" },

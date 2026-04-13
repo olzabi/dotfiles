@@ -1,0 +1,34 @@
+[include]
+	path = ~/.config/git/user.gitconfig
+	path = ~/.config/git/delta.gitconfig
+	path = ~/.config/git/aliases.gitconfig
+
+[core]
+	editor = nvim
+	whitespace      = fix,-indent-with-non-tab,trailing-space,cr-at-eol
+
+[init]
+	defaultBranch = dev
+
+[fetch]
+	prune = false
+	prunetags = true
+
+[pull]
+	rebase = true
+
+[push]
+	autoSetupRemote = true
+	followTags = true
+
+[rebase]
+	authStash = true
+	autoSquah = true
+	updateRefs = true
+
+[credential]
+	helper = osxkeychain
+
+[url "git@github.com:"]
+insteadOf = https://github.com/
+

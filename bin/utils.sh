@@ -20,4 +20,4 @@ error() {
 
 warning() {
     printf "%s==> %s%s\n" "$yellow" "$1" "$default_color"
-}d
+}

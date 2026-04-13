@@ -16,6 +16,7 @@
   show = delta
 
 [merge]
+  ff=false
   conflictStyle = zdiff3
 
 [interactive]

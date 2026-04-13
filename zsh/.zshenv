@@ -25,6 +25,7 @@ export MANPATH="/usr/local/man:$MANPATH"
 
 # ---------
 export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig
+export PATH="$XDG_LOCAL_HOME/bin:$PATH"
 
 # ---------
 export XDG_CONFIG_HOME="$HOME/.config"

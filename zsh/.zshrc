@@ -88,7 +88,7 @@ export RUSTFLAGS="-C opt-level=3 -C target-cpu=native" # Rust app build optimiza
 # ---------
 
 . "$ZSH/oh-my-zsh.sh"
-. "$XDG_LOCAL_HOME/bin/env"
+#. "$XDG_LOCAL_HOME/bin/env"
 . "$ZSH/../aliases.zsh"
 . "$ZSH/../fzf.zsh"
 
