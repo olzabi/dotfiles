@@ -1,21 +1,31 @@
 #!/usr/bin/env zsh
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_CACHE_HOME="$HOME/.cache"
+export XDG_LOCAL_HOME="$HOME/.local"
+export XDG_BIN_HOME="$XDG_LOCAL_HOME/bin"
+export XDG_DATA_HOME="$XDG_LOCAL_HOME/share"
+
+export DOTFILES_PATH="$XDG_CONFIG_HOME/dotfiles"
+export DEV="$HOME/dev"
+
+# ---------
+export LANG="en_US.UTF-8"
+export LC_ALL="${LANG}"
+export LC_CTYPE="${LANG}"
+
 
 #* nvim
 # ---------
 # export PATH="/usr/local/bin:$PATH"
 export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
 
+#* SSH
 # ---------
 if [[ -n $SSH_CONNECTION ]]; then
   export EDITOR='vim'
 else
   export EDITOR='nvim'
 fi
-
-# ---------
-export LANG="en_US.UTF-8"
-export LC_ALL="${LANG}"
-export LC_CTYPE="${LANG}"
 
 # ---------
 [[ $- != *i* ]] && return
@@ -27,18 +37,8 @@ export MANPATH="/usr/local/man:$MANPATH"
 export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig
 export PATH="$XDG_LOCAL_HOME/bin:$PATH"
 
-# ---------
-export XDG_CONFIG_HOME="$HOME/.config"
-export XDG_CACHE_HOME="$HOME/.cache"
-export XDG_LOCAL_HOME="$HOME/.local"
-export XDG_BIN_HOME="$XDG_LOCAL_HOME/bin"
-export XDG_DATA_HOME="$XDG_LOCAL_HOME/share"
-
-export DOTFILES_PATH="$XDG_CONFIG_HOME/dotfiles"
-export DEV="$HOME/dev"
-export NOTES_PATH="$HOME/vaults"
-
 #* history
+# ---------
 export HIST_DIR="$XDG_DATA_HOME/histfiles"
 export HISTFILE="$HIST_DIR/.zsh_history"
 export PSQL_HISTORY="$HIST_DIR/.psql_history"
@@ -53,9 +53,7 @@ export ZSH_CUSTOM="$DOTFILES_PATH/zsh/custom"
 export ZSH_COMPDUMP="$XDG_CACHE_HOME/zsh/.zcomdump-$HOST"
 export PATH="$ZSH_CUSTOM/plugins/git-fuzzy/bin:$PATH"
 
-export ANTIDOTE_HOME="$XDG_CONFIG_HOME/.antidote"
 # ---------
-export ANSIBLE_HOME="$XDG_CONFIG_HOME/.ansible"
 export YAZI_CONFIG_HOME="$DOTFILES_PATH/yazi"
 
 #* tmux
@@ -73,12 +71,12 @@ export CC="${commands[gcc]:-$CC}"
 export CC="${commands[clang]:-$CC}"
 export CXX="${commands[g++]:-$CXX}"
 export CXX="${commands[clang++]:-$CXX}"
-
 export CMAKE_CONFIG_DIR="$XDG_CONFIG_HOME/.cmake"
 
 #* docker & k8
 export DOCKER_CONFIG="$XDG_CONFIG_HOME/.docker"
 export MINIKUBE_HOME="$XDG_CONFIG_HOME/.minikube"
+export ANSIBLE_HOME="$XDG_CONFIG_HOME/.ansible"
 
 #* golang
 # ---------
@@ -129,10 +127,7 @@ export NVM_DIR="$XDG_CONFIG_HOME/.nvm"
 
 #* git
 # ---------
-export GIT_CONFIG_GLOBAL="$DOTFILES_PATH/git/.gitconfig"
-
-#* lazygit
-# ---------
+export GIT_CONFIG_GLOBAL="$XDG_CONFIG_HOME/git/.gitconfig"
 export LG_CONFIG_FILE="$DOTFILES_PATH/git/lazygit.config.yml" lazygit
 
 # php
@@ -146,10 +141,7 @@ export PATH="$XDG_CONFIG_HOME/.composer/vendor/bin:$PATH"
 # java
 # ---------
 export PATH="/usr/lib/jvm/java-11-openjdk-amd64/bin:$PATH"
-
-# julia
-# ---------
-export PATH="$HOME/.local/julia-1.8.1/bin:$PATH"
+export PATH="$XDG_LOCAL_HOME/julia-1.8.1/bin:$PATH"
 
 # Perl
 # ---------
@@ -169,6 +161,7 @@ fi
 # Yaml
 # ---------
 export YAMLLINT_CONFIG_FILE="$DOTFILES_PATH/yamllint/.yamllint.yml"
+
 # ---------
 export RIPGREP_CONFIG_PATH="$DOTFILES_PATH/.ripgreprc"
 
@@ -176,24 +169,3 @@ export RIPGREP_CONFIG_PATH="$DOTFILES_PATH/.ripgreprc"
 export EZA_COLORS="di=1;34:ln=36:ex=1;32"
 export ZELLIJ_CONFIG_DIR="$DOTFILES_PATH/zellij"
 
-# Unused
-# ---------
-# export NPM_PATH="$XDG_CONFIG_HOME/node_modules"
-# export NPM_BIN="$XDG_CONFIG_HOME/node_modules/bin"
-# export NPM_CONFIG_PREFIX="$XDG_CONFIG_HOME/node_modules"
-# export PATH="$COMPOSER_HOME/vendor/bin:$PATH" # COMPOSER
-# export PATH="$NPM_BIN:$PATH" # NPM
-
-#* nix
-# ---------
-# export NIX_HOME="$XDG_CONFIG_HOME/nix"
-# export NIX_USER_PROFILE_DIR="$NIX_HOME/profile"
-# export NIX_PATH="nixpkgs=$NIX_HOME/defexpr/channels/nixpkgs:$NIX_HOME/defexpr/channels"
-# export NIX_PROFILES="$NIX_PATH/.nix-profile $NIX_USER_PROFILE_DIR"
-# export PATH="$NIX_USER_PROFILE_DIR/bin:$PATH"
-
-
-#* npm
-# ---------
-# export NPM_CONFIG_CACHE="$XDG_CACHE_HOME/npm"
-# export NPM_CONFIG_DEVDIR="$XDG_CACHE_HOME/node-gyp"

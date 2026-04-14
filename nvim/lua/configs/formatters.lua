@@ -1,22 +1,11 @@
 local M = {}
 
-local file_exists = function(path)
-  local exists = vim.fn.filereadable(path) == 1
-  return exists
-end
-
 local prettier = { "prettierd", "prettier", stop_after_first = true }
 M.lint = function()
   local lint = require("lint")
   local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
   local eslint = lint.linters.eslint_d
   local php_linters = {}
-
-  -- if file_exists("./vendor/bin/phpcs") then
-  --   -- configure phpcs
-  --   lint.linters.phpcs.cmd = "./vendor/bin/phpcs"
-  --   table.insert(php_linters, "phpcs")
-  -- end
 
   -- Use either composer or phive tools.
   if vim.fn.filereadable("./tools/psalm") == 1 then
@@ -38,12 +27,12 @@ M.lint = function()
     cmake = { "cmakelint", "cmakelang" },
     json = { "eslint_d" },
     yaml = { "yamllint" },
-    vue = {},
 
     php = php_linters,
     python = { "ruff", "pylint" },
     sh = { "shellcheck" },
-    -- markdown = { "markdownlint-cli2" },
+    bash = { "shellcheck" },
+    zsh = { "zsh" },
 
     go = { "golangcilint" },
   }
@@ -60,7 +49,6 @@ M.lint = function()
   }
 
   lint.linters.phpcs.args = {
-    -- "--tab-width=2",
     "-q",
     "--report=json",
     "-",
@@ -94,6 +82,14 @@ M.lint = function()
     -- parser = require("lint.parser").from_json({
     --   source = "golangci-lint",
     -- }),
+  }
+
+  lint.linters.shellcheck.args = {
+    "-e",
+    "SC2016",
+    "--format=json",
+    "-x",
+    "-"
   }
 
   -- Auto-lint
@@ -135,7 +131,7 @@ M.conform = {
     go = { "gofumpt", "golines" },
     c = { "clang-format" },
     cpp = { "clang-format" },
-    javascrspt = prettier,
+    javascript = prettier,
     javascriptreact = prettier,
     typescript = prettier,
     typescriptreact = prettier,
@@ -151,6 +147,7 @@ M.conform = {
     rust = { "rustfmt" },
     sql = { "sqlfluff" },
     sh = { "shfmt" },
+    bash = { "shfmt" },
     vue = prettier,
     markdown = { "prettier", "markdownlint-cli2", "markdown-toc" },
     ["markdown.mdx"] = { "prettier", "markdownlint-cli2", "markdown-toc" },

@@ -8,7 +8,7 @@ sort_by = "alphabetical"
 linemode = "mtime"
 sort_sensitive = true
 sort_dir_first = true
-ratio = [1, 2, 6]
+ratio = [1, 2, 5]
 
 [preview]
 wrap = "no"
@@ -21,6 +21,19 @@ bizarre_retry = 5
 image_alloc = 536870912  # 512MB
 image_bound = [0, 0]
 suppress_preload = false
+
+[plugin]
+prepend_fetchers = [
+    { id = "git", url = "*", run = "git" },
+    { id = "git", url = "*/", run = "git" },
+]
+
+# [opener]
+# edit = []
+# open = []
+#
+# [open]
+
 
 [input]
 cursor_blink = false
@@ -59,3 +72,6 @@ search_offset = [0, 2, 50, 3]
 shell_title = ["Shell:", "Shell (block):"]
 shell_origin = "center"
 shell_offset = [0, 2, 50, 3]
+
+[log]
+enabled = false

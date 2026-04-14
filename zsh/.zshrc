@@ -90,9 +90,14 @@ export RUSTFLAGS="-C opt-level=3 -C target-cpu=native" # Rust app build optimiza
 . "$ZSH/oh-my-zsh.sh"
 #. "$XDG_LOCAL_HOME/bin/env"
 . "$ZSH/../aliases.zsh"
+. "$ZSH/../functions.zsh"
 . "$ZSH/../fzf.zsh"
 
 [ -x "$(command -v zoxide)" ] && eval "$(zoxide init zsh)"
 [ -x "$(command -v phpenv)" ] && eval "$(phpenv init -)"
 [ -x "$(command -v pyenv)"  ] && eval "$(pyenv init - zsh)"
 
+
+export NVM_DIR="$HOME/.config/nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
