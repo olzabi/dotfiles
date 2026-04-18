@@ -11,8 +11,9 @@ return {
         "**/vendor/**",
         "**/stubs/**",
         "app",
+        "routes",
         "database",
-        ""
+        "",
       },
     },
     intelephense = {
@@ -119,21 +120,11 @@ return {
   },
   capabilities = {
     textDocument = {
-      codeLens = {
-        dynamicRegistration = true,
-      },
-      formatting = {
-        dynamicRegistration = false,
-      },
-      documentFormatting = {
-        dynamicRegistration = false,
-      },
-      documentRangeFormatting = {
-        dynamicRegistration = false,
-      },
-      documentOnTypeFormatting = {
-        dynamicRegistration = false,
-      },
+      codeLens = { dynamicRegistration = true },
+      formatting = { dynamicRegistration = false },
+      documentFormatting = { dynamicRegistration = false },
+      documentRangeFormatting = { dynamicRegistration = false },
+      documentOnTypeFormatting = { dynamicRegistration = false },
       codeAction = {
         dynamicRegistration = false,
         codeActionLiteralSupport = {

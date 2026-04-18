@@ -3,169 +3,34 @@ local M = {}
 local utils = require("utils.packages")
 
 M.capabilities = function()
-  local client_capabilities = vim.lsp.protocol.make_client_capabilities()
+  local ok, blink = pcall(require, "blink.cmp")
+  local base = ok and blink.get_lsp_capabilities() or vim.lsp.protocol.make_client_capabilities()
 
-  client_capabilities.textDocument.completion.completionItem.snippetSupport = true
-  client_capabilities.textDocument.semanticTokens.multilineTokenSupport = true
-
-  client_capabilities.workspace.didChangeWorkspaceFolders = { dynamicRegistration = false }
-  client_capabilities.workspace.didChangeConfiguration = { dynamicRegistration = false }
-
-  client_capabilities.textDocument.foldingRange = {
-    dynamicRegistration = true,
-    lineFoldingOnly = true,
-  }
-
-  client_capabilities.textDocument.completion.completionItem = {
-    snippetSupport = true,
-    preselectSupport = true,
-    deprecatedSupport = true,
-    commitCharactersSupport = true,
-    resolveSupport = {
-      properties = {
-        "documentation",
-        "detail",
-        "additionalTextEdits",
-      },
+  return vim.tbl_deep_extend("force", base, {
+    textDocument = {
+      semanticTokens = { multilineTokenSupport = true },
+      foldingRange = { dynamicRegistration = true, lineFoldingOnly = true },
     },
-  }
-
-  local ok, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
-  local cmp_capabilities = ok and cmp_nvim_lsp.default_capabilities() or {}
-
-  local capabilities = vim.tbl_deep_extend("force", client_capabilities, cmp_capabilities)
-
-  return capabilities
-end
-
-M.on_attach = function(client, bufnr) -- client, buffer
-  -- if not vim.api.nvim_buf_is_loaded(bufnr) then
-  --   return
-  -- end
-
-  local ok, err = pcall(function()
-    -- Enable completion triggered by <c-x><c-o>
-    vim.bo[bufnr].omnifunc = "v:lua.vim.lsp.omnifunc"
-
-    local ok, wd = pcall(require, "workspace-diagnostics")
-    if ok then
-      wd.populate_workspace_diagnostics(client, bufnr)
-    end
-
-    if client.supports_method("textDocument/inlayHint") then
-      vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
-    end
-
-    if client.supports_method("textDocument/definition") then
-      vim.keymap.set("n", "<C-]>", vim.lsp.buf.definition, { buffer = bufnr })
-    end
-
-    if client.supports_method("textDocument/implementation") then
-      vim.keymap.set("n", "<space>&", vim.lsp.buf.implementation, { buffer = bufnr })
-    end
-
-    if client.supports_method("textDocument/hover") then
-      vim.keymap.set("n", "<CR>", function()
-        vim.lsp.buf.hover({ border = vim.g.floating_window_border_dark })
-      end, { buffer = bufnr })
-    end
-
-    if client.supports_method("textDocument/definition") then
-      vim.keymap.set("n", "<Space>*", function()
-        require("lists").change_active("Quickfix")
-        vim.lsp.buf.references()
-      end, { buffer = bufnr })
-    end
-
-    if client.supports_method("textDocument/signatureHelp") then
-      vim.keymap.set("i", "<C-k>", vim.lsp.buf.signature_help, { buffer = bufnr, desc = "Signature help" })
-    end
-  end)
-
-  if not ok then
-    vim.notify("Error in LSP on_attach: " .. tostring(err), vim.log.levels.ERROR)
-  end
-end
-
-M.diagnostic = function()
-  local signs = require("utils.icons").diagnostic
-  for type, icon in pairs(signs) do
-    local hl = "DiagnosticSign" .. type
-    vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
-  end
-
-  local original_sign_handler = vim.diagnostic.handlers.signs
-  vim.diagnostic.handlers.signs = {
-    show = function(ns, bufnr, diagnostics, opts)
-      if diagnostics then
-        local new_diagnostics = {}
-        for _, diagnostic in ipairs(diagnostics) do
-          if
-            diagnostic.message:match("Unexpected statement, found '<<'")
-            and diagnostic.severity == vim.diagnostic.severity.WARN
-          then
-          -- Remove these warnings...
-          elseif
-            diagnostic.message:match("Unexpected statement, found '<<'")
-            and diagnostic.severity == vim.diagnostic.severity.ERROR
-          then
-            diagnostic.message = "Git conflict detected."
-            table.insert(new_diagnostics, diagnostic)
-          else
-            table.insert(new_diagnostics, diagnostic)
-          end
-        end
-        diagnostics = new_diagnostics
-      end
-      original_sign_handler.show(ns, bufnr, diagnostics, opts)
-    end,
-    hide = original_sign_handler.hide,
-  }
-
-  -- Global diagnostic settings
-  vim.diagnostic.config({
-    title = false,
-    underline = true,
-    update_in_insert = true,
-    virtual_text = true,
-    severity_sort = true,
-    virtual_lines = {
-      current_line = true,
-    },
-    sigs = true,
-    float = {
-      source = "always",
-      focusable = false,
-      border = "rounded",
-      style = "minimal",
-      header = "",
-      suffix = "",
-      prefix = "",
-      format = function(diagnostic)
-        local severity_symbols = {
-          [vim.diagnostic.severity.ERROR] = "✘",
-          [vim.diagnostic.severity.WARN] = " ",
-          [vim.diagnostic.severity.INFO] = "",
-          [vim.diagnostic.severity.HINT] = "",
-        }
-        local msg = diagnostic.message
-        local sym = severity_symbols[diagnostic.severity] or ""
-        return string.format("%s\n%s", sym, msg)
-      end,
-    },
-    signs = {
-      text = {
-        [vim.diagnostic.severity.ERROR] = "✘",
-        [vim.diagnostic.severity.WARN] = " ",
-        [vim.diagnostic.severity.INFO] = "",
-        [vim.diagnostic.severity.HINT] = "",
-      },
-      numhl = {
-        [vim.diagnostic.severity.ERROR] = "ErrorMsg",
-        [vim.diagnostic.severity.WARN] = "WarningMsg",
-      },
+    workspace = {
+      didChangeWorkspaceFolders = { dynamicRegistration = false },
+      didChangeConfiguration = { dynamicRegistration = false },
     },
   })
+end
+
+M.on_attach = function(client, bufnr)
+  if not vim.api.nvim_buf_is_valid(bufnr) then
+    return
+  end
+
+  local wd_ok, wd = pcall(require, "workspace-diagnostics")
+  if wd_ok then
+    wd.populate_workspace_diagnostics(client, bufnr)
+  end
+
+  if client:supports_method("textDocument/inlayHint") then
+    vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+  end
 end
 
 M.setup = function()
@@ -177,48 +42,41 @@ M.setup = function()
         return
       end
 
-      vim.api.nvim_create_autocmd("BufWritePre", {
-        buffer = buf,
-        callback = function()
-          -- if client:supports_method("textDocument/formatting") then
-          --   vim.lsp.buf.format({ bufnr = args.buf, id = client.id })
-          -- end
-
-          if client:supports_method("textDocument/codeAction") then
-            local function apply_code_action(action_type)
-              local ctx = { only = action_type, diagnostics = {} }
-              local actions = vim.lsp.buf.code_action({ context = ctx, apply = true, return_actions = true })
-
-              -- only apply if code action is available
-              if actions and #actions > 0 then
-                vim.lsp.buf.code_action({ context = ctx, apply = true })
-              end
-            end
-            apply_code_action({ "source.fixAll" })
-            apply_code_action({ "source.organizeImports" })
-          end
-        end,
-      })
-
-      ---@diagnostic disable-next-line need-check-nil
       if client.server_capabilities.completionProvider then
         vim.bo[buf].omnifunc = "v:lua.vim.lsp.omnifunc"
       end
-      ---@diagnostic disable-next-line need-check-nil
       if client.server_capabilities.definitionProvider then
         vim.bo[buf].tagfunc = "v:lua.vim.lsp.tagfunc"
       end
 
-      local bufopts = { noremap = true, silent = true, buffer = buf }
-      vim.keymap.set("n", "<Leader>gi", "<cmd>Telescope lsp_implementations<CR>", bufopts)
-      vim.keymap.set("n", "<Leader>gd", "<cmd>Telescope lsp_definitions<CR>", bufopts)
-      vim.keymap.set("n", "<Leader>gr", "<cmd>Telescope lsp_references<CR>", bufopts)
-      vim.keymap.set("n", "<Leader>es", "<cmd>Telescope diagnostics bufnr=0<CR>", bufopts)
-      vim.keymap.set("n", "<Leader>gD", vim.lsp.buf.declaration, bufopts)
-      vim.keymap.set("n", "<leader>rs", "<cmd>LspRestart<CR>", bufopts)
-      vim.keymap.set("n", "<Leader>ee", function()
-        vim.diagnostic.open_float(nil, { scope = "line" })
-      end, bufopts)
+      vim.api.nvim_create_autocmd("BufWritePre", {
+        buffer = buf,
+        callback = function()
+          if not client:supports_method("textDocument/codeAction") then
+            return
+          end
+
+          local function sync_action(kind)
+            local params = vim.lsp.util.make_range_params(0, client.offset_encoding)
+            params.context = { only = { kind }, diagnostics = vim.diagnostic.get(buf) }
+            local result, err = client:request_sync("textDocument/codeAction", params, 3000, buf)
+            if err or not result or not result.result then
+              return
+            end
+            for _, action in ipairs(result.result) do
+              if action.edit then
+                vim.lsp.util.apply_workspace_edit(action.edit, client.offset_encoding)
+              elseif action.command then
+                client:exec_cmd(action.command)
+              end
+            end
+          end
+
+          sync_action("source.organizeImports")
+        end,
+      })
+
+      require("keymaps.lsp").attach(buf)
     end,
   })
 
@@ -231,10 +89,7 @@ M.setup = function()
 end
 
 M.mason = function()
-  local mason = require("mason")
-  local mason_tools = utils.mason_tools
-
-  mason.setup({
+  require("mason").setup({
     registries = {
       "github:crashdummyy/mason-registry",
       "github:mason-org/mason-registry",
@@ -242,15 +97,27 @@ M.mason = function()
   })
 
   local registry = require("mason-registry")
-  for _, server_name in ipairs(mason_tools) do
-    local ok, pkg = pcall(registry.get_package, server_name)
-    if ok and not pkg:is_installed() then
-      vim.notify("Installing " .. server_name, vim.log.levels.INFO)
-      pkg:install()
-    elseif not ok then
-      vim.notify("Package not found: " .. server_name, vim.log.levels.WARN)
+  registry.refresh(function(ok, err)
+    if not ok then
+      vim.notify("Mason registry refresh failed: " .. tostring(err), vim.log.levels.ERROR)
+      return
     end
-  end
+
+    for _, name in ipairs(utils.mason_tools) do
+      local pkg_ok, pkg = pcall(registry.get_package, name)
+      if not pkg_ok then
+        vim.notify("Mason: unknown package '" .. name .. "'", vim.log.levels.WARN)
+      elseif not pkg:is_installed() then
+        pkg:install({}, function(success, result)
+          vim.schedule(function()
+            local msg = success and ("Mason: installed " .. name)
+              or ("Mason: failed " .. name .. " — " .. tostring(result))
+            vim.notify(msg, success and vim.log.levels.INFO or vim.log.levels.ERROR)
+          end)
+        end)
+      end
+    end
+  end)
 end
 
 return M

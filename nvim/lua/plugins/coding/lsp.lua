@@ -7,16 +7,8 @@ return {
     lazy = false,
     config = function()
       require("configs.lsp").mason()
+      require("configs.lsp").setup()
     end,
-  },
-
-  {
-    -- NOTE: can be removed after moving to native lsp setup  >v0.11
-    "hrsh7th/nvim-cmp",
-    event = { "InsertEnter", "CmdlineEnter" },
-    dependencies = require("configs.cmp").dependencies,
-    ---@param config cmp.ConfigSchema
-    config = require("configs.cmp").config,
   },
 
   {
@@ -24,39 +16,19 @@ return {
     "aznhe21/actions-preview.nvim",
     event = { "LspAttach" },
     opts = {
-      -- priority list of preferred backend
       backend = { "snacks", "telescope", "nui" },
-      -- options for nui.nvim components
       nui = {
-        -- options for nui Layout component: https://github.com/MunifTanjim/nui.nvim/tree/main/lua/nui/layout
         layout = {
           position = "50%",
-          size = {
-            width = "80%",
-            height = "80%",
-          },
+          size = { width = "80%", height = "80%" },
           min_width = 40,
           min_height = 10,
           relative = "editor",
         },
-        -- options for preview area: https://github.com/MunifTanjim/nui.nvim/tree/main/lua/nui/popup
-        preview = {
-          size = "60%",
-          border = {
-            padding = { 0, 1 },
-          },
-        },
-        -- options for selection area: https://github.com/MunifTanjim/nui.nvim/tree/main/lua/nui/menu
-        select = {
-          size = "40%",
-          border = {
-            padding = { 0, 1 },
-          },
-        },
+        preview = { size = "60%", border = { padding = { 0, 1 } } },
+        select = { size = "40%", border = { padding = { 0, 1 } } },
       },
-      snacks = {
-        layout = { preset = "telescope" },
-      },
+      snacks = { layout = { preset = "telescope" } },
     },
 
     keys = {

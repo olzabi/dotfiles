@@ -9,17 +9,6 @@ return {
     config = require("configs.treesitter").config,
   },
 
-  {
-    "neovim/nvim-lspconfig",
-    event = { "BufReadPre", "BufNewFile" },
-    lazy = false,
-    config = function()
-      require("configs.lsp").setup()
-    end,
-  },
-
-  "brianhuster/live-preview.nvim",
-
   { "3rd/diagram.nvim", ft = { "markdown" } },
   {
     "vhyrro/luarocks.nvim",
@@ -63,13 +52,6 @@ return {
   },
 
   {
-    "alex-popov-tech/store.nvim",
-    dependencies = "OXY2DEV/markview.nvim", -- optional, for pretty readme preview / help window
-    cmd = "Store",
-    opts = {},
-  },
-
-  {
     "codethread/qmk.nvim",
     opts = {
       name = "corne",
@@ -84,10 +66,16 @@ return {
   },
 
   {
-    "adelarsq/image_preview.nvim",
-    event = "VeryLazy",
-    config = function()
-      require("image_preview").setup()
-    end,
+    -- Diagnostics tool
+    "folke/trouble.nvim",
+    cmd = { "Trouble" },
+    opts = {
+      modes = {
+        lsp = {
+          win = { position = "right" },
+        },
+      },
+    },
+    keys = require("keymaps").trouble,
   },
 }

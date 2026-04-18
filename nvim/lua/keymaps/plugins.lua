@@ -8,93 +8,16 @@ M.laravel = {
   -- { ";Lr", "<cmd>Laravel routes<cr>", desc = "Laravel - Routes" },
   { ";Li", "<cmd>Laravel install<cr>", desc = "Laravel Install" },
   { ";LR", "<cmd>Laravel related<cr>", desc = "Laravel - Related" },
-
-  {
-    ";Ll",
-    function()
-      Laravel.pickers.laravel()
-    end,
-    desc = "Laravel: Open Laravel Picker",
-  },
-  {
-    "<c-g>",
-    function()
-      Laravel.commands.run("view:finder")
-    end,
-    desc = "Laravel: Open View Finder",
-  },
-  {
-    ";La",
-    function()
-      Laravel.pickers.artisan()
-    end,
-    desc = "Laravel: Artisan",
-  },
-  {
-    ";Lt",
-    function()
-      Laravel.commands.run("actions")
-    end,
-    desc = "Laravel: Actions",
-  },
-  {
-    ";Lr",
-    function()
-      Laravel.pickers.routes()
-    end,
-    desc = "Laravel: Routes",
-  },
-  {
-    ";Lh",
-    function()
-      Laravel.run("artisan docs")
-    end,
-    desc = "Laravel: Documentation",
-  },
-  {
-    ";Lm",
-    function()
-      Laravel.pickers.make()
-    end,
-    desc = "Laravel: Make",
-  },
-  {
-    ";Lc",
-    function()
-      Laravel.pickers.commands()
-    end,
-    desc = "Laravel: Commands",
-  },
-  {
-    ";Lo",
-    function()
-      Laravel.pickers.resources()
-    end,
-    desc = "Laravel: Resources",
-  },
-  {
-    ";Lp",
-    function()
-      Laravel.commands.run("command_center")
-    end,
-    desc = "Laravel: Command Center",
-  },
-  -- {
-  --   "gf",
-  --   function()
-  --     local ok, res = pcall(function()
-  --       if Laravel.app("gf").cursorOnResource() then
-  --         return "<cmd>lua Laravel.commands.run('gf')<cr>"
-  --       end
-  --     end)
-  --     if not ok or not res then
-  --       return "gf"
-  --     end
-  --     return res
-  --   end,
-  --   expr = true,
-  --   noremap = true,
-  -- },
+  { ";Ll", function() Laravel.pickers.laravel() end, desc = "Laravel: Open Laravel Picker", },
+  { "<c-g>", function() Laravel.commands.run("view:finder") end, desc = "Laravel: Open View Finder", },
+  { ";La", function() Laravel.pickers.artisan() end, desc = "Laravel: Artisan", },
+  { ";Lt", function() Laravel.commands.run("actions") end, desc = "Laravel: Actions", },
+  { ";Lr", function() Laravel.pickers.routes() end, desc = "Laravel: Routes", },
+  { ";Lh", function() Laravel.run("artisan docs") end, desc = "Laravel: Documentation", },
+  { ";Lm", function() Laravel.pickers.make() end, desc = "Laravel: Make", },
+  { ";Lc", function() Laravel.pickers.commands() end, desc = "Laravel: Commands", },
+  { ";Lo", function() Laravel.pickers.resources() end, desc = "Laravel: Resources", },
+  { ";Lp", function() Laravel.commands.run("command_center") end, desc = "Laravel: Command Center", },
 }
 
 M.phptools_ide_helper_mapping = function()
@@ -163,22 +86,9 @@ M.neo_tree = {
 }
 
 M.multicursors = {
-  {
-    "<leader>m",
-    "<CMD>MCstart<CR>",
-    desc = "multicursor",
-  },
-  {
-    "<leader>m",
-    "<CMD>MCvisual<CR>",
-    mode = "v",
-    desc = "multicursor",
-  },
-  {
-    "<leader><C-Down>",
-    "<CMD>MCunderCursor<CR>",
-    desc = "multicursor down",
-  },
+  { "<leader>m", "<CMD>MCstart<CR>", desc = "multicursor", },
+  { "<leader>m", "<CMD>MCvisual<CR>", mode = "v", desc = "multicursor", },
+  { "<leader><C-Down>", "<CMD>MCunderCursor<CR>", desc = "multicursor down", },
 }
 
 M.grug_far = {
@@ -206,10 +116,7 @@ M.symbols_outline = { { "<leader>uCo", "<cmd>SymbolsOutline<cr>", desc = "Symbol
 M.transparent = { { "<leader>uEt", "<cmd>TransparentToggle<cr>", desc = "Toggle Transparency" } }
 M.zen_mode = { { "<leader>uEz", "<cmd>ZenMode<cr>", desc = "Toggle ZenMode" } }
 M.twilight = { { "<leader>uEc", "<cmd>Twilight<cr>", desc = "Toggle Twilight" } }
-
-M.vim_dadbod = {
-  { "<leader>ud", "<cmd>DBUIToggle<cr>", desc = "Open Database UI" },
-}
+M.vim_dadbod = { { "<leader>ud", "<cmd>DBUIToggle<cr>", desc = "Open Database UI" }, }
 
 M.symbol_usage = function()
   nmap("<leader>uCs", "<cmd>lua require('symbol-usage').toggle_globally()<cr>", "Toggle Symbol Usage")
@@ -247,16 +154,8 @@ M.lazygit = {
 }
 
 M.git_worktree = {
-  {
-    ";Gwl",
-    "<cmd>lua require('telescope').extensions.git_worktree.git_worktrees()<cr>",
-    desc = "List Git Worktree",
-  },
-  {
-    ";Gwc",
-    "<cmd>lua require('telescope').extensions.git_worktree.create_git_worktree()<cr>",
-    desc = "Create Git Worktree Branches",
-  },
+  { ";Gwl", "<cmd>lua require('telescope').extensions.git_worktree.git_worktrees()<cr>", desc = "List Git Worktree", },
+  { ";Gwc", "<cmd>lua require('telescope').extensions.git_worktree.create_git_worktree()<cr>", desc = "Create Git Worktree Branches", },
 }
 
 M.git_fzf = function()
@@ -268,42 +167,14 @@ end
 -------------
 
 M.overseer = {
-  {
-    "<leader>ot",
-    "<cmd>OverseerToggle<CR>",
-    desc = "Toggle Overseer Task List",
-  },
-  { "<leader>or", "<cmd>OverseerRun<CR>", desc = "Run Overseer Task" },
-  {
-    "<leader>ol",
-    "<cmd>OverseerRunCmd<CR>",
-    desc = "Run Command in Overseer",
-  },
-  {
-    "<leader>oq",
-    "<cmd>OverseerQuickAction<CR>",
-    desc = "Quick Action for Overseer Task",
-  },
-  {
-    "<leader>oa",
-    "<cmd>OverseerTaskAction<CR>",
-    desc = "Select and Act on Overseer Task",
-  },
-  {
-    "<leader>oc",
-    "<cmd>OverseerClearCache<CR>",
-    desc = "Clear Overseer Task Cache",
-  },
-  {
-    "<leader>os",
-    "<cmd>OverseerSaveBundle<CR>",
-    desc = "Save Overseer Task Bundle",
-  },
-  {
-    "<leader>ob",
-    "<cmd>OverseerLoadBundle<CR>",
-    desc = "Load Overseer Task Bundle",
-  },
+  { "<leader>ot", "<cmd>OverseerToggle<CR>",     desc = "Toggle Overseer Task List", },
+  { "<leader>or", "<cmd>OverseerRun<CR>",        desc = "Run Overseer Task" },
+  { "<leader>ol", "<cmd>OverseerRunCmd<CR>",     desc = "Run Command in Overseer", },
+  { "<leader>oq", "<cmd>OverseerQuickAction<CR>",desc = "Quick Action for Overseer Task", },
+  { "<leader>oa", "<cmd>OverseerTaskAction<CR>", desc = "Select and Act on Overseer Task", },
+  { "<leader>oc", "<cmd>OverseerClearCache<CR>", desc = "Clear Overseer Task Cache", },
+  { "<leader>os", "<cmd>OverseerSaveBundle<CR>", desc = "Save Overseer Task Bundle", },
+  { "<leader>ob", "<cmd>OverseerLoadBundle<CR>", desc = "Load Overseer Task Bundle", },
 }
 
 M.trouble = {
@@ -354,222 +225,58 @@ M.yazi = {
 }
 
 M.yanky = {
-  { "<leader>y", "<cmd>YankyRingHistory<cr>", mode = { "n", "x" }, desc = "Open Yank History" },
-  { "y", "<Plug>(YankyYank)", mode = { "n", "x" }, desc = "Yank text" },
-  { "p", "<Plug>(YankyPutAfter)", mode = { "n", "x" }, desc = "Put yanked text after cursor" },
-  { "P", "<Plug>(YankyPutBefore)", mode = { "n", "x" }, desc = "Put yanked text before cursor" },
-  { "gp", "<Plug>(YankyGPutAfter)", mode = { "n", "x" }, desc = "Put yanked text after selection" },
-  { "gP", "<Plug>(YankyGPutBefore)", mode = { "n", "x" }, desc = "Put yanked text before selection" },
-  { "]p", "<Plug>(YankyPutIndentAfterLinewise)", desc = "Put indented after cursor (linewise)" },
-  { "[p", "<Plug>(YankyPutIndentBeforeLinewise)", desc = "Put indented before cursor (linewise)" },
-  { "]P", "<Plug>(YankyPutIndentAfterLinewise)", desc = "Put indented after cursor (linewise)" },
-  { "[P", "<Plug>(YankyPutIndentBeforeLinewise)", desc = "Put indented before cursor (linewise)" },
-  { ">p", "<Plug>(YankyPutIndentAfterShiftRight)", desc = "Put and indent right" },
-  { "<p", "<Plug>(YankyPutIndentAfterShiftLeft)", desc = "Put and indent left" },
-  { ">P", "<Plug>(YankyPutIndentBeforeShiftRight)", desc = "Put before and indent right" },
-  { "<P", "<Plug>(YankyPutIndentBeforeShiftLeft)", desc = "Put before and indent left" },
-  { "=p", "<Plug>(YankyPutAfterFilter)", desc = "Put after applying a filter" },
-  { "=P", "<Plug>(YankyPutBeforeFilter)", desc = "Put before applying a filter" },
+  { "<leader>y", "<cmd>YankyRingHistory<cr>",     mode = { "n", "x" }, desc = "Open Yank History" },
+  { "y", "<Plug>(YankyYank)",                     mode = { "n", "x" }, desc = "Yank text" },
+  { "p", "<Plug>(YankyPutAfter)",                 mode = { "n", "x" }, desc = "Put yanked text after cursor" },
+  { "P", "<Plug>(YankyPutBefore)",                mode = { "n", "x" }, desc = "Put yanked text before cursor" },
+  { "gp", "<Plug>(YankyGPutAfter)",               mode = { "n", "x" }, desc = "Put yanked text after selection" },
+  { "gP", "<Plug>(YankyGPutBefore)",              mode = { "n", "x" }, desc = "Put yanked text before selection" },
+  { "]p", "<Plug>(YankyPutIndentAfterLinewise)",                       desc = "Put indented after cursor (linewise)" },
+  { "[p", "<Plug>(YankyPutIndentBeforeLinewise)",                      desc = "Put indented before cursor (linewise)" },
+  { "]P", "<Plug>(YankyPutIndentAfterLinewise)",                       desc = "Put indented after cursor (linewise)" },
+  { "[P", "<Plug>(YankyPutIndentBeforeLinewise)",                      desc = "Put indented before cursor (linewise)" },
+  { ">p", "<Plug>(YankyPutIndentAfterShiftRight)",                     desc = "Put and indent right" },
+  { "<p", "<Plug>(YankyPutIndentAfterShiftLeft)",                      desc = "Put and indent left" },
+  { ">P", "<Plug>(YankyPutIndentBeforeShiftRight)",                    desc = "Put before and indent right" },
+  { "<P", "<Plug>(YankyPutIndentBeforeShiftLeft)",                     desc = "Put before and indent left" },
+  { "=p", "<Plug>(YankyPutAfterFilter)",                               desc = "Put after applying a filter" },
+  { "=P", "<Plug>(YankyPutBeforeFilter)",                              desc = "Put before applying a filter" },
 }
 
 M.todo_comments = {
-  {
-    "[t",
-    function()
-      require("todo-comments").jump_prev()
-    end,
-    desc = "Previous Todo Comment",
-  },
-  {
-    "]t",
-    function()
-      require("todo-comments").jump_next()
-    end,
-    desc = "Next Todo Comment",
-  },
+  { "[t", function() require("todo-comments").jump_prev() end, desc = "Previous Todo Comment", },
+  { "]t", function() require("todo-comments").jump_next() end, desc = "Next Todo Comment", },
   { ";xt", "<cmd>TodoTelescope<cr>", desc = "Todo" },
   { ";xT", "<cmd>TodoTelescope keywords=TODO,FIX,FIXME<cr>", desc = "Todo/Fix/Fixme" },
 }
 
 M.snacks = {
-  -- buffer
-  {
-    "<leader>bd",
-    function()
-      Snacks.bufdelete()
-    end,
-    desc = "Delete Buffer",
-  },
-  -- search
-  {
-    ";;",
-    function()
-      Snacks.picker.grep()
-    end,
-    desc = "Grep",
-  },
-  {
-    "<leader>sw",
-    function()
-      Snacks.picker.grep_word()
-    end,
-    desc = "Visual selection or word",
-    mode = { "n", "x" },
-  },
-  {
-    "<leader>sB",
-    function()
-      Snacks.picker.grep_buffers()
-    end,
-    desc = "Grep Open Buffers",
-  },
-  {
-    "<leader>su",
-    function()
-      Snacks.picker.undo()
-    end,
-    desc = "Undo History",
-  },
-  {
-    '<leader>"',
-    function()
-      Snacks.picker.registers()
-    end,
-    desc = "Registers",
-  },
-  {
-    ";ff",
-    function()
-      Snacks.picker.files()
-    end,
-    desc = "Find Files",
-  },
+  { "<leader>bd", function() Snacks.bufdelete() end, desc = "Delete Buffer", },
+  { ";;",         function() Snacks.picker.grep() end, desc = "Grep", },
+  { "<leader>sw", function() Snacks.picker.grep_word() end, desc = "Visual selection or word", mode = { "n", "x" }, },
+  { "<leader>sB", function() Snacks.picker.grep_buffers() end, desc = "Grep Open Buffers", },
+  { "<leader>su", function() Snacks.picker.undo() end, desc = "Undo History", },
+  { '<leader>"',  function() Snacks.picker.registers() end, desc = "Registers", },
+  { ";ff",        function() Snacks.picker.files() end, desc = "Find Files", },
 
-  -- Git
-  {
-    ";Gb",
-    function()
-      Snacks.picker.git_branches()
-    end,
-    desc = "Git Branches",
-  },
-  {
-    ";Gl",
-    function()
-      Snacks.picker.git_log()
-    end,
-    desc = "Git Log",
-  },
-  {
-    ";GL",
-    function()
-      Snacks.picker.git_log_line()
-    end,
-    desc = "Git Log Line",
-  },
-  {
-    ";Gs",
-    function()
-      Snacks.picker.git_status()
-    end,
-    desc = "Git Status",
-  },
-  {
-    ";GS",
-    function()
-      Snacks.picker.git_stash()
-    end,
-    desc = "Git Stash",
-  },
-  {
-    ";Gd",
-    function()
-      Snacks.picker.git_diff()
-    end,
-    desc = "Git Diff (Hunks)",
-  },
-  {
-    ";Ggf",
-    function()
-      Snacks.picker.git_log_file()
-    end,
-    desc = "Git Log File",
-  },
-  --
-  {
-    ";q",
-    function()
-      Snacks.picker.qflist()
-    end,
-    desc = "Quickfix List",
-  },
-  {
-    ";m",
-    function()
-      Snacks.picker.marks()
-    end,
-    desc = "Marks",
-  },
-  {
-    ";P",
-    function()
-      Snacks.picker.projects()
-    end,
-    desc = "Projects",
-  },
-  {
-    "<leader><leader>",
-    function()
-      Snacks.scratch()
-    end,
-    desc = "Scratch",
-  },
-  {
-    ";s<leader>",
-    function()
-      Snacks.scratch.select()
-    end,
-    desc = "Select Scratch",
-  },
-  {
-    ";r",
-    function()
-      Snacks.picker.recent()
-    end,
-    desc = "Recent files",
-  },
-  {
-    ";<leader>",
-    function()
-      Snacks.picker.smart()
-    end,
-    desc = "Smart Find Files",
-  },
+  { ";Gb", function() Snacks.picker.git_branches() end, desc = "Git Branches", },
+  { ";Gl", function() Snacks.picker.git_log() end, desc = "Git Log", },
+  { ";GL", function() Snacks.picker.git_log_line() end, desc = "Git Log Line", },
+  { ";Gs", function() Snacks.picker.git_status() end, desc = "Git Status", },
+  { ";GS", function() Snacks.picker.git_stash() end, desc = "Git Stash", },
+  { ";Gd", function() Snacks.picker.git_diff() end, desc = "Git Diff (Hunks)", },
+  { ";Ggf",function() Snacks.picker.git_log_file() end, desc = "Git Log File", },
 
-  {
-    -- double \ to enter
-    "\\\\",
-    function()
-      Snacks.terminal()
-    end,
-    desc = "Toggle Terminal",
-  },
-
-  -- todo
-  {
-    "<leader>xT",
-    "<cmd>Trouble todo toggle filter = {tag = {TODO,FIX,WARN,HACK,PERF,NOTE,TEST}}<cr>",
-    desc = "Search Todos (Trouble)",
-  },
-  {
-    "<leader>sT",
-    function()
-      Snacks.picker.todo_comments({
-        keywords = { "TODO", "FIX", "WARN", "HACK", "PERF", "NOTE", "TEST" },
-      })
-    end,
-    desc = "Todo/Fix/Fixme",
-  },
+  { ";q",               function() Snacks.picker.qflist() end, desc = "Quickfix List", },
+  { ";m",               function() Snacks.picker.marks() end, desc = "Marks", },
+  { ";P",               function() Snacks.picker.projects() end, desc = "Projects", },
+  { "<leader><leader>", function() Snacks.scratch() end, desc = "Scratch", },
+  { ";s<leader>",       function() Snacks.scratch.select() end, desc = "Select Scratch", },
+  { ";r",               function() Snacks.picker.recent() end, desc = "Recent files", },
+  { ";<leader>",        function() Snacks.picker.smart() end, desc = "Smart Find Files", },
+  { "\\\\",             function() Snacks.terminal() end, desc = "Toggle Terminal", },
+  { "<leader>xT", "<cmd>Trouble todo toggle filter = {tag = {TODO,FIX,WARN,HACK,PERF,NOTE,TEST}}<cr>", desc = "Search Todos (Trouble)", },
+  { "<leader>sT", function() Snacks.picker.todo_comments({ keywords = { "TODO", "FIX", "WARN", "HACK", "PERF", "NOTE", "TEST" }, }) end, desc = "Todo/Fix/Fixme", },
 }
 
 M.treesitter = { { "<leader>ts", "<cmd>TSContextToggle<cr>", desc = "Treesitter Context" } }
@@ -581,16 +288,7 @@ M.noice = {
 }
 
 M.refactoring = {
-  {
-    "<leader>Rs",
-    function()
-      require("refactoring").select_refactor()
-    end,
-    mode = { "n", "v" },
-    noremap = true,
-    silent = true,
-    expr = false,
-  },
+  { "<leader>Rs", function() require("refactoring").select_refactor() end, mode = { "n", "v" }, noremap = true, silent = true, expr = false, },
   { "<leader>Re", "<cmd>Refactor extract<cr>", mode = "x", desc = "Extract function" },
   { "<leader>Rf", "<cmd>Refactor extract_to_file<cr>", mode = "x", desc = "Extract function to file" },
   { "<leader>Rv", "<cmd>Refactor extract_var<cr>", mode = "x", desc = "Extract variable" },
@@ -620,95 +318,6 @@ M.bufferline = {
   { "<leader>bp", "<cmd>BufferLinePick<cr>", desc = "Pick Buffer" },
   { "<A-S-Right>", "<cmd>+tabmove<cr>", desc = "Move tab to next" },
   { "<A-S-Left>", "<cmd>-tabmove<cr>", desc = "Move tab to previous" },
-}
-
-M.debug = {
-  -- Basic debugging keymaps, feel free to change to your liking!
-  {
-    "<leader>dc",
-    function()
-      require("dap").continue()
-    end,
-    desc = "Continue",
-  },
-  {
-    "<leader>di",
-    function()
-      require("dap").step_into()
-    end,
-    desc = "Step Into",
-  },
-  {
-    "<leader>dO",
-    function()
-      require("dap").step_over()
-    end,
-    desc = "Step Over",
-  },
-  {
-    "<leader>do",
-    function()
-      require("dap").step_out()
-    end,
-    desc = "Step Out",
-  },
-  {
-    "<leader>dg",
-    function()
-      require("dap").goto_()
-    end,
-    desc = "Got to line (no execute)",
-  },
-  {
-    "<leader>dt",
-    function()
-      require("dap").terminate()
-    end,
-    desc = "Terminate",
-  },
-  {
-    "<leader>dC",
-    function()
-      require("dap").run_to_cursor()
-    end,
-    desc = "Run to Cursor",
-  },
-  {
-    "<leader>dp",
-    function()
-      require("dap").pause()
-    end,
-    desc = "Pause",
-  },
-  {
-    "<leader>da",
-    function()
-      require("dap").continue({ before = get_args })
-    end,
-    desc = "Run with Args",
-  },
-  {
-    "<leader>db",
-    function()
-      require("dap").toggle_breakpoint()
-    end,
-    desc = "Toggle Breakpoint",
-  },
-  {
-    "<leader>dB",
-    function()
-      require("dap").set_breakpoint(vim.fn.input("Breakpoint condition: "))
-    end,
-    desc = "Set Breakpoint",
-  },
-  -- Toggle to see last session result. Without this, you can't see session output in case of unhandled exception.
-  {
-    "<F7>",
-    function()
-      require("dapui").toggle()
-    end,
-    desc = "See last session result.",
-  },
 }
 
 -- Coding
@@ -743,46 +352,6 @@ M.typescript = {
   { "<leader>cTr", "<cmd>TSToolsRenameFile<CR>", desc = "Rename File" },
   { "<leader>cTF", "<cmd>TSToolsFileReferences<CR>", desc = "Find File References" },
 }
--------------
-
--- cmp
--------------
-M.cmp_mapping = function()
-  local cmp = require("cmp")
-  return {
-    -- ["<C-b>"] = cmp.mapping.scroll_docs(-4), -- Up
-    -- ["<C-f>"] = cmp.mapping.scroll_docs(4), -- Down
-    ["<C-Space>"] = cmp.mapping.complete({
-      config = {
-        sources = { { name = "nvim_lsp" } },
-      },
-    }),
-    ["<C-s>"] = cmp.mapping.complete({
-      config = {
-        sources = { { name = "luasnip" } },
-      },
-    }),
-    ["<C-v>"] = cmp.mapping.complete({
-      config = {
-        sources = { { name = "path" }, { name = "buffer" } },
-      },
-    }),
-    ["<CR>"] = cmp.mapping.confirm({
-      -- behavior = cmp.ConfirmBehavior.Insert,
-      select = false,
-    }),
-    -- NOTE: default ones: [C-y] to confirm, [C-e] to abort
-  }
-end
-
-M.cmdline_mapping = function()
-  local cmp = require("cmp")
-  return {
-    ["<CR>"] = cmp.mapping(cmp.mapping.confirm({ select = false }), { "c" }),
-    ["<C-j>"] = cmp.mapping(cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }), { "c" }),
-    ["<C-k>"] = cmp.mapping(cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }), { "c" }),
-  }
-end
 
 -- HTTP
 -------------
@@ -797,100 +366,6 @@ M.persistence = {
   { "<leader>Sd", [[<cmd>lua require("persistence").stop()<cr>]] },
 }
 
-M.telescope = {
-  -- {
-  --   "<leader>r",
-  --   ":lua require'telescope'.extensions.live_grep_args.live_grep_args()<CR>",
-  --   noremap = true,
-  --   silent = true,
-  --   desc = "RG",
-  -- },
-  -- {
-  --   "<leader>#",
-  --   ":lua require('telescope.builtin').grep_string()<CR>",
-  --   noremap = true,
-  --   silent = true,
-  --   desc = "Grep string",
-  -- },
-  -- {
-  --   "<leader>ts",
-  --   ":lua require('telescope.builtin').treesitter()<CR>",
-  --   noremap = true,
-  --   silent = true,
-  --   desc = "Treesitter",
-  -- },
-  -- { "<leader>m", ":lua require('telescope.builtin').marks()<CR>", noremap = true, silent = true, desc = "Marks" },
-  -- {
-  --   "<leader>bb",
-  --   ":lua require('plugins.telescope').my_buffers()<CR>",
-  --   noremap = true,
-  --   silent = true,
-  --   desc = "Buffers",
-  -- },
-  -- {
-  --   "<leader>l",
-  --   ":lua require('telescope.builtin').current_buffer_fuzzy_find()<CR>",
-  --   noremap = true,
-  --   silent = true,
-  --   desc = "Search line buffer",
-  -- },
-  -- {
-  --   "<leader>f",
-  --   ":lua require('telescope.builtin').find_files({hidden=true})<CR>",
-  --   noremap = true,
-  --   silent = true,
-  --   desc = "Find files",
-  -- },
-  -- {
-  --   "<leader>fp",
-  --   ":lua require('plugins.telescope').project_files()<CR>",
-  --   noremap = true,
-  --   silent = true,
-  --   desc = "Project files",
-  -- },
-  -- {
-  --   "<leader>p",
-  --   ":lua require'telescope'.extensions.repo.list{file_ignore_patterns={'/%.cache/', '/%.cargo/', '/%.local/', '/%.asdf/', '/%.zinit/', '/%.tmux/'}}<CR>",
-  --   noremap = true,
-  --   silent = true,
-  --   desc = "Projects",
-  -- },
-  -- {
-  --   "<leader>g",
-  --   ":lua require('plugins.telescope').my_git_status()<CR>",
-  --   noremap = true,
-  --   silent = true,
-  --   desc = "Git status",
-  -- },
-  -- { "<leader>ns", ":lua require('plugins.telescope').my_note()<CR>", noremap = true, silent = true, desc = "Note" },
-  -- { "<leader>y", ":Telescope neoclip<CR>", noremap = true, silent = true, desc = "Neoclip" },
-  -- {
-  --   "<leader>ll",
-  --   ":lua require('telescope.builtin').grep_string({ search = vim.fn.input('GREP -> ') })<CR>",
-  --   noremap = true,
-  --   silent = true,
-  --   desc = "Grep string",
-  -- },
-  -- { "<leader>z", ":Telescope zoxide list<CR>", noremap = true, silent = true, desc = "Zoxide" },
-  -- { "<leader>f", "<cmd>Telescope find_files<cr>", desc = "Find in files" },
-  -- { "<leader>o", "<cmd>Telescope find_files<cr>", desc = "Find files" },
-  -- { "<leader>p", "<cmd>Telescope oldfiles<cr>", desc = "Previous files" },
-  -- { "gr", "<cmd>Telescope lsp_references<cr>", desc = "Go to references" },
-  -- { "gI", "<cmd>Telescope lsp_implementations<cr>", desc = "Go to implementations" },
-  -- { "<leader>t", group = "Telescope" },
-  -- { "<leader>tb", "<cmd>Telescope buffers<cr>", desc = "Buffers" },
-  -- { "<leader>tg", group = "Git" },
-  -- { "<leader>tgb", "<cmd>Telescope git_branches<cr>", desc = "Git branches" },
-  -- { "<leader>tgo", "<cmd>Telescope git_files<cr>", desc = "Git files" },
-  -- { "<leader>tj", "<cmd>Telescope jumplist<cr>", desc = "Jumplist" },
-  -- { "<leader>to", "<cmd>Telescope find_files<CR>", desc = "Find files" },
-  -- { "<leader>tp", "<cmd>Telescope oldfiles<cr>", desc = "Oldfiles" },
-  -- { "<leader>tq", "<cmd>Telescope quickfix<cr>", desc = "Quickfix list" },
-  -- { "<leader>tr", "<cmd>Telescope resume<cr>", desc = "Previous Telescope window" },
-  -- { "<leader>ts", "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>", desc = "Workspace symbols" },
-  -- { "<leader>tt", "<cmd>Telescope<cr>", desc = "Open Telescope" },
-}
--- Reload nvim
+M.telescope = { }
 
 return M --
--- nmap("<leader>ee", "<cmd>vsp .env<cr>", "Open .env file in a vertical split")

@@ -116,6 +116,7 @@ return {
 
   {
     "smoka7/multicursors.nvim",
+    enabled = false,
     dependencies = "Cathyprime/hydra.nvim",
     cmd = { "MCstart", "MCvisual", "MCclear", "MCpattern", "MCvisualPattern", "MCunderCursor" },
     keys = require("keymaps").multicursors,

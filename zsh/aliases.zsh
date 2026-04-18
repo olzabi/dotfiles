@@ -13,6 +13,7 @@ alias n='nvim'
 alias zw='zellij --layout layout.kdl'
 alias leet='nvim leetcode.nvim'
 alias monkey='smassh' # inspired by monkeytype
+alias cal="calcurse"
 
 #* git
 # ---------
@@ -32,15 +33,3 @@ alias serve="artisan serve"
 alias tinker="artisan tinker"
 alias cu='composer update'
 alias ci='composer install'
-
-# TODO:
-
-# Docker
-# ---------
-# alias dc='docker compose'
-# alias dcb='docker compose build'
-# alias dcu='docker compose up -d'
-# alias dcd='docker compose down'
-# alias dockerclean="docker ps -a | grep 'days ago\|weeks ago' | awk '{print $1}' | gxargs --no-run-if-empty docker rm"
-# alias dockercleani="docker images | grep '<none>' | awk '{print $3}' | gxargs --no-run-if-empty docker rmi -f"
-

@@ -106,7 +106,6 @@ local extensions = {
 }
 
 M.dependencies = {
-  { "nvim-telescope/telescope-dap.nvim" },
   { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
   { "nvim-telescope/telescope-file-browser.nvim" },
   { "nvim-telescope/telescope-frecency.nvim" },
@@ -149,7 +148,6 @@ M.config = function()
     "luasnip",
     "heading",
     "env",
-    "dap",
     "frecency",
     "fzy_native",
     "gh",
