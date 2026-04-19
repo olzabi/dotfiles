@@ -267,6 +267,7 @@ M.snacks = {
   { ";Gd", function() Snacks.picker.git_diff() end, desc = "Git Diff (Hunks)", },
   { ";Ggf",function() Snacks.picker.git_log_file() end, desc = "Git Log File", },
 
+  { "<leader>p",        function() Snacks.picker.yanky() end, mode = { "n", "x" }, desc = "Open Yank History" },
   { ";q",               function() Snacks.picker.qflist() end, desc = "Quickfix List", },
   { ";m",               function() Snacks.picker.marks() end, desc = "Marks", },
   { ";P",               function() Snacks.picker.projects() end, desc = "Projects", },

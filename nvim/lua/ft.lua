@@ -1,9 +1,9 @@
-vim.filetype.add({
+vim.filetype.add {
   pattern = { [".*%.overlay"] = "c", [".*%.dts"] = "c" },
-})
-vim.cmd([[autocmd BufNewFile,BufRead *.keymap setfiletype c]])
+}
+vim.cmd [[autocmd BufNewFile,BufRead *.keymap setfiletype c]]
 
-vim.filetype.add({
+vim.filetype.add {
   extension = {
     es6 = "javascript",
     mts = "typescript",
@@ -19,9 +19,9 @@ vim.filetype.add({
     [".*config/git/config"] = "gitconfig",
     [".env.*"] = "sh",
   },
-})
+}
 
-vim.filetype.add({
+vim.filetype.add {
   filename = {
     [".env"] = "sh",
     [".envrc"] = "sh",
@@ -30,4 +30,20 @@ vim.filetype.add({
     ["%.env"] = "sh",
     ["%.envrc"] = "sh",
   },
-})
+}
+
+vim.filetype.add {
+  pattern = {
+    [".*/%.github[%w/]+workflows[%w/]+.*%.ya?ml"] = "yaml.github",
+  },
+}
+
+vim.filetype.add {
+  extension = {
+    mdx = "mdx",
+    blade = "blade",
+    ["blade.php"] = "blade",
+  },
+  pattern = { [".*%.blade%.php"] = "blade" },
+}
+

@@ -16,20 +16,6 @@ return {
   },
 
   {
-    "nvim-neo-tree/neo-tree.nvim",
-    branch = "v3.x",
-    cmd = "Neotree",
-    enabled = false,
-    dependencies = {
-      "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
-      "MunifTanjim/nui.nvim",
-      "3rd/image.nvim",
-    },
-    opts = require("configs.neo-tree").opts,
-    keys = require("keymaps").neo_tree,
-  },
-
-  {
     -- color highlighter for hexcodes (e.g. #fff)
     -- NOTE: config = true, opts = {} does not initalize plugin
     "norcalli/nvim-colorizer.lua",
@@ -54,22 +40,6 @@ return {
     dependencies = require("configs.telescope").dependencies,
     config = require("configs.telescope").config,
     keys = require("keymaps").telescope,
-  },
-
-  {
-    "rachartier/tiny-code-action.nvim",
-    enabled = false,
-    event = "LspAttach",
-    keymaps = {
-      {
-        { "n", "x" },
-        "..",
-        function()
-          require("tiny-code-action").code_action()
-        end,
-        { noremap = true, silent = true },
-      },
-    },
   },
 
   {
@@ -265,71 +235,11 @@ return {
   },
 
   {
-    "ibhagwan/fzf-lua",
-    config = require("configs.fzf").config,
-  },
-
-  {
     "gbprod/yanky.nvim",
-    enabled = false,
-    event = "BufReadPost",
+    enabled = true,
     opts = {},
     dependencies = { "folke/snacks.nvim" },
     keys = require("keymaps").yanky,
   },
 
-  {
-    enabled = false,
-    -- macros
-    "chrisgrieser/nvim-recorder",
-    dependencies = "rcarriga/nvim-notify", -- optional
-    opts = {
-      slots = { "a", "b", "c", "d", "e", "f", "g" },
-      mapping = {
-        startStopRecording = "q",
-        playMacro = "@",
-      },
-      lessNotifications = false,
-      clear = false,
-      logLevel = vim.log.levels.INFO,
-      dapSharedKeymaps = false,
-    },
-  },
-
-  {
-    "coffebar/neovim-project",
-    enabled = false,
-    opts = {
-      projects = {
-        "~/dev/*",
-      },
-      picker = {
-        type = "telescope",
-      },
-    },
-    init = function()
-      -- enable saving the state of plugins in the session
-      vim.opt.sessionoptions:append("globals") -- save global variables that start with an uppercase letter and contain at least one lowercase letter.
-    end,
-    dependencies = {
-      -- optional picker
-      { "nvim-telescope/telescope.nvim", tag = "0.1.4" },
-      -- optional picker
-      { "ibhagwan/fzf-lua" },
-      -- optional picker
-      { "folke/snacks.nvim" },
-      { "Shatur/neovim-session-manager" },
-    },
-    lazy = false,
-    priority = 100,
-  },
-
-  {
-    enabled = false,
-    "m4xshen/hardtime.nvim",
-    lazy = false,
-    config = function()
-      require("hardtime").setup()
-    end,
-  },
 }

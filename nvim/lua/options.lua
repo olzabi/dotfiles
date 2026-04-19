@@ -32,7 +32,7 @@ opt.tabstop = 2
 opt.shiftround = true -- round indent to shiftwidth
 opt.smartindent = true -- better autoindent for code
 
-opt.formatoptions = "jcroqlnt"
+opt.formatoptions = "jqlnt"
 opt.virtualedit = "block" -- free cursor in visual block mode          [IDEA]
 
 opt.ignorecase = true

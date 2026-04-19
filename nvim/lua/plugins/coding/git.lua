@@ -1,56 +1,6 @@
 return {
   {
-    -- TODO: add pipeline in neo-tree
-    "topaxi/pipeline.nvim",
-    build = "make",
-    cmd = "Pipeline",
-    keys = require("keymaps").git_pipeline,
-  },
-
-  {
-    "pwntester/octo.nvim",
-    requires = {
-      "nvim-lua/plenary.nvim",
-      -- OR 'ibhagwan/fzf-lua',
-      -- OR 'folke/snacks.nvim',
-      "nvim-tree/nvim-web-devicons",
-    },
-    config = function()
-      require("octo").setup()
-    end,
-  },
-
-  {
-    "ldelossa/gh.nvim",
-    dependencies = {
-      {
-        "ldelossa/litee.nvim",
-        config = function()
-          require("litee.lib").setup()
-        end,
-      },
-    },
-    config = function()
-      require("litee.gh").setup()
-    end,
-  },
-
-  {
-    "rawnly/gist.nvim",
-    cmd = { "GistCreate", "GistCreateFromFile", "GistsList" },
-    config = true,
-  },
-
-  { "pwntester/octo.nvim", config = true },
-
-  {
-    "f-person/git-blame.nvim",
-    keys = require("keymaps.plugins").git_blame,
-  },
-
-  {
     "lewis6991/gitsigns.nvim",
-    enabled = true,
     event = { "CursorHold", "CursorHoldI" },
     config = function()
       require("gitsigns").setup({
@@ -62,72 +12,26 @@ return {
           changedelete = { text = "▎" },
           untracked = { text = "▎" },
         },
-        signcolumn = true, -- Toggle with `:Gitsigns toggle_signs`
-        numhl = false, -- Toggle with `:Gitsigns toggle_numhl`
-        linehl = false, -- Toggle with `:Gitsigns toggle_linehl`
-        word_diff = false, -- Toggle with `:Gitsigns toggle_word_diff`
-        watch_gitdir = {
-          interval = 1000,
-          follow_files = true,
-        },
-        attach_to_untracked = true,
-        current_line_blame = false, -- `:Gitsigns toggle_current_line_blame`
-        current_line_blame_opts = {
-          virt_text = true,
-          virt_text_pos = "eol", -- 'eol' | 'overlay' | 'right_align'
-          delay = 1000,
-          ignore_whitespace = false,
-        },
-        sign_priority = 6,
-        update_debounce = 100,
-        status_formatter = nil, -- Use default
-        max_file_length = 40000,
-        preview_config = {
-          -- Options passed to nvim_open_win
-          border = "single",
-          style = "minimal",
-          relative = "cursor",
-          row = 0,
-          col = 1,
-        },
       })
     end,
     keys = require("keymaps").gitsigns,
   },
 
-  { "tpope/vim-fugitive", event = "VimEnter", cmd = "Git" },
-  { "tpope/vim-rhubarb" },
-
   {
     "kdheepak/lazygit.nvim",
-    cmd = {
-      "LazyGit",
-      "LazyGitConfig",
-      "LazyGitCurrentFile",
-      "LazyGitFilter",
-      "LazyGitFilterCurrentFile",
-    },
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-    },
+    cmd = { "LazyGit", "LazyGitConfig", "LazyGitCurrentFile", "LazyGitFilter", "LazyGitFilterCurrentFile" },
+    dependencies = { "nvim-lua/plenary.nvim" },
     keys = require("keymaps").lazygit,
-    config = function()
-      vim.g.lazygit_floating_window_scaling_factor = 1
-      vim.g.lazygit_floating_window_winblend = 0 -- transparency of floating window (0-100)
-      vim.g.lazygit_floating_window_scaling_factor = 0.9 -- scaling factor for floating window
-      vim.g.lazygit_floating_window_border_chars = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" } -- customize lazygit popup window border characters
-      vim.g.lazygit_floating_window_use_plenary = 0 -- use plenary.nvim to manage floating window if available
-      vim.g.lazygit_use_neovim_remote = 1 -- fallback to 0 if neovim-remote is not installed
-      vim.g.lazygit_use_custom_config_file_path = 0 -- config file path is evaluated if this value is 1
-      vim.g.lazygit_config_file_path = {} -- table of custom config file paths
-    end,
+    opts = {
+      lazygit_floating_window_scaling_factor = 0.9,
+      lazygit_floating_window_winblend = 0,
+      lazygit_use_neovim_remote = 1,
+    },
   },
 
   {
     "ThePrimeagen/git-worktree.nvim",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-    },
+    dependencies = { "nvim-lua/plenary.nvim" },
     keys = require("keymaps").git_worktree,
     config = true,
   },
