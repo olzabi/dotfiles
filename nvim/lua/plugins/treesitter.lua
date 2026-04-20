@@ -21,6 +21,7 @@ return {
   {
     -- popular language parser for syntax highlighting
     "nvim-treesitter/nvim-treesitter",
+    branch = "main",
     event = { "BufReadPre" },
     build = ":TSUpdate",
     opts = {
@@ -35,7 +36,35 @@ return {
       },
     },
     config = function(_, opts)
-      require("nvim-treesitter").setup(opts)
+      local parser_config = require "nvim-treesitter.parsers"
+
+      parser_config.blade = {
+        install_info = {
+          url = "https://github.com/EmranMR/tree-sitter-blade",
+          files = { "src/parser.c" },
+          branch = "main",
+        },
+        filetype = "blade",
+      }
+
+      parser_config.templ = {
+        install_info = {
+          url = "https://github.com/vrischmann/tree-sitter-templ.git",
+          files = { "src/parser.c", "src/scanner.c" },
+          branch = "master",
+        },
+      }
+
+      parser_config.gotmpl = {
+        install_info = {
+          url = "https://github.com/ngalaiko/tree-sitter-go-template",
+          files = { "src/parser.c" },
+        },
+        filetype = "gotmpl",
+        used_by = { "gotext", "gotemplate", "yaml", "tpl", "gohtmltmpl" },
+      }
+
+     require("nvim-treesitter").setup(opts)
 
       -- select/swap keymaps are explicit vim.keymap.set calls
       local to_select = require "nvim-treesitter-textobjects.select"
@@ -89,36 +118,14 @@ return {
         to_swap.swap_previous "@parameter.inner"
       end, { desc = "Swap prev parameter" })
 
-      -- Custom parsers
-      local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
-
-      ---@diagnostic disable-next-line: inject-field
-      parser_config.blade = {
-        install_info = {
-          url = "https://github.com/EmranMR/tree-sitter-blade",
-          files = { "src/parser.c" },
-          branch = "main",
+      vim.filetype.add {
+        extension = {
+          mdx = "mdx",
+          blade = "blade",
+          ["blade.php"] = "blade",
         },
-        filetype = "blade",
+        pattern = { [".*%.blade%.php"] = "blade" },
       }
-
-      ---@diagnostic disable-next-line: inject-field
-      parser_config.templ = {
-        install_info = {
-          url = "https://github.com/vrischmann/tree-sitter-templ.git",
-          files = { "src/parser.c", "src/scanner.c" },
-          branch = "master",
-        },
-      }
-
-      ---@diagnostic disable-next-line: inject-field
-      parser_config.gotmpl = {
-        install_info = { url = "https://github.com/ngalaiko/tree-sitter-go-template", files = { "src/parser.c" } },
-        filetype = "gotmpl",
-        used_by = { "gotext", "gotemplate", "yaml", "tpl", "gohtmltmpl" },
-      }
-
-      vim.treesitter.language.register("templ", "templ")
       vim.treesitter.language.register("markdown", "mdx")
     end,
   },
