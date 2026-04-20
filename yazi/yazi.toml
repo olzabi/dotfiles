@@ -11,6 +11,11 @@ sort_dir_first = true
 ratio = [1, 2, 5]
 
 [preview]
+max_width  = 2000
+max_height = 2000
+ueberzug_scale = 1
+ueberzug_offset = [0,0,0,0]
+image_quality = 90
 wrap = "no"
 tab_size = 2
 
@@ -18,22 +23,66 @@ tab_size = 2
 micro_workers = 10
 macro_workers = 25
 bizarre_retry = 5
-image_alloc = 536870912  # 512MB
+image_alloc = 1073741824 # = 1024*1024*1024 = 1024MB
 image_bound = [0, 0]
 suppress_preload = false
 
 [plugin]
 prepend_fetchers = [
-    { id = "git", url = "*", run = "git" },
-    { id = "git", url = "*/", run = "git" },
+  { id = "git", url = "*", run = "git" },
+  { id = "git", url = "*/", run = "git" },
+]
+prepend_previewers = [
+  { url = "*.csv",                run = "rich-preview" }, # for csv files
+  { url = "*.md",                 run = "rich-preview" }, # for markdown (.md) files
+  { url = "*.rst",                run = "rich-preview" }, # for restructured text (.rst) files
+  { url = "*.ipynb",              run = "rich-preview" }, # for jupyter notebooks (.ipynb)
+  { url = "*.json",               run = "rich-preview" }, # for json (.json) files
+  { url = "*.toml",               run = "rich-preview" }, # for toml (.toml) files
+  { url = "*.{yml,yaml}",         run = "rich-preview" },
+{ mime = "{audio,video,image}/*", run = "mediainfo --no-metadata"},
+  # { mime = "text/*", run = 'piper -- bat --number --color=always "$1"' },
 ]
 
-# [opener]
-# edit = []
-# open = []
-#
-# [open]
+prepend_preloaders = [
+  { mime = "{audio,video,image}/*", run = "mediainfo" },
+]
 
+[opener]
+edit = [
+  { run = '$EDITOR "$@"', desc = "$EDITOR", block = true, for = "linux" },
+]
+edit_php = [
+  { run = 'phpstorm64.exe "$@"',   desc = "Open in PhpStorm",  orphan = true, for = "unix" },
+  { run = 'nvim "$@"',             desc = "Edit in Neovim",    block = true,  for = "unix" },
+]
+open_linux = [
+  { run = 'xdg-open "$1"', desc = "Open (xdg)", orphan = true, for = "linux" },  # Arch native
+]
+open_windows = [
+  { run = 'wslview "$1"',    desc = "Open in Windows (wslview)", orphan = true, for = "linux" },  # WSL2
+  { run = 'explorer.exe "$1"', desc = "Open in Explorer",        orphan = true, for = "linux" },  # fallback
+]
+reveal = [
+  { run = 'xdg-open "$(dirname "$1")"',        desc = "Reveal (xdg)",       for = "linux" },
+  { run = 'explorer.exe "$(wslpath -w "$1")"', desc = "Reveal in Explorer", for = "linux" },
+]
+audio = [
+  { run = '''mediainfo "$1"; echo "Press enter to exit"; read''', block = true, desc = "Show media info" },
+  { run = 'mpv --no-video "$@"', block = true },
+]
+
+
+[open]
+prepend_rules = [
+  { mime = "application/*zip",                               use = [ "extract", "reveal", ] },
+	{ mime = "application/x-{tar,bzip*,7z-compressed,xz,rar}", use = [ "extract", "reveal", ] },
+  { url = "*.php",                                           use = "edit_php" },
+  { url = "*.blade.php",                                     use = "edit_php" },
+  { mime = "text/*",                                         use = [ "edit",  "reveal"] },
+  { mime = "audio/*",                                        use = "audio" },
+  { mime = "*",                                              use = [ "open_linux", "open_windows", "reveal"] },
+]
 
 [input]
 cursor_blink = false
