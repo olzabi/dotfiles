@@ -1,0 +1,188 @@
+local prettier = { "prettierd", "prettier", stop_after_first = true }
+
+return {
+
+  {
+    "mfussenegger/nvim-lint",
+    event = {
+      "BufWritePost",
+      "BufReadPost",
+      "InsertLeave",
+    },
+    config = function()
+      local lint = require "lint"
+      local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
+      local eslint = lint.linters.eslint_d
+      local php_linters = {}
+
+      -- Use either composer or phive tools.
+      if vim.fn.filereadable "./tools/psalm" == 1 then
+        lint.linters.psalm.cmd = "./tools/psalm"
+        table.insert(php_linters, "psalm")
+      elseif vim.fn.filereadable "./vendor/bin/psalm" == 1 then
+        lint.linters.psalm.cmd = "./vendor/bin/psalm"
+        table.insert(php_linters, "psalm")
+      end
+
+      -- if Eslint error configuration not found : change MasonInstall eslint@version or npm i -g eslint at a specific version
+      lint.linters_by_ft = {
+        javascript = { "eslint_d" },
+        typescript = { "eslint_d" },
+        javascriptreact = { "eslint_d" },
+        typescriptreact = { "eslint_d" },
+
+        terraform = { "terraform_validate", "tflint", "tfsec" },
+        cmake = { "cmakelint", "cmakelang" },
+        json = { "eslint_d" },
+        yaml = { "yamllint" },
+
+        php = php_linters,
+        python = { "ruff", "pylint" },
+        sh = { "shellcheck" },
+        bash = { "shellcheck" },
+        zsh = { "zsh" },
+
+        go = { "golangcilint" },
+      }
+
+      eslint.args = {
+        "--no-warn-ignored",
+        "--format",
+        "json",
+        "--stdin",
+        "--stdin-filename",
+        function()
+          return vim.api.nvim_buf_get_name(0)
+        end,
+      }
+
+      lint.linters.phpcs.args = {
+        "-q",
+        "--report=json",
+        "-",
+      }
+
+      lint.linters.golangcilint = {
+        cmd = "golangci-lint",
+        args = {
+          "run",
+          "--output.json.path=stdout",
+          -- Overwrite values possibly set in .golangci.yml
+          "--output.text.path=",
+          "--output.tab.path=",
+          "--output.html.path=",
+          "--output.checkstyle.path=",
+          "--output.code-climate.path=",
+          "--output.junit-xml.path=",
+          "--output.teamcity.path=",
+          "--output.sarif.path=",
+          "--issues-exit-code=0",
+          "--show-stats=false",
+          -- Get absolute path of the linted file
+          "--path-mode=abs",
+          function()
+            return vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":h")
+          end,
+        },
+        stdin = false,
+        stream = "stdout",
+        ignore_exitcode = true,
+        -- parser = require("lint.parser").from_json({
+        --   source = "golangci-lint",
+        -- }),
+      }
+
+      lint.linters.shellcheck.args = {
+        "-e",
+        "SC2016",
+        "--format=json",
+        "-x",
+        "-",
+      }
+
+      -- Auto-lint
+      vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
+        group = lint_augroup,
+        callback = function()
+          lint.try_lint()
+        end,
+      })
+
+      vim.keymap.set("n", "<leader>cl", function()
+        lint.try_lint()
+      end, { desc = "Trigger linting" })
+    end,
+  },
+
+  {
+    "stevearc/conform.nvim",
+    dependencies = {
+      "MunifTanjim/prettier.nvim",
+      "mcauley-penney/tidy.nvim",
+      "bennypowers/svgo.nvim",
+    },
+    event = { "BufWritePre", "BufReadPre", "BufNewFile" },
+    cmd = { "ConformInfo" },
+    opts = {
+      formatters = {
+        ["shfmt"] = { prepend_args = { "-i", "2" } },
+        prettier = {
+          command = "prettier",
+          args = {
+            "--stdin-filepath",
+            "$FILENAME",
+            "--tab-width",
+            "2",
+            "--use-tabs",
+            "false",
+          },
+        },
+        taplo = {
+          command = "taplo",
+          args = { "format", "-" },
+          stdin = true,
+        },
+      },
+
+      formatters_by_ft = {
+        ["*"] = { "trim_whitespace" },
+        go = { "gofumpt", "golines" },
+        c = { "clang-format" },
+        cpp = { "clang-format" },
+        javascript = prettier,
+        javascriptreact = prettier,
+        typescript = prettier,
+        typescriptreact = prettier,
+        css = prettier,
+        html = prettier,
+        json = { "jq", "prettier", "prettierd" },
+        -- json = { "jq" },
+        yaml = { "prettier", "yamlfmt" },
+        xml = { "xmlformatter" },
+        lua = { "stylua" },
+        python = { "isort" },
+        php = { "pint", "php_cs_fixer" },
+        rust = { "rustfmt" },
+        sql = { "sqlfluff" },
+        sh = { "shfmt" },
+        bash = { "shfmt" },
+        vue = prettier,
+        markdown = { "prettier", "markdownlint-cli2", "markdown-toc" },
+        ["markdown.mdx"] = { "prettier", "markdownlint-cli2", "markdown-toc" },
+        toml = { "taplo" },
+      },
+
+      -- format_on_save = function(n)
+      --   if vim.b[n].conform_disable then
+      --     return
+      --   end
+      --   return {
+      --     timeout_ms = 500,
+      --     lsp_format = "fallback",
+      --     lsp_fallback = true,
+      --   }
+      -- end,
+    },
+    keys = require("keymaps").formatter,
+  },
+}

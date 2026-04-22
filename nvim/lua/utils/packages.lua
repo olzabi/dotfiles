@@ -10,6 +10,7 @@ M.lazy_dev_libs = {
 }
 
 M.lsp = {
+  "clangd",
   "vtsls",
   "lua_ls",
   "svelte",

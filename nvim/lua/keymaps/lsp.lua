@@ -5,17 +5,30 @@ M.attach = function(buf)
     vim.keymap.set(mode, lhs, rhs, { noremap = true, silent = true, buffer = buf, desc = desc })
   end
 
-  map("n", "<C-]>", vim.lsp.buf.definition, "LSP definition")
-  map("n", "<Space>*", function()
-    require("lists").change_active("Quickfix")
-    vim.lsp.buf.references()
-  end, "LSP references (quickfix)")
-  map("n", "<Leader>gD", vim.lsp.buf.declaration, "LSP declaration")
-  map("n", "<Leader>gd", "<cmd>Telescope lsp_definitions<CR>", "LSP definitions (Telescope)")
-  map("n", "<Leader>gi", "<cmd>Telescope lsp_implementations<CR>", "LSP implementations (Telescope)")
-  map("n", "<Leader>gr", "<cmd>Telescope lsp_references<CR>", "LSP references (Telescope)")
-  map("n", "<Leader>es", "<cmd>Telescope diagnostics bufnr=0<CR>", "Buffer diagnostics (Telescope)")
-  map("n", "<Leader>rs", "<cmd>LspRestart<CR>", "LSP restart")
+  map("n", "gd", vim.lsp.buf.definition, "Go to definition")
+  map("n", "gD", vim.lsp.buf.declaration, "Go to declaration")
+  map("n", "gri", vim.lsp.buf.implementation, "Go to implementation")
+  map("n", "grr", vim.lsp.buf.references, "References")
+  map("n", "grt", vim.lsp.buf.type_definition, "Go to type definition")
+
+  -- Info
+  map("n", "K", vim.lsp.buf.hover, "Hover docs")
+  map("n", "gK", vim.lsp.buf.signature_help, "Signature help")
+
+  -- Actions
+  map("n", "grn", vim.lsp.buf.rename, "[r]e[n]ame")
+  map({ "n", "v" }, "gra", vim.lsp.buf.code_action, "Code action")
+
+  -- Diagnostics
+  map("n", "<leader>e", vim.diagnostic.open_float, "Line diagnostics")
+  map("n", "]d", vim.diagnostic.goto_next, "Next diagnostic")
+  map("n", "[d", vim.diagnostic.goto_prev, "Prev diagnostic")
+  map("n", "]e", function() vim.diagnostic.goto_next { severity = vim.diagnostic.severity.ERROR } end, "Next error")
+  map("n", "[e", function() vim.diagnostic.goto_prev { severity = vim.diagnostic.severity.ERROR } end, "Prev error")
+
+  -- Codelens
+  map("n", "<leader>cl", vim.lsp.codelens.run, "Run codelens")
+  map("n", "<leader>cL", vim.lsp.codelens.refresh, "Refresh codelens")
 end
 
 return M

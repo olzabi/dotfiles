@@ -1,0 +1,9 @@
+{
+    "diagnostics.disable": [
+        "missing-fields",
+        "trailing-space",
+        "redefined-local",
+        "need-check-nil",
+        "inject-field"
+    ]
+}

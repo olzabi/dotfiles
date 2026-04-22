@@ -1,0 +1,29 @@
+return {
+
+  {
+    "folke/todo-comments.nvim",
+    lazy = false,
+    enabled = false,
+    event = { "CursorHold", "CursorHoldI" },
+    cmd = { "TodoTrouble", "TodoTelescope" },
+    opts = {
+      signs = true,
+      keywords = {
+        FIX = {
+          icon = " ",
+          color = "error",
+          alt = { "FIXME", "BUG", "FIXIT", "ISSUE" },
+        },
+        TODO = { icon = " ", color = "info" },
+        HACK = { icon = " ", color = "warning" },
+        WARN = { icon = " ", color = "warning", alt = { "WARNING", "XXX" } },
+        PERF = { icon = " ", alt = { "OPTIM", "PERFORMANCE", "OPTIMIZE" } },
+        NOTE = { icon = " ", color = "hint", alt = { "INFO" } },
+        TEST = { icon = "⏲ ", color = "test", alt = { "TESTING", "PASSED", "FAILED" } },
+      },
+      highlight = { pattern = [[.*<(KEYWORDS)\s*]] },
+      search = { pattern = [[\b(KEYWORDS)\b]] },
+    },
+    keys = require("keymaps").todo_comments,
+  },
+}
