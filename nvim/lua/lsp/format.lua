@@ -108,7 +108,7 @@ return {
         end,
       })
 
-      vim.keymap.set("n", "<leader>cl", function()
+      vim.keymap.set("n", "<leader>cj", function()
         lint.try_lint()
       end, { desc = "Trigger linting" })
     end,
@@ -171,18 +171,20 @@ return {
         ["markdown.mdx"] = { "prettier", "markdownlint-cli2", "markdown-toc" },
         toml = { "taplo" },
       },
-
-      -- format_on_save = function(n)
-      --   if vim.b[n].conform_disable then
-      --     return
-      --   end
-      --   return {
-      --     timeout_ms = 500,
-      --     lsp_format = "fallback",
-      --     lsp_fallback = true,
-      --   }
-      -- end,
     },
-    keys = require("keymaps").formatter,
+    keys = {
+      {
+        "<leader>cp",
+        function()
+          require("conform").format {
+            notify_on_error = true,
+            async = true,
+            lsp_fallback = true,
+          }
+        end,
+        mode = { "n", "v" },
+        desc = "Format",
+      },
+    },
   },
 }

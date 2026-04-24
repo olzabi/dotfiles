@@ -40,10 +40,9 @@ prepend_previewers = [
   { url = "*.json",               run = "rich-preview" }, # for json (.json) files
   { url = "*.toml",               run = "rich-preview" }, # for toml (.toml) files
   { url = "*.{yml,yaml}",         run = "rich-preview" },
-{ mime = "{audio,video,image}/*", run = "mediainfo --no-metadata"},
+  { mime = "{audio,video,image}/*", run = "mediainfo --no-metadata"},
   # { mime = "text/*", run = 'piper -- bat --number --color=always "$1"' },
 ]
-
 prepend_preloaders = [
   { mime = "{audio,video,image}/*", run = "mediainfo" },
 ]
@@ -77,28 +76,12 @@ audio = [
 prepend_rules = [
   { mime = "application/*zip",                               use = [ "extract", "reveal", ] },
 	{ mime = "application/x-{tar,bzip*,7z-compressed,xz,rar}", use = [ "extract", "reveal", ] },
-
-  { url = "*.json",       use = "edit" },
-  { url = "*.toml",       use = "edit" },
-  { url = "*.yaml",       use = "edit" },
-  { url = "*.yml",        use = "edit" },
-  { url = "*.js",         use = "edit" },
-  { url = "*.ts",         use = "edit" },
-  { url = "*.jsx",        use = "edit" },
-  { url = "*.tsx",        use = "edit" },
-  { url = "*.css",        use = "edit" },
-  { url = "*.html",       use = "edit" },
-  { url = "*.sh",         use = "edit" },
-  { url = "*.env",        use = "edit" },
-
-
-  { url = "*.php",                                           use = "edit_php" },
   { url = "*.blade.php",                                     use = "edit_php" },
-  { mime = "text/*",                                         use = [ "edit",  "reveal"] },
+  { url = "*.php",                                           use = "edit_php" },
   { mime = "audio/*",                                        use = "audio" },
-  { mime = "*",                                              use = [ "open_linux", "open_windows", "reveal"] },
+  { mime = "text/*",                                         use = [ "edit",  "reveal"] },
+  { mime = "*",                                              use = [ "edit", "open_linux", "open_windows", "reveal"] },
 ]
-
 [input]
 cursor_blink = false
 

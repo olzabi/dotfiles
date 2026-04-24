@@ -10,8 +10,35 @@ return {
       input = { enabled = true },
       scratch = { enabled = true },
       quickfile = { enabled = true },
-
       terminal = { enabled = false, win = { style = "terminal", border = vim.g.border_style } },
+      notifier = {
+        enabled = true,
+        timeout = 5000,
+        width = { min = 40, max = 0.4 },
+        height = { min = 1, max = 0.6 },
+        margin = { top = 0, right = 1, bottom = 0 },
+        padding = true,
+        sort = { "level", "added" },
+        level = vim.log.levels.TRACE,
+        style = "minimal", -- "compact" | "fancy" | "minimal"
+        top_down = true,
+        -- Mirror the skip/mini routes from noice for vim.notify traffic
+        filter = function(notif)
+          local msg = notif.msg or ""
+          local skip = {
+            "No signature help",
+            "No code actions available",
+            "^Already at %a+ change$",
+            "All parsers are up%-to%-date",
+          }
+          for _, pat in ipairs(skip) do
+            if msg:find(pat) then
+              return false
+            end
+          end
+          return true
+        end,
+      },
 
       picker = {
         enabled = true,
@@ -70,7 +97,6 @@ return {
         projects = { pattern = { ".git", "package.json" } },
         matcher = { fuzzy = true, smartcase = true, ignorecase = true, filename_bonus = true },
       },
-
       styles = {
         terminal = {
           relative = "editor",
@@ -81,8 +107,20 @@ return {
           width = 0.65,
           zindex = 50,
         },
+        notification_history = {
+          border = "rounded",
+          zindex = 100,
+          width = 0.6,
+          height = 0.6,
+          minimal = false,
+          title = " Notification History ",
+          title_pos = "center",
+          ft = "markdown",
+          bo = { filetype = "snacks_notif_history", modifiable = false },
+        },
       },
     },
+
     init = function()
       vim.api.nvim_create_autocmd("User", {
         pattern = "VeryLazy",

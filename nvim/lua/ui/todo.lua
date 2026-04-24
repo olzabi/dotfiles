@@ -2,8 +2,7 @@ return {
 
   {
     "folke/todo-comments.nvim",
-    lazy = false,
-    enabled = false,
+    enabled = true,
     event = { "CursorHold", "CursorHoldI" },
     cmd = { "TodoTrouble", "TodoTelescope" },
     opts = {

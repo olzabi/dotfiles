@@ -4,6 +4,9 @@
         "trailing-space",
         "redefined-local",
         "need-check-nil",
-        "inject-field"
+        "inject-field",
+        "deprecated",
+        "redundant-parameter",
+        "param-type-mismatch"
     ]
 }

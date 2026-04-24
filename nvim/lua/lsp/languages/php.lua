@@ -1,10 +1,9 @@
 return {
   {
     "ccaglak/phptools.nvim",
-    lazy = false,
     keys = require("keymaps").phptools,
     config = function()
-      require("phptools").setup({
+      require("phptools").setup {
         ui = {
           enable = true, -- default:true; false only if you have a UI enhancement plugin
           fzf = false, -- default:false; tests requires fzf used only in tests module otherwise there might long list  of tests
@@ -15,11 +14,10 @@ return {
           root_markers = { ".git" }, -- Project root markers
           autoload_file = "/vendor/composer/autoload_psr4.php", -- Autoload file path
         },
-        custom_toggles = { -- delete if you dont use it
-          enable = false, -- default:false
-          -- { "foo", "bar", "baz" }, -- Add more custom toggle groups here
+        custom_toggles = {
+          enable = false,
         },
-      })
+      }
       require("keymaps").phptools_ide_helper_mapping()
       require("keymaps").phptools_test_mapping()
     end,
@@ -29,10 +27,7 @@ return {
     -- Add the blade-nav.nvim plugin which provides Goto File capabilities
     -- for Blade files.
     "ricardoramirezr/blade-nav.nvim",
-    dependencies = {
-      "hrsh7th/nvim-cmp",
-    },
-    ft = { "blade", "php" },
+    dependencies = "saghen/blink.cmp",
     opts = {
       close_tag_on_complete = true,
     },
@@ -40,10 +35,8 @@ return {
 
   {
     "adalessa/laravel.nvim",
-    lazy = false,
     event = { "VeryLazy" },
     cmd = { "Laravel", "Artisan", "Composer", "Sail", "Npm", "Yarn" },
-    ft = { "blade", "php" },
     cond = function()
       return vim.fn.filereadable(vim.fn.getcwd() .. "/artisan") == 1
     end,
@@ -52,7 +45,7 @@ return {
       "MunifTanjim/nui.nvim",
       "kevinhwang91/promise-async",
       "nvim-neotest/nvim-nio",
-      "hrsh7th/nvim-cmp",
+      "saghen/blink.cmp",
     },
     opts = {
       lsp_server = "intelephense",
@@ -74,28 +67,20 @@ return {
     },
     config = function(_, opts)
       require("laravel").setup(opts)
+
+      vim.lsp.config("laravel-ls", {
+        cmd = { "laravel-ls" },
+        filetypes = { "php", "blade" },
+        root_dir = vim.fn.getcwd,
+      })
+
       vim.api.nvim_create_autocmd("FileType", {
         pattern = { "php", "blade" },
         callback = function()
-          vim.lsp.start({
-            name = "laravel-ls",
-
-            -- if laravel ls is in your $PATH
-            cmd = { "laravel-ls" },
-
-            -- Absolute path
-            -- cmd = { '/path/to/laravel-ls/build/laravel-ls' },
-
-            -- if you want to recompile everytime
-            -- the language server is started.
-            -- cmd = { '/path/to/laravel-ls/start.sh' },
-
-            root_dir = vim.fn.getcwd(),
-          })
+          vim.lsp.enable "laravel-ls"
         end,
       })
     end,
-
     keys = require("keymaps").laravel,
   },
 

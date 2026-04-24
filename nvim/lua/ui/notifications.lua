@@ -2,9 +2,7 @@ local routes = {
   { filter = { find = "E31" }, skip = true },
   { filter = { find = "E37" }, skip = true },
   { filter = { find = "E162" }, view = "mini" },
-  -- E211 no longer needed, since auto-closing deleted buffers
   { filter = { event = "msg_show", find = "E211: File .* no longer available" }, skip = true },
-  -- search pattern not found
   { filter = { event = "msg_show", find = "E486: Pattern not found" }, view = "mini" },
   { filter = { event = "msg_show", find = "search hit TOP" }, skip = true },
   { filter = { event = "msg_show", find = "search hit BOTTOM" }, skip = true },
@@ -14,7 +12,6 @@ local routes = {
   { filter = { find = "Error detected while processing BufReadPost Autocommands for" }, skip = true },
   {
     filter = {
-      -- write/deletion messages
       event = "msg_show",
       any = {
         { find = "%d+L, %d+B" },
@@ -25,11 +22,6 @@ local routes = {
         { find = "yanked" },
       },
     },
-    view = "mini",
-  },
-  {
-    -- LSP
-    filter = { event = "notify", find = "Restarting…" },
     view = "mini",
   },
   {
@@ -45,18 +37,15 @@ local routes = {
     },
     view = "mini",
   },
-  -- nvim-treesitter
   { filter = { event = "msg_show", find = "^%[nvim%-treesitter%]" }, view = "mini" },
-  { filter = { event = "notify", find = "All parsers are up%-to%-date" }, view = "mini" },
-  -- code actions
+  -- code actions / search (already covered by snacks filter, belt-and-suspenders)
   { filter = { event = "notify", find = "No code actions available" }, skip = true },
+  { filter = { event = "notify", find = "All parsers are up%-to%-date" }, skip = true },
   { filter = { event = "msg_show", find = "^[/?]." }, skip = true },
 }
 
 local views = {
-  split = {
-    enter = true,
-  },
+  split = { enter = true },
   mini = {
     timeout = 3000,
     zindex = 4,
@@ -66,18 +55,8 @@ local views = {
   },
   cmdline_popup = {
     relative = "editor",
-    position = {
-      row = 26,
-      col = "50%",
-    },
-    -- size = {
-    --   width = 60,
-    --   height = "auto",
-    --   max_height = 15
-    -- },
-    border = {
-      style = vim.g.borderStyle,
-    },
+    position = { row = 26, col = "50%" },
+    border = { style = vim.g.borderStyle },
   },
 }
 
@@ -86,17 +65,16 @@ local lsp = {
   override = {
     ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
     ["vim.lsp.util.stylize_markdown"] = true,
-    ["cmp.entry.get_documentation"] = true,
   },
   hover = { enabled = true },
   signature = { enabled = true },
-  progress = { enabled = true },
+  progress = { enabled = true, view = "mini", format = "lsp_progress" },
   message = { enabled = true, view = "mini" },
 }
 
 return {
+
   {
-    -- TODO: opts/config
     "j-hui/fidget.nvim",
     event = "LspAttach",
     opts = {
@@ -106,7 +84,7 @@ return {
         ignore_empty_message = false,
       },
       notification = {
-        override_vim_notify = true,
+        override_vim_notify = false,
         window = {
           winblend = 0,
           border = "none",
@@ -120,17 +98,7 @@ return {
     event = "VimEnter",
     lazy = false,
     cmd = "Noice",
-    dependencies = {
-      "MunifTanjim/nui.nvim",
-      {
-        "rcarriga/nvim-notify",
-        lazy = true,
-        opts = {
-          background_colour = "#000",
-        },
-      },
-      "vigoux/notifier.nvim",
-    },
+    dependencies = "MunifTanjim/nui.nvim",
     opts = {
       presets = {
         long_message_to_split = true,
@@ -147,14 +115,16 @@ return {
         view_history = "mini",
         view_search = "mini",
       },
-      notify = {
-        enabled = true,
-        view = "mini",
-      },
+      notify = { enabled = false },
       lsp = lsp,
       views = views,
       routes = routes,
     },
-    keys = require("keymaps").noice,
+    keys = {
+      { "<leader>n",  function() Snacks.picker.notifications() end, desc = "Notifications" },
+      { "<leader>nn", "<cmd>NoiceDismiss<cr>", desc = "Dismiss" },
+      { "<leader>nH", "<cmd>Noice history<cr>", desc = "History" },
+      { "<leader>nl", "<cmd>Noice last<cr>", desc = "Last message" },
+    },
   },
 }

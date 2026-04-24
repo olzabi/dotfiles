@@ -1,15 +1,10 @@
 return {
+  "cuducos/yaml.nvim",
   {
     "saecki/crates.nvim",
     event = "BufRead Cargo.toml",
-    dependencies = { "nvim-lua/plenary.nvim" },
+    dependencies = "nvim-lua/plenary.nvim",
     config = true,
-    ft = { "rust", "Cargo" },
-  },
-
-  {
-    "cuducos/yaml.nvim",
-    ft = { "yaml", "yml" },
   },
 
   {
@@ -27,7 +22,9 @@ return {
   },
 
   {
+    -- TODO:
     "linux-cultist/venv-selector.nvim",
+    enabled = false,
     branch = "regexp",
     opts = {},
     keys = require "keymaps",
@@ -62,59 +59,4 @@ return {
     cmd = { "CsvViewEnable", "CsvViewDisable", "CsvViewToggle" },
   },
 
-  {
-    -- Known limitations: it doesn't work around buffer preview (telescope, neo-tree)
-    -- or the issue related that wezterm does not support rendering images yet
-    "MeanderingProgrammer/render-markdown.nvim",
-    dependencies = {
-      "nvim-mini/mini.nvim",
-      "nvim-tree/nvim-web-devicons",
-      { "3rd/image.nvim", lazy = true, opts = {} },
-      -- { "OXY2DEV/markview.nvim", priority = 1000},
-      -- {
-      --           "lukas-reineke/headlines.nvim",
-      --   opts = { markdown = {disable = true}}
-      --
-      -- }
-    },
-    opts = {
-      enabled = true,
-      render_modes = { "n", "v", "i", "c" },
-      latex = { enabled = false },
-      bullet = {
-        enabled = true,
-      },
-      checkbox = {
-        enabled = true,
-        position = "inline",
-        unchecked = {
-          raw = "[-]",
-          icon = "   󰄱 ",
-          highlight = "RenderMarkdownUnchecked",
-          scope_highlight = nil,
-        },
-        checked = {
-          -- raw = "[x]",
-          icon = "   󰱒 ",
-          highlight = "RenderMarkdownChecked",
-          scope_highlight = nil,
-        },
-        custom = {
-          doing = {
-            raw = "[_]",
-            rendered = "󰄮",
-            highlight = "RenderMarkdownDoing",
-          },
-          wontdo = {
-            raw = "[~]",
-            rendered = "󰅗",
-            highlight = "RenderMarkdownWontdo",
-          },
-        },
-      },
-      html = { enabled = true },
-      -- css = { enabled = true },
-      file_types = { "markdown", "FzfPreview", "Avante" },
-    },
-  },
 }
