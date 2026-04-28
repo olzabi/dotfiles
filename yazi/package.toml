@@ -53,5 +53,10 @@ use = "MasouShizuka/projects"
 rev = "198c2ba"
 hash = "5eeb4f0919ce6be5d941a9290c131d7d"
 
+[[plugin.deps]]
+use = "dedukun/bookmarks"
+rev = "9ef1254"
+hash = "92fbb5483657fa7976cdf4e0104e18e0"
+
 [flavor]
 deps = []

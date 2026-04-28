@@ -55,16 +55,9 @@ edit_php = [
   { run = 'phpstorm64.exe "$@"',   desc = "Open in PhpStorm",  orphan = true, for = "unix" },
   { run = 'nvim "$@"',             desc = "Edit in Neovim",    block = true,  for = "unix" },
 ]
-open_linux = [
-  { run = 'xdg-open "$1"', desc = "Open (xdg)", orphan = true, for = "linux" },  # Arch native
-]
-open_windows = [
-  { run = 'wslview "$1"',    desc = "Open in Windows (wslview)", orphan = true, for = "linux" },  # WSL2
-  { run = 'explorer.exe "$1"', desc = "Open in Explorer",        orphan = true, for = "linux" },  # fallback
-]
 reveal = [
-  { run = 'xdg-open "$(dirname "$1")"',        desc = "Reveal (xdg)",       for = "linux" },
-  { run = 'explorer.exe "$(wslpath -w "$1")"', desc = "Reveal in Explorer", for = "linux" },
+  { run = 'wslview "$1"',      desc = "Open in Windows (wslview)", orphan = true, for = "linux" },
+  { run = 'explorer.exe "$(wslpath -w "$1")"', orphan = true, desc = "Reveal in Explorer", for = "linux" },
 ]
 audio = [
   { run = '''mediainfo "$1"; echo "Press enter to exit"; read''', block = true, desc = "Show media info" },
@@ -80,7 +73,7 @@ prepend_rules = [
   { url = "*.php",                                           use = "edit_php" },
   { mime = "audio/*",                                        use = "audio" },
   { mime = "text/*",                                         use = [ "edit",  "reveal"] },
-  { mime = "*",                                              use = [ "edit", "open_linux", "open_windows", "reveal"] },
+  { mime = "*",                                              use = [ "edit",  "reveal"] },
 ]
 [input]
 cursor_blink = false

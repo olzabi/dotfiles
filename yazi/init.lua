@@ -1,3 +1,4 @@
+
 require("projects"):setup({
 	save = { method = "yazi" },
 	last = {
@@ -19,4 +20,21 @@ th.git.ignored_sign = "I"
 
 require("git"):setup({
 	order = 500,
+})
+
+require("bookmarks"):setup({
+	last_directory = { enable = false, persist = true, mode="dir" },
+	persist = "vim",
+	desc_format = "full",
+	file_pick_mode = "hover",
+	show_keys = true,
+	notify = {
+		enable = true,
+		timeout = 1,
+		message = {
+			new = "New bookmark '<key>' -> '<folder>'",
+			delete = "Deleted bookmark in '<key>'",
+			delete_all = "Deleted all bookmarks",
+		},
+	},
 })
