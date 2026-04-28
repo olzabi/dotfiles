@@ -108,10 +108,7 @@ return {
         end,
       })
 
-      vim.keymap.set("n", "<leader>cj", function()
-        lint.try_lint()
-      end, { desc = "Trigger linting" })
-    end,
+      vim.keymap.set("n", "<leader>cl", function() lint.try_lint() end, { desc = "Trigger linting" }) end,
   },
 
   {

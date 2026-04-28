@@ -3,7 +3,16 @@ return {
   {
     "ThePrimeagen/refactoring.nvim",
     cmd = "Refactor",
-    keys = require("keymaps").refactoring,
+    keys = {
+      { "<leader>Rs", function() require("refactoring").select_refactor() end, mode = { "n","v" }, desc = "Select refactor" },
+      { "<leader>Re", "<cmd>Refactor extract<cr>",                                      mode = "x",         desc = "Extract function" },
+      { "<leader>Rf", "<cmd>Refactor extract_to_file<cr>",                              mode = "x",         desc = "Extract to file" },
+      { "<leader>Rv", "<cmd>Refactor extract_var<cr>",                                  mode = "x",         desc = "Extract variable" },
+      { "<leader>Ri", "<cmd>Refactor inline_var<cr>",                                   mode = { "x","n" }, desc = "Inline variable" },
+      { "<leader>RI", "<cmd>Refactor inline_func<cr>",                                  mode = "n",         desc = "Inline function" },
+      { "<leader>Rb", "<cmd>Refactor extract_block<cr>",                                mode = "n",         desc = "Extract block" },
+      { "<leader>RB", "<cmd>Refactor extract_block_to_file<cr>",                        mode = "n",         desc = "Extract block to file" },
+    },
     config = function()
       require("refactoring").setup {
         prompt_func_return_type = {
@@ -26,7 +35,6 @@ return {
         },
         show_success_message = true,
       }
-      require("telescope").load_extension "refactoring"
     end,
   },
 

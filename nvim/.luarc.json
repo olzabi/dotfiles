@@ -7,6 +7,12 @@
         "inject-field",
         "deprecated",
         "redundant-parameter",
-        "param-type-mismatch"
+        "param-type-mismatch",
+        "undefined-field",
+        "missing-parameter",
+        "redundant-value",
+        "unused-local",
+        "unused-function",
+        "assign-type-mismatch"
     ]
 }

@@ -10,49 +10,42 @@ return {
       local wk = require "which-key"
       wk.setup()
       wk.add {
+        { ";", group = ";" },
+        { ";x", group = "Diagnostic" },
+
         { "<leader>b", group = "Buffer" },
         { "<leader>w", group = "Window" },
-        { "<leader>d", group = "Debug" },
+
         { "<leader>f", group = "Find" },
         { "<leader>s", group = "Search" },
         { "<leader>n", group = "Notifications" },
-        { "<leader>ms", group = "MiniSessions" },
+        { "<leader>G", group = "Git" },
+        { "<leader>R", group = "Refactoring" },
 
         { "<leader>u", group = "UI" },
-        { "<leader>uG", group = "Git" },
         { "<leader>uE", group = "Editor" },
         { "<leader>uC", group = "Code" },
 
-        { "<leader>c", group = "Code" },
+        { "<leader>c", group =  "Code" },
         { "<leader>cT", group = "Typescript" },
-        { "<leader>cP", group = "PHP" },
 
-        { "<leader>G", group = "Git" },
-        { "<leader>R", group = "Refactoring" },
-        -- { "<leader>t", group = "Trouble" },
+        { "<leader>cG", group = "Go Language" },
+        { "<leader>cGa", group = "Go: test" },
+        { "<leader>cGt", group = "Go: tags" },
 
-        { ";", group = ";" },
-        { ";c", group = "Code" },
-        { ";G", group = "Git" },
-        { ";Gw", group = "Git Worktree" },
-        { ";s", group = "Search" },
-        { ";f", group = "Find" },
-        { ";x", group = "Diagnostic" },
+        -- Parameter swap
+        { "<leader>a", hidden = true },
+        { "<leader>A", hidden = true },
 
-        { "-", group = "PHP Easy" },
-        { ";L", group = "Laravel" },
-
-        { ";P", group = "PHP Tools" },
-        { ";Ph", group = "Helpers" },
-        { ";Pt", group = "Tests" },
-
-        { "<leader>e", hidden = true },
-        { "<leader>j", hidden = true },
         { "<leader>q", hidden = true },
         { "<leader>qf", hidden = true },
-        { "<leader>W", hidden = true },
-        { "<leader>Q", hidden = true },
-        { "<leader><C-Down>", hidden = true },
+
+        -- Multicursors
+        { "<up>", hidden = true },
+        { "<down>", hidden = true },
+        { "<leader><up>", hidden = true },
+        { "<leader><down>", hidden = true },
+        { "<c-q>", hidden = true },
       }
     end,
   },

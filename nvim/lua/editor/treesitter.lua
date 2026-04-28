@@ -1,18 +1,5 @@
-local disable_hl = {
-  enable = true,
-  additional_vim_regex_highlighting = false,
-  disable = function(_, buf)
-    local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(buf))
-    if ok and stats and stats.size > 100 * 1024 then
-      vim.notify("File >100KB: treesitter disabled", vim.log.levels.WARN)
-      return true
-    end
-  end,
-}
-
 local ts_parser_configs = function()
   local parser_config = require "nvim-treesitter.parsers"
-
   parser_config.blade = {
     install_info = {
       url = "https://github.com/EmranMR/tree-sitter-blade",
@@ -21,7 +8,6 @@ local ts_parser_configs = function()
     },
     filetype = "blade",
   }
-
   parser_config.templ = {
     install_info = {
       url = "https://github.com/vrischmann/tree-sitter-templ.git",
@@ -29,6 +15,7 @@ local ts_parser_configs = function()
       branch = "master",
     },
   }
+  vim.treesitter.language.register("templ", "templ")
 
   parser_config.gotmpl = {
     install_info = {
@@ -42,31 +29,36 @@ end
 
 return {
   { "nvim-treesitter/nvim-treesitter-textobjects", branch = "main" },
-  {
-    "nvim-treesitter/nvim-treesitter-context",
-    opts = { max_lines = 5, mode = "topline" },
-  },
-
+  { "nvim-treesitter/nvim-treesitter-context", opts = { max_lines = 5, mode = "topline" },  },
   {
     "nvim-treesitter/nvim-treesitter",
     branch = "main",
     event = { "BufReadPre" },
     build = ":TSUpdate",
     opts = {
-      ensure_installed = require("utils.packages").treesitter,
       sync_install = false,
       auto_install = true,
       indent = { enable = true },
-      highlight = disable_hl,
+      highlight = {
+        enable = true,
+        additional_vim_regex_highlighting = false,
+        disable = function(_, buf)
+          local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(buf))
+          if ok and stats and stats.size > 100 * 1024 then
+            vim.notify("File >100KB: treesitter disabled", vim.log.levels.WARN)
+            return true
+          end
+        end,
+      },
       incremental_selection = {
         enable = true,
         keymaps = { init_selection = "<C-space>", node_incremental = "<C-space>", scope_incremental = false },
       },
     },
     config = function(_, opts)
+
       ts_parser_configs()
       require("nvim-treesitter").setup(opts)
-
       local to_select = require "nvim-treesitter-textobjects.select"
       local to_move = require "nvim-treesitter-textobjects.move"
       local to_swap = require "nvim-treesitter-textobjects.swap"
@@ -108,21 +100,22 @@ return {
         end, { desc = "TS " .. m.method .. " " .. m.query })
       end
 
-      -- Swap parameters
-      vim.keymap.set("n", "<leader>a", function()
-        to_swap.swap_next "@parameter.inner"
-      end, { desc = "Swap next parameter" })
-      vim.keymap.set("n", "<leader>A", function()
-        to_swap.swap_previous "@parameter.inner"
-      end, { desc = "Swap prev parameter" })
+      vim.keymap.set("n", "<leader>a", function() to_swap.swap_next "@parameter.inner" end, { desc = "Swap next parameter" })
+      vim.keymap.set("n", "<leader>A", function() to_swap.swap_previous "@parameter.inner" end, { desc = "Swap prev parameter" })
 
       vim.filetype.add {
         extension = {
           mdx = "mdx",
           blade = "blade",
           ["blade.php"] = "blade",
+          ["go.sum"] = "gosum",
+          tmpl = "gotmpl",
+          tpl = "gotmpl",
         },
-        pattern = { [".*%.blade%.php"] = "blade" },
+        pattern = {
+          [".*%.blade%.php"] = "blade",
+          [".*go%.sum"] = "gosum",
+        },
       }
       vim.treesitter.language.register("markdown", "mdx")
     end,

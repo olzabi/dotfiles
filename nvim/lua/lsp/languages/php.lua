@@ -1,7 +1,9 @@
 return {
   {
     "ccaglak/phptools.nvim",
-    keys = require("keymaps").phptools,
+    cond = function()
+      return vim.fn.executable "php" == 1
+    end,
     config = function()
       require("phptools").setup {
         ui = {
@@ -18,15 +20,110 @@ return {
           enable = false,
         },
       }
-      require("keymaps").phptools_ide_helper_mapping()
-      require("keymaps").phptools_test_mapping()
     end,
+    keys = {
+      { ";Pl", "<cmd>PhpTools Method<cr>", desc = "Method" },
+      { ";Pc", "<cmd>PhpTools Class<cr>", desc = "Class" },
+      { ";Ps", "<cmd>PhpTools Scripts<cr>", desc = "Scripts" },
+      { ";Pn", "<cmd>PhpTools Namespace<cr>", desc = "Namespace" },
+      { ";Pg", "<cmd>PhpTools GetSet<cr>", desc = "GetSet" },
+      { ";Pf", "<cmd>PhpTools Create<cr>", desc = "Create" },
+      { ";Pd", "<cmd>PhpTools DrupalAutoLoader<cr>", desc = "DrupalAutoLoader" },
+      { ";Pr", mode = "v", "<cmd>PhpTools Refactor<cr>", desc = "Refactor" },
+      {
+        ";Pha",
+        function()
+          require("phptools.ide_helper").generate_all()
+        end,
+        desc = "Generate all IDE helpers",
+      },
+      {
+        ";Phm",
+        function()
+          require("phptools.ide_helper").generate_models()
+        end,
+        desc = "Generate model helpers",
+      },
+      {
+        ";Phf",
+        function()
+          require("phptools.ide_helper").generate_facades()
+        end,
+        desc = "Generate facade helpers",
+      },
+      {
+        ";Pht",
+        function()
+          require("phptools.ide_helper").generate_meta()
+        end,
+        desc = "Generate meta helper",
+      },
+      {
+        ";Phi",
+        function()
+          require("phptools.ide_helper").install()
+        end,
+        desc = "Install IDE Helper",
+      },
+      {
+        ";Plta",
+        function()
+          require("phptools.tests").test.all()
+        end,
+        desc = "Run all tests",
+      },
+      {
+        ";Ptf",
+        function()
+          require("phptools.tests").test.file()
+        end,
+        desc = "Run file tests",
+      },
+      {
+        ";Ptl",
+        function()
+          require("phptools.tests").test.line()
+        end,
+        desc = "Run test at cursor",
+      },
+      {
+        ";Pts",
+        function()
+          require("phptools.tests").test.filter()
+        end,
+        desc = "Search and run test",
+      },
+      {
+        ";Ptp",
+        function()
+          require("phptools.tests").test.parallel()
+        end,
+        desc = "Run in parallel",
+      },
+      {
+        ";Ptr",
+        function()
+          require("phptools.tests").test.rerun()
+        end,
+        desc = "Rerun last test",
+      },
+      {
+        ";Pti",
+        function()
+          require("phptools.tests").test.selected()
+        end,
+        desc = "Run selected test",
+      },
+    },
   },
 
   {
     -- Add the blade-nav.nvim plugin which provides Goto File capabilities
     -- for Blade files.
     "ricardoramirezr/blade-nav.nvim",
+    cond = function()
+      return vim.fn.executable "php" == 1
+    end,
     dependencies = "saghen/blink.cmp",
     opts = {
       close_tag_on_complete = true,
@@ -35,10 +132,8 @@ return {
 
   {
     "adalessa/laravel.nvim",
-    event = { "VeryLazy" },
-    cmd = { "Laravel", "Artisan", "Composer", "Sail", "Npm", "Yarn" },
     cond = function()
-      return vim.fn.filereadable(vim.fn.getcwd() .. "/artisan") == 1
+      return vim.fn.filereadable(vim.fn.getcwd() .. "/artisan") == 1 and vim.fn.executable "php" == 1
     end,
     dependencies = {
       "tpope/vim-dotenv",
@@ -81,26 +176,135 @@ return {
         end,
       })
     end,
-    keys = require("keymaps").laravel,
+    keys = {
+      { ";Li", "<cmd>Laravel install<cr>", desc = "Laravel Install" },
+      { ";LR", "<cmd>Laravel related<cr>", desc = "Laravel Related" },
+      {
+        ";Ll",
+        function()
+          Laravel.pickers.laravel()
+        end,
+        desc = "Laravel Picker",
+      },
+      {
+        ";La",
+        function()
+          Laravel.pickers.artisan()
+        end,
+        desc = "Laravel Artisan",
+      },
+      {
+        ";Lr",
+        function()
+          Laravel.pickers.routes()
+        end,
+        desc = "Laravel Routes",
+      },
+      {
+        ";Lm",
+        function()
+          Laravel.pickers.make()
+        end,
+        desc = "Laravel Make",
+      },
+      {
+        ";Lc",
+        function()
+          Laravel.pickers.commands()
+        end,
+        desc = "Laravel Commands",
+      },
+      {
+        ";Lo",
+        function()
+          Laravel.pickers.resources()
+        end,
+        desc = "Laravel Resources",
+      },
+      {
+        ";Lt",
+        function()
+          Laravel.commands.run "actions"
+        end,
+        desc = "Laravel Actions",
+      },
+      {
+        ";Lp",
+        function()
+          Laravel.commands.run "command_center"
+        end,
+        desc = "Laravel Command Center",
+      },
+      {
+        ";Lh",
+        function()
+          Laravel.run "artisan docs"
+        end,
+        desc = "Laravel Docs",
+      },
+      {
+        "<C-g>",
+        function()
+          Laravel.commands.run "view:finder"
+        end,
+        desc = "Laravel View Finder",
+      },
+    },
   },
 
   {
     "ta-tikoma/php.easy.nvim",
+    enabled = false,
+    cond = function()
+      return vim.fn.executable "php" == 1
+    end,
     opts = {
       onAppend = {
         engine = "LuaSnip",
       },
     },
     config = true,
-    keys = require("keymaps").php_easy,
+    keys = {
+      { "-#", "<CMD>PHPEasyAttribute<CR>", desc = "Attribute" },
+      { "-b", "<CMD>PHPEasyDocBlock<CR>", desc = "DocBlock" },
+      { "-r", "<CMD>PHPEasyReplica<CR>", desc = "Replica" },
+      { "-y", "<CMD>PHPEasyCopy<CR>", desc = "Copy" },
+      { "-d", "<CMD>PHPEasyDelete<CR>", desc = "Delete" },
+      { "-uu", "<CMD>PHPEasyRemoveUnusedUses<CR>", desc = "Remove unused uses" },
+      { "-e", "<CMD>PHPEasyExtends<CR>", desc = "Extends" },
+      { "-i", "<CMD>PHPEasyImplements<CR>", desc = "Implements" },
+      { "--i", "<CMD>PHPEasyInitInterface<CR>", desc = "Init interface" },
+      { "--c", "<CMD>PHPEasyInitClass<CR>", desc = "Init class" },
+      { "--ac", "<CMD>PHPEasyInitAbstractClass<CR>", desc = "Init abstract class" },
+      { "--t", "<CMD>PHPEasyInitTrait<CR>", desc = "Init trait" },
+      { "--e", "<CMD>PHPEasyInitEnum<CR>", desc = "Init enum" },
+      { "-c", "<CMD>PHPEasyAppendConstant<CR>", mode = { "n", "v" }, desc = "Append constant" },
+      { "-p", "<CMD>PHPEasyAppendProperty<CR>", mode = { "n", "v" }, desc = "Append property" },
+      { "-m", "<CMD>PHPEasyAppendMethod<CR>", mode = { "n", "v" }, desc = "Append method" },
+      { "__", "<CMD>PHPEasyAppendConstruct<CR>", desc = "Append construct" },
+      { "_i", "<CMD>PHPEasyAppendInvoke<CR>", desc = "Append invoke" },
+      { "-a", "<CMD>PHPEasyAppendArgument<CR>", desc = "Append argument" },
+    },
   },
 
-  "barryvdh/laravel-ide-helper",
+  {
+    "barryvdh/laravel-ide-helper",
+    cond = function()
+      return vim.fn.filereadable(vim.fn.getcwd() .. "/artisan") == 1 and vim.fn.executable "php" == 1
+    end,
+  },
 
   {
     "phpactor/phpactor",
+    enabled = false,
+    cond = function()
+      return vim.fn.executable "php" == 1 and vim.fn.executable "composer" == 1
+    end,
     build = "composer install --no-dev --optimize-autoloader",
     ft = "php",
-    keys = require("keymaps").phpactor,
+    keys = {
+      { ";Pm", "<cmd>PhpactorContextMenu<CR>", ft = "php", desc = "Contexmenu" },
+      { ";Pn", "<cmd>PhpactorClassNew<CR>", ft = "php", desc = "New class" },
+    },
   },
 }

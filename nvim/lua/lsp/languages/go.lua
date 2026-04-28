@@ -1,6 +1,7 @@
 return {
 
   {
+    -- WARN: not updated since added
     "ray-x/go.nvim",
     dependencies = { -- optional packages
       "ray-x/guihua.lua",
@@ -14,21 +15,15 @@ return {
       })
     end,
     keys = {
-      { mode = "n", "<leader>gcm", "<cmd>GoCmt<cr>", desc = "Add comment" },
-      { mode = "n", "<leader>gta", "<cmd>GoAddTag<cr>", desc = "Add tags" },
-      { mode = "n", "<leader>gtr", "<cmd>GoRmTag<cr>", desc = "Remove tags" },
-      { mode = "n", "<leader>gte", "<cmd>GoTest<cr>", desc = "Run tests" },
-      { mode = "n", "<leader>grn", vim.lsp.buf.rename, desc = "[r]e[n]ame" },
-      { mode = "n", "<leader>gre", vim.lsp.buf.references, desc = "[r][e]ferences" },
-      {
-        mode = "n",
-        "<leader>gre",
-        "<Cmd>Fzf lsp_references<CR>",
-        desc = "references",
-      },
-      { mode = "n", "<leader>gat", "<cmd>GoAlt!<cr>", desc = "Toggle test" },
-      { mode = "n", "<leader>gas", "<cmd>GoAltS!<cr>", desc = "Toggle split test" },
-      { mode = "n", "<leader>gav", "<cmd>GoAltV!<cr>", desc = "Toggle vsplit test" },
+      { mode = "n", "<leader>cGcm", "<cmd>GoCmt<cr>", desc = "Add comment" },
+
+      { mode = "n", "<leader>cGta", "<cmd>GoAddTag<cr>", desc = "Add tags" },
+      { mode = "n", "<leader>cGtr", "<cmd>GoRmTag<cr>", desc = "Remove tags" },
+      { mode = "n", "<leader>cGte", "<cmd>GoTest<cr>", desc = "Run tests" },
+
+      { mode = "n", "<leader>cGat", "<cmd>GoAlt!<cr>", desc = "Toggle test" },
+      { mode = "n", "<leader>cGas", "<cmd>GoAltS!<cr>", desc = "Toggle split test" },
+      { mode = "n", "<leader>cGav", "<cmd>GoAltV!<cr>", desc = "Toggle vsplit test" },
     },
   },
 }

@@ -51,11 +51,10 @@ return {
         end,
       })
     end,
-    keys = require("keymaps").typescript,
   },
 
   { "dmmulroy/tsc.nvim" },
-  { "dmmulroy/ts-error-translator.nvim", opts = { auto_override_publish_diagnostics = true } },
+  -- { "dmmulroy/ts-error-translator.nvim", opts = { auto_override_publish_diagnostics = true } },
   {
     "bennypowers/nvim-regexplainer",
     ft = { "regexp" },

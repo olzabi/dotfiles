@@ -1,31 +1,27 @@
----@diagnostic disable: inject-field
-return {
-  { "b0o/SchemaStore.nvim", lazy = false, version = false },
-  { "artemave/workspace-diagnostics.nvim" },
+local capabilities = function()
+  local ok, blink = pcall(require, "blink.cmp")
+  return ok and blink.get_lsp_capabilities() or vim.lsp.protocol.make_client_capabilities()
+end
 
----@diagnostic disable-next-line: inject-field
-  {
-    "williamboman/mason.nvim",
-    dependencies = {
-      "WhoIsSethDaniel/mason-tool-installer.nvim",
-      opts = {
-        ensure_installed = require("utils.packages").mason_tools,
-      },
-    },
-    build = ":MasonUpdate",
-    cmd = { "Mason", "MasonInstall" },
-    opts = {},
-  },
+return {
+  "b0o/SchemaStore.nvim",
+  "artemave/workspace-diagnostics.nvim",
 
   {
     "folke/lazydev.nvim",
     cmd = "LazyDev",
     lazy = false,
     dependencies = { { "justinsgithub/wezterm-types", ft = { "wezterm" } } },
-    opts = { library = require("utils.packages").lazy_dev_libs },
-    ft = "lua",
+    opts = {
+      library = {
+        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+        { path = "snacks.nvim", words = { "Snacks" } },
+        { path = "lazy.nvim", words = { "LazyVim" } },
+        { path = "wezterm-types", modes = { "wezterm" } },
+        "neotest",
+      },
+    },
   },
-
 
   {
     --  TODO
@@ -37,63 +33,121 @@ return {
     },
   },
 
-
-
   {
     "LSP",
     dependencies = "williamboman/mason.nvim",
     virtual = true,
     config = function()
-      require "utils.servers"
+      local groups = {
+        "scripting",
+        "systems",
+        "misc",
+        "php",
+        "infra",
+        "typescript",
+        "web",
+      }
+      local group = { "scripting", "systems", "misc", "php", "infra", "typescript", "web" }
+      for _, group in ipairs(groups) do
+        local servers = require("lsp.servers." .. group)
+        for name, cfg in pairs(servers) do
+          vim.lsp.config(name, cfg)
+          vim.lsp.enable(name)
+        end
+      end
+
       vim.api.nvim_create_autocmd("LspAttach", {
         group = vim.api.nvim_create_augroup("lsp_global_attach", { clear = true }),
-        callback = function(event)
-          local buf = event.buf
-          local client = vim.lsp.get_client_by_id(event.data.client_id)
+        callback = function(ev)
+          local buf = ev.buf
+          local client = vim.lsp.get_client_by_id(ev.data.client_id)
           if not client then
             return
           end
 
-          if client.server_capabilities.completionProvider then
-            vim.bo[buf].omnifunc = "v:lua.vim.lsp.omnifunc"
-          end
-          if client.server_capabilities.definitionProvider then
-            vim.bo[buf].tagfunc = "v:lua.vim.lsp.tagfunc"
-          end
-
-          vim.api.nvim_create_autocmd("BufWritePre", {
+          vim.api.nvim_create_autocmd("LspDetach", {
             buffer = buf,
-            group = vim.api.nvim_create_augroup("lsp_organize_" .. buf, { clear = true }),
+            once = true,
             callback = function()
-              if not client:supports_method "textDocument/codeAction" then
-                return
-              end
-              local params = vim.lsp.util.make_range_params(
-                vim.api.nvim_get_current_win(), -- window handle, not 0
-                client.offset_encoding
-              )
-              params.context = {
-                only = { "source.organizeImports" },
-                diagnostics = vim.diagnostic.get(buf),
-              }
-              local result, err = client:request_sync("textDocument/codeAction", params, 3000, buf)
-              if err or not result or not result.result then
-                return
-              end
-              for _, action in ipairs(result.result) do
-                if action.edit then
-                  vim.lsp.util.apply_workspace_edit(action.edit, client.offset_encoding)
-                elseif action.command then
-                  client:exec_cmd(action.command)
-                end
-              end
+              pcall(vim.api.nvim_del_augroup_by_name, "lsp_organize_" .. buf)
+              pcall(vim.api.nvim_del_augroup_by_name, "lsp_format_" .. buf)
+              pcall(vim.api.nvim_del_augroup_by_name, "lsp_codelens_" .. buf)
             end,
           })
 
-          require("keymaps.lsp").attach(buf)
+          if client:supports_method "textDocument/codeAction" then
+            vim.api.nvim_create_autocmd("BufWritePre", {
+              buffer = buf,
+              group = vim.api.nvim_create_augroup("lsp_organize_" .. buf, { clear = true }),
+              callback = function()
+                local params = vim.lsp.util.make_range_params(vim.api.nvim_get_current_win(), client.offset_encoding)
+                params.context = {
+                  only = { "source.organizeImports" },
+                  diagnostics = vim.diagnostic.get(buf),
+                }
+                local result, err = client:request_sync("textDocument/codeAction", params, 3000, buf)
+                if err or not result or not result.result then
+                  return
+                end
+                for _, action in ipairs(result.result) do
+                  if action.edit then
+                    vim.lsp.util.apply_workspace_edit(action.edit, client.offset_encoding)
+                  elseif action.command then
+                    client:exec_cmd(action.command)
+                  end
+                end
+              end,
+            })
+          end
+
+          if client:supports_method "textDocument/formatting" then
+            vim.api.nvim_create_autocmd("BufWritePre", {
+              buffer = buf,
+              group = vim.api.nvim_create_augroup("lsp_format_" .. buf, { clear = true }),
+              callback = function()
+                vim.lsp.buf.format { bufnr = buf, id = client.id, async = false }
+              end,
+            })
+          end
+
+          if client:supports_method "textDocument/inlayHint" then
+            vim.lsp.inlay_hint.enable(true, { bufnr = buf })
+          end
+
+          if client:supports_method "textDocument/codeLens" then
+            vim.lsp.codelens.enable(true, { bufnr = buf })
+            vim.lsp.codelens.refresh { bufnr = buf }
+            vim.api.nvim_create_autocmd({ "BufEnter", "InsertLeave", "BufWritePost" }, {
+              buffer = buf,
+              group = vim.api.nvim_create_augroup("lsp_codelens_" .. buf, { clear = true }),
+              callback = function()
+                vim.lsp.codelens.refresh { bufnr = buf }
+              end,
+            })
+          end
+
+          local wd_ok, wd = pcall(require, "workspace-diagnostics")
+          if wd_ok then
+            wd.populate_workspace_diagnostics(client, buf)
+          end
+
+          local function map(mode, lhs, rhs, desc)
+            vim.keymap.set(mode, lhs, rhs, { noremap = true, silent = true, buffer = buf, desc = desc })
+          end
+
+          map("n", "gd", vim.lsp.buf.definition, "Go to definition")
+          map("n", "gD", vim.lsp.buf.declaration, "Go to declaration")
+          map("n", "gi", vim.lsp.buf.implementation, "Go to implementation")
+          map("n", "gt", vim.lsp.buf.type_definition, "Go to type definition")
+          map("n", "gR", vim.lsp.buf.references, "References")
+          map("n", "gO", vim.lsp.buf.document_symbol, "Document symbols")
+          map("n", "K", vim.lsp.buf.hover, "Hover docs")
+          map({ "n", "i" }, "<C-h>", vim.lsp.buf.signature_help, "Signature help")
+          map({ "n", "v" }, "g..", vim.lsp.buf.code_action, "Code action")
+          map("n", "<leader>ws", vim.lsp.buf.workspace_symbol, "Workspace symbols")
+          map("n", "<leader>cL", vim.lsp.codelens.run, "Run codelens")
         end,
       })
-
     end,
   },
 }

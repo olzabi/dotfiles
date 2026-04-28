@@ -1,20 +1,12 @@
 return {
   {
-    "vhyrro/luarocks.nvim",
-    priority = 1001, -- this plugin needs to run before anything else
-    opts = {
-      rocks = { "magick" },
-    },
-  },
-
-  {
     -- TODO: sessions manager
     "folke/persistence.nvim",
-    enabled = false,
+    enabled = true,
     event = "BufReadPre",
     lazy = false,
     config = function()
-      require("persistence").setup(opts)
+      require("persistence").setup()
 
       vim.api.nvim_create_user_command("PersistenceLoad", function()
         require("persistence").load()
@@ -35,38 +27,29 @@ return {
         end,
       })
     end,
-    keys = require("keymaps").persistence,
   },
 
   {
     -- Search & replace
     "MagicDuck/grug-far.nvim",
     opts = { headerMaxWidth = 80 },
-    keys = require("keymaps").grug_far,
+    keys = {
+      {
+        "<leader>sR",
+        function()
+          local ext = vim.bo.buftype == "" and vim.fn.expand "%:e"
+          require("grug-far").open {
+            transient = true,
+            prefills = { filesFilter = ext and ext ~= "" and "*." .. ext or nil },
+          }
+        end,
+        mode = { "n", "v" },
+        desc = "Search and Replace",
+      },
+    },
     config = function()
       require("grug-far").setup()
     end,
-  },
-
-  {
-    -- TODO:
-    "stevearc/overseer.nvim",
-    opts = {
-      task_list = {
-        direction = "left",
-        bindings = {
-          ["<C-h>"] = false,
-          ["<C-j>"] = false,
-          ["<C-k>"] = false,
-          ["<C-l>"] = false,
-          ["L"] = "IncreaseDetail",
-          ["H"] = "DecreaseDetail",
-          ["<PageUp>"] = "ScrollOutputUp",
-          ["<PageDown>"] = "ScrollOutputDown",
-        },
-      },
-    },
-    keys = require("keymaps").overseer,
   },
 
   {
@@ -80,18 +63,35 @@ return {
 
   {
     "Wansmer/treesj",
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
-    enabled = true,
+    dependencies = "nvim-treesitter/nvim-treesitter",
     opts = {},
-    keys = require("keymaps").treesj,
+    keys = {
+      { ".j", "<cmd>TSJToggle<cr>", desc = "Join Toggle" },
+    },
   },
 
   {
     "gbprod/yanky.nvim",
     enabled = true,
     opts = {},
-    dependencies = { "folke/snacks.nvim" },
-    keys = require("keymaps").yanky,
+    dependencies = "folke/snacks.nvim",
+    keys = {
+      { "y", "<Plug>(YankyYank)", mode = { "n", "x" }, desc = "Yank" },
+      { "p", "<Plug>(YankyPutAfter)", mode = { "n", "x" }, desc = "Put after" },
+      { "P", "<Plug>(YankyPutBefore)", mode = { "n", "x" }, desc = "Put before" },
+      { "gp", "<Plug>(YankyGPutAfter)", mode = { "n", "x" }, desc = "Put after selection" },
+      { "gP", "<Plug>(YankyGPutBefore)", mode = { "n", "x" }, desc = "Put before selection" },
+      { "]p", "<Plug>(YankyPutIndentAfterLinewise)", desc = "Put indented after" },
+      { "[p", "<Plug>(YankyPutIndentBeforeLinewise)", desc = "Put indented before" },
+      { "]P", "<Plug>(YankyPutIndentAfterLinewise)", desc = "Put indented after" },
+      { "[P", "<Plug>(YankyPutIndentBeforeLinewise)", desc = "Put indented before" },
+      { ">p", "<Plug>(YankyPutIndentAfterShiftRight)", desc = "Put indent right" },
+      { "<p", "<Plug>(YankyPutIndentAfterShiftLeft)", desc = "Put indent left" },
+      { ">P", "<Plug>(YankyPutIndentBeforeShiftRight)", desc = "Put before indent right" },
+      { "<P", "<Plug>(YankyPutIndentBeforeShiftLeft)", desc = "Put before indent left" },
+      { "=p", "<Plug>(YankyPutAfterFilter)", desc = "Put after filter" },
+      { "=P", "<Plug>(YankyPutBeforeFilter)", desc = "Put before filter" },
+    },
   },
 
   {
@@ -108,6 +108,9 @@ return {
   {
     -- TODO:
     "kylechui/nvim-surround",
+    config = function()
+      require("nvim-surround").setup()
+    end,
   },
 
   {
@@ -139,10 +142,9 @@ return {
   },
 
   {
-    -- TODO:
     "ckolkey/ts-node-action",
     config = function()
-      vim.keymap.set({ "n" }, ".f", require("ts-node-action").node_action, { desc = "Trigger Node Action" })
+      vim.keymap.set({ "n" }, ".<leader>", require("ts-node-action").node_action, { desc = "Trigger Node Action" })
     end,
   },
 }

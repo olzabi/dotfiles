@@ -1,8 +1,9 @@
 return {
+  "3rd/diagram.nvim",
 
   {
     "folke/twilight.nvim",
-    keys = require("keymaps").twilight,
+    keys = { { "<leader>uEc", "<cmd>Twilight<cr>", desc = "Toggle Twilight" } },
   },
 
   {
@@ -33,10 +34,9 @@ return {
     end,
   },
 
-  { "3rd/diagram.nvim", ft = { "markdown" } },
   {
     "folke/zen-mode.nvim",
-    keys = require("keymaps").zen_mode,
+    keys = { { "<leader>uEz", "<cmd>ZenMode<cr>", desc = "Toggle ZenMode" } },
   },
 
   {
@@ -65,6 +65,6 @@ return {
         },
       },
     },
-    keys = require("keymaps").cloak,
+    keys = { { "<leader>uc", "<cmd>CloakToggle<cr>", desc = "Toggle cloak (.env)" } },
   },
 }

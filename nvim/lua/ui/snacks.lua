@@ -1,16 +1,22 @@
 return {
-
   {
     "folke/snacks.nvim",
     lazy = false,
     priority = 1000,
+    dependencies = {
+      "gbprod/yanky.nvim",
+      "folke/todo-comments.nvim",
+      "kdheepak/lazygit.nvim",
+    },
+
     opts = {
-      bigfile = { enabled = true, notify = false, size = 1.5 * 1024 * 1024 },
-      indent = { enabled = true },
-      input = { enabled = true },
-      scratch = { enabled = true },
+      bigfile   = { enabled = true, notify = false, size = 1.5 * 1024 * 1024 },
+      indent    = { enabled = true },
+      input     = { enabled = true },
+      scratch   = { enabled = true },
       quickfile = { enabled = true },
-      terminal = { enabled = false, win = { style = "terminal", border = vim.g.border_style } },
+      terminal  = { enabled = false, win = { style = "terminal", border = vim.g.border_style } },
+      lazygit   = { enabled = true, configure = true, win = { style = "lazygit" } },
       notifier = {
         enabled = true,
         timeout = 5000,
@@ -95,7 +101,14 @@ return {
           },
         },
         projects = { pattern = { ".git", "package.json" } },
-        matcher = { fuzzy = true, smartcase = true, ignorecase = true, filename_bonus = true },
+        matcher = {
+          fuzzy = true,
+          smartcase = true,
+          ignorecase = true,
+          filename_bonus = true,
+          frecency = true,
+        },
+        exclude = { ".git", "node_modules",  }
       },
       styles = {
         terminal = {
@@ -149,6 +162,22 @@ return {
         end,
       })
     end,
-    keys = require("keymaps").snacks,
+
+    keys = {
+      { ";;",               function() Snacks.picker.grep()         end,                     desc = "Grep" },
+      { ";<leader>",        function() Snacks.picker.smart()        end,                     desc = "Smart find files" },
+      { "<leader>hp",       function() Snacks.picker.yanky()        end, mode = { "n","x" }, desc = "Yank history" },
+      { "<leader>sw",       function() Snacks.picker.grep_word()    end, mode = { "n","x" }, desc = "Visual selection or word" },
+      { "<leader>hu",       function() Snacks.picker.undo()         end,                     desc = "Undo history" },
+      { "<leader>bd",       function() Snacks.bufdelete()           end,                     desc = "Delete buffer" },
+      { '<leader>"',        function() Snacks.picker.registers()    end,                     desc = "Registers" },
+      { ";ff",              function() Snacks.picker.files()        end,                     desc = "Find files" },
+      { ";q",               function() Snacks.picker.qflist()       end,                     desc = "Quickfix list" },
+      { ";m",               function() Snacks.picker.marks()        end,                     desc = "Marks" },
+      { ";P",               function() Snacks.picker.projects()     end,                     desc = "Projects" },
+      { ";s<leader>",       function() Snacks.scratch.select()      end,                     desc = "Select scratch" },
+      { ";r",               function() Snacks.picker.recent()       end,                     desc = "Recent files" },
+      { ";xT",              function() Snacks.picker.todo_comments({ keywords = { "TODO","FIX","WARN","HACK","PERF","NOTE","TEST" } }) end, desc = "Todo/Fix/Fixme" },
+    },
   },
 }

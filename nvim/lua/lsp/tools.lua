@@ -5,6 +5,6 @@ return {
     config = function()
       require("lazydocker").setup()
     end,
-    keys = require("keymaps").lazydocker,
+    keys = { { "<leader>ul", "<cmd>Lazydocker<cr>", desc = "LazyDocker" } },
   },
 }

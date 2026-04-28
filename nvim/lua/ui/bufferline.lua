@@ -18,7 +18,7 @@ return {
         show_buffer_close_icons = false,
       },
     },
-    config = function()
+    config = function(_,opts)
       local bufferline = require "bufferline"
       bufferline.setup(opts)
 
@@ -30,6 +30,6 @@ return {
         end,
       })
     end,
-    keys = require("keymaps").bufferline,
+    keys = { { "<leader>bp", "<cmd>BufferLinePick<cr>", desc = "Pick buffer" } },
   },
 }

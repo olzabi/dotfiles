@@ -1,8 +1,15 @@
 local map = vim.keymap.set
-local nmap = require("keymaps.utils").nmap
+local nmap= function(keys, func, desc, buf)
+  if desc then
+    desc = desc
+  end
 
--- join lines focus
-nmap("J", "mzJ`z", "Join lines and keep in the same place the cursor")
+  if buf then
+    buf = buf
+  end
+
+  vim.keymap.set("n", keys, func, { noremap = true, silent = true, desc = desc, buffer = buf })
+end
 
 -- better up/down
 map({ "n", "x" }, "j", "v:count == 0 ? 'gj' : 'j'", { desc = "Down", expr = true, silent = true })
@@ -48,7 +55,7 @@ map({ "v", "x" }, "<", "<gv")
 nmap("dw", 'vb"_d')
 nmap("<C-a>", "gg<S-v>G")
 nmap("<Esc>", "<cmd>noh<cr>")
-nmap("<leader>j", "*``cgn")
+--nmap("<leader>j", "*``cgn")
 map("v", "//", [[y/\V<C-R>=escape(@",'/\')<CR><CR>]])
 
 nmap("<leader>rc", function()

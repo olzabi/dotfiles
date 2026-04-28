@@ -96,8 +96,6 @@ return {
   {
     "folke/noice.nvim",
     event = "VimEnter",
-    lazy = false,
-    cmd = "Noice",
     dependencies = "MunifTanjim/nui.nvim",
     opts = {
       presets = {
@@ -121,7 +119,7 @@ return {
       routes = routes,
     },
     keys = {
-      { "<leader>n",  function() Snacks.picker.notifications() end, desc = "Notifications" },
+      { "<leader>nh", function() Snacks.picker.notifications() end, desc = "Notifications" },
       { "<leader>nn", "<cmd>NoiceDismiss<cr>", desc = "Dismiss" },
       { "<leader>nH", "<cmd>Noice history<cr>", desc = "History" },
       { "<leader>nl", "<cmd>Noice last<cr>", desc = "Last message" },

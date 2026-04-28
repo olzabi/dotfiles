@@ -27,7 +27,6 @@ return {
     enabled = false,
     branch = "regexp",
     opts = {},
-    keys = require "keymaps",
   },
 
   {
