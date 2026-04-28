@@ -1,0 +1,305 @@
+""" Plugin
+Plug 'tpope/vim-surround' " ys, cs, ds,  S
+Plug 'tpope/vim-commentary' " gcc, gc + motion, v_gc
+Plug 'vim-scripts/argtextobj.vim' " argument text objects: aa, ia
+Plug 'tommcdo/vim-exchange' " cx{motion} to select, again to exchange
+Plug 'kana/vim-textobj-entire' " entire buffer text object: ae
+Plug 'terryma/vim-multiple-cursors'
+Plug 'preservim/nerdtree'
+Plug 'easymotion/vim-easymotion'
+Plug 'machakann/vim-highlightedyank'
+Plug 'dbakker/vim-paragraph-motion'
+Plug 'michaeljsmith/vim-indent-object'
+Plug 'justinmk/vim-sneak'
+Plug 'inkarkat/vim-ReplaceWithRegister'
+
+if has('ide')
+    " ----------------------------------------------------------------------------
+    "  Vim Config & plugins
+
+    let mapleader = " "
+    set scrolloff=16
+    set sidescrolloff=8
+    set relativenumber
+    set number
+    set hlsearch ignorecase smartcase incsearch
+    set showmode
+    set showcmd
+    set visualbell
+    set history=10000
+    set wrapscan                      " searches wrap around the end of the file
+    set gdefault                      " substitute all occurrences in line per default
+    set clipboard=unnamedplus,unnamed,ideaput " integrate with system clipboard
+    filetype on
+    filetype plugin on
+    filetype indent on
+    set fdm=indent
+
+    set commentary           " gc — toggle comments
+    set dial                 " Increment on +/-
+    set sneak                " s{char}{char} — fast 2-char jump
+    set ideajoin             " smart join with J (respects language syntax)
+    set idearefactormode=keep " keep cursor in place after refactor
+    set multiple-cursors
+    set ReplaceWithRegister
+    set NERDTree             " optional: file tree via :NERDTree
+    set highlightedyank
+    let g:highlightedyank_highlight_duration = "300"
+    let g:highlightedyank_highlight_color = "#05D292FF"
+
+    " ----------------------------------------------------------------------------
+    " Sys/Conf/General
+    map <Esc> <Esc>:noh<CR>
+    map <leader><Esc> <Esc><Action>(EditorRemoveSecondaryCarets)
+    map <leader><tab> <Action>(Switcher)
+    map <Leader>rs <Action>(IdeaVim.ReloadVimRc.reload)
+    map <Leader>rr <Action>(ExternalSystem.ProjectRefreshAction)
+
+    " --------------------------------------
+    noremap  <right> [w
+    noremap  <left>  [b
+    nnoremap <right> [w
+    nnoremap <left>  [b
+    map <c-l> <c-w>l
+    map <c-h> <c-w>h
+    map <C-d> <C-d>zz
+    map <C-u> <C-u>zz
+    nmap n nzzzv
+    nmap N Nzzzv
+    nmap U <C-r>
+    nmap <C-=> :action EditorIncreaseFontSize<CR>
+    nmap <C--> :action EditorDecreaseFontSize<CR>
+    nmap + :DialIncrement<cr>
+    nmap - :DialDecrement<cr>
+    nmap <leader>= :action EditorResetFontSize<CR>
+    vmap < <gv
+    vmap > >gv
+    nmap <S-h> <Action>(PreviousTab)
+    nmap <S-l> <Action>(NextTab)
+    nmap <leader>j *``cgn
+
+    " ----------------------------------------------------------------------------
+    " Buffer
+    map <leader>bd :bd<cr>
+    " Window
+    nmap <leader>w| <Action>(SplitVertically)
+    nmap <leader>w- <Action>(SplitHorizontally)
+    nmap <leader>ww <Action>(JumpToLastWindow)
+    nmap <leader>wQ <Action>(HideAllWindows)
+    nmap <leader>wp <Action>(ActivateProjectToolWindow)
+    nmap <leader>wq <Action>(HideActiveWindow)
+    nmap <leader>wu <Action>(UnsplitAll)
+
+    " --------------------------------------
+    nmap <C-h> <C-w>h
+    nmap <C-l> <C-w>l
+    nmap <C-j> <C-w>j
+    nmap <C-k> <C-w>k
+    nmap <C-Left>  <Action>(StretchSplitToLeft)
+    nmap <C-Right> <Action>(StretchSplitToRight)
+    nmap <C-Up>    <Action>(StretchSplitToUp)
+    nmap <C-Down>  <Action>(StretchSplitToBottom)
+    map  <A-k>     <Action>(MoveLineUp)
+    map  <A-j>     <Action>(MoveLineDown)
+    map  <A-down>  <Action>(EditorCloneCaretBelow)
+    map  <A-up>    <Action>(EditorCloneCaretAbove)
+    imap <A-down>  <Action>(EditorCloneCaretBelow)
+    imap <A-up>    <Action>(EditorCloneCaretAbove)
+
+    " --------------------------------------
+    map [m  <Action>(MethodUp)
+    map ]m  <Action>(MethodDown)
+
+    " --------------------------------------
+    " Find
+    map <Leader>fb <Action>(ShowBookmarks)
+    map <Leader>fc <Action>(GotoClass)
+    map <Leader>ff <Action>(GotoFile)
+    map <Leader>fo <Action>(RecentFiles)
+    map <Leader>fw <Action>(FindInPath)
+    map <Leader>fs <Action>(GotoSymbol)
+
+    " --------------------------------------
+    " Diagnostics
+    map <Leader>xx <Action>(ActivateProblemsViewToolWindow)
+    map <leader>e  <Action>(ShowErrorDescription)
+    map [d         <Action>(GotoPreviousError)
+    map ]d         <Action>(GotoNextError)
+
+    " --------------------------------------
+    " Misc
+    map <leader>sr <Action>(Replace)
+    map <Leader>i <Action>(ImplementMethods)
+    map <leader>a <Action>(Annotate)
+    nmap <C-A> gg<S-v>G
+    nmap <CR> a<CR><Esc>k$
+    " Make Y consistent with other capital letter actions (A, C, D...)
+    nnoremap Y y$
+    xnoremap Y y$
+    nnoremap gp `[v`]
+    nmap <leader>; A;<ESC>o
+
+    " --------------------------------------
+    " Motions
+    set exchange             " cx — exchange two motions
+    set textobj-entire       " ae/ie — entire buffer | d/c/v+ae/ie
+    set textobj-indent       " ii/ai/aI
+
+    set argtextobj           " aa/ia — function arguments | daa,cia,via
+    let g:argtextobj_pairs="[:],(:),<:>"
+
+    set surround             " ys/cs/ds — surround text objects (built-in, always add)
+    let g:WhichKeyDesc_surround_add    = "ys  add surround"
+    let g:WhichKeyDesc_surround_change = "cs  change surround"
+    let g:WhichKeyDesc_surround_delete = "ds  delete surround"
+    let g:WhichKeyDesc_surround_paren      = "S(  surround with ( )"
+    let g:WhichKeyDesc_surround_bracket    = "S[  surround with [ ]"
+    let g:WhichKeyDesc_surround_brace      = "S{  surround with { }"
+    let g:WhichKeyDesc_surround_quote      = "S\"  surround with \"\""
+    let g:WhichKeyDesc_surround_squote     = "S'  surround with ''"
+    let g:WhichKeyDesc_surround_backtick   = "S\`  surround with \`\`"
+    let g:WhichKeyDesc_surround_tag        = "St  surround with <tag>"
+
+    " History
+    nmap <leader>hl <Action>(LocalHistory.ShowHistory)
+    xmap <leader>hl <Action>(LocalHistory.ShowSelectionHistory)
+
+    " --------------------------------------
+    " Formatting
+    map <leader>ci <Action>(OptimizeImports)
+    map <Leader>cp <Action>(ReformatCode)
+    " --------------------------------------
+    " LSP (kinda (?))
+    map gi  <Action>(GotoImplementation)
+    map gd  <Action>(GotoDeclaration)
+    map gu  <Action>(ShowUsages)
+    map gt  <Action>(GotoTypeDeclaration)
+    map grn <Action>(RenameElement)
+    map gs  <Action>(GotoSuperMethod)
+    map gT  <Action>(GotoTest)
+    nmap K  <Action>(QuickJavaDoc)
+    map gU  <Action>(FindUsages)
+    nmap ]q <Action>(NextOccurence)
+    nmap [q <Action>(PreviousOccurence)
+    xmap zf <Action>(CollapseSelection)
+
+    " --------------------------------------
+    " Folding
+    set foldenable
+    set foldmethod=indent
+    xmap zf <Action>(CollapseSelection)<ESC>
+    map za  <Action>(ExpandCollapseToggleAction)
+    map zA  <Action>(ExpandCollapseToggleAllAction)
+    map zM  <Action>(CollapseAllRegions)
+    map zR  <Action>(ExpandAllRegions)
+    map zO  <Action>(ExpandRegionRecursively)
+    map zC  <Action>(CollapseRegionRecursively)
+
+    " --------------------------------------
+    " Refactoring
+    nmap <Leader>Rn  <Action>(RenameElement)
+    nmap <Leader>Rf  <Action>(RenameFile)
+    nmap <Leader>Rs  <Action>(ChangeSignature)
+    nmap <Leader>Rm  <Action>(Move)
+    nmap <Leader>Rc  <Action>(CopyElement)
+    nmap <leader>Rf  <Action>(Refactorings.QuickListPopupAction)
+    vmap <leader>Rf  <Action>(Refactorings.QuickListPopupAction)
+    vmap <leader>Rei <Action>(ExtractInterface)
+    vmap <leader>Rem <Action>(ExtractMethod)
+
+    map <A-S-h> <Action>(MoveElementLeft)
+    map <A-S-l> <Action>(MoveElementRight)
+    map <A-S-j> <Action>(MoveStatementDown)
+    map <A-S-k> <Action>(MoveStatementUp)
+
+    " --------------------------------------
+    " Bookmarks
+    map <leader>mt <Action>(ToggleBookmark)
+    map <leader>mm <Action>(ShowBookmarks)
+    map <leader>mr <Action>(EditBookmark)
+
+    " system clipboard
+    " NOTE: not sure if it is that useful. Might be removed later
+    vmap <leader>yiw "+yiw
+    nmap <leader>yiw "+yiw
+    vmap <leader>y "+y
+    vmap <leader>d "_d
+    nmap <leader>y "+yy
+    nmap <leader>p "+p
+    nmap <leader>P "+P
+    vmap <leader>p "+p
+    vmap <leader>P "+P
+
+    " Do not copy on selection paste
+    vmap p "_dP
+
+    " --------------------------------------
+    " Which-key
+    set which-key
+    set notimeout " which-key: no timeout
+    let g:WhichKey_FontSize = 15
+    let g:WhichKey_CommandColor = "#41ead4"
+    let g:WhichKey_PrefixColor = "#f335b2"
+    let g:WhichKey_SortOrder = "by_key_prefix_first"
+    let g:WhichKey_ShowTypedSequence = "true"
+
+
+    " TODO: Review
+    "nnoremap <Leader>ic :action InspectCode<CR>
+    "nnoremap <Leader>im :action ImplementMethods<CR>
+    "nnoremap <Leader>om :action OverrideMethods<CR>
+    "nnoremap <Leader>nc :action NewClass<CR>
+    "nnoremap <Leader>ps :action FileStructurePopup<CR>
+    "nnoremap <leader>pg :action Generate<CR>
+    "nnoremap <Leader>pm :action ShowPopupMenu<CR>
+    "nnoremap <Leader>ga :action GotoAction<CR>
+    "nnoremap <Leader>gc :action GotoClass<CR>
+    "nnoremap <Leader>gf :action GotoFile<CR>
+    "nnoremap <Leader>gs :action GotoSymbol<CR>
+    "nnoremap gh :action Back <CR>
+    "nnoremap gl :action Forward <CR>
+    "nnoremap gj :action MethodDown <CR>
+    "nnoremap gk :action MethodUp <CR>
+    "nnoremap gs :action GotoSuperMethod <CR>
+    "nnoremap gi :action GotoImplementation <CR>
+    "nnoremap g, :action JumpToLastChange <CR>
+    "nnoremap g. :action JumpToNextChange <CR>
+    "nnoremap gd :action GotoDeclaration <CR>
+    "nnoremap gr :action RecentFiles <CR>
+    "nnoremap <leader>gc :action GotoClass <CR>
+    "vnoremap <leader>gc :action GotoClass <CR>
+    "nnoremap <leader>gf :action GotoFile <CR>
+    "vnoremap <leader>gf :action GotoFile <CR>
+    "nnoremap <leader>ww :action HideAllWindows <CR>
+    "nnoremap gp :NERDTree <CR>
+    "nnoremap <leader>gt :action GotoTest <CR>
+    "nnoremap <leader>rc :action RunClass <CR>
+    "nnoremap ,rc :action ChooseRunConfiguration <CR>
+    "nnoremap <leader>gq :action QuickList.Git <CR>
+    "nnoremap <leader>ns :action NewScratchFile <CR>
+    "nnoremap <leader>nf :action NewElementSamePlace <CR>
+    "nnoremap <leader>ge :action Generate<CR>
+    "vnoremap <leader>re :action Replace<CR>
+    "nnoremap <leader>re :action Replace<CR>
+    "vnoremap / :action Find<CR>
+    "nnoremap / :action Find<CR>
+    "nnoremap <leader>ss :action SelectInProjectView<CR>
+    "nmap <leader>a <Action>(GotoAction)
+    "nmap <leader>gg <Action>(Gradle.ExecuteTask)
+    "nmap ga <Action>(SearchEverywhere)
+    "nmap gc <Action>(GotoClass)
+    "nmap gf <Action>(GotoFile)
+    "nmap gs <Action>(GotoSymbol)
+    "nmap gt <Action>(GoToTest)
+    "nmap gT <Action>(TextSearchAction)
+    "nmap go <Action>(GotoSuperMethod)
+    "nmap gd <Action>(GotoDeclaration)
+    "nmap gD <Action>(GotoTypeDeclaration)
+    "nmap gr <Action>(ShowUsages)
+    "nmap gR <Action>(FindUsages)
+    "nmap gi <Action>(GotoImplementation)
+    "nmap gI <Action>(QuickImplementations)
+    "nmap gn <Action>(ShowNavBar)
+    "nmap gm %
+
+endif
