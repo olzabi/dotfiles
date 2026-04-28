@@ -39,6 +39,14 @@ export PATH="$XDG_LOCAL_HOME/bin:$PATH"
 #* history
 # ---------
 export HIST_DIR="$XDG_DATA_HOME/histfiles"
+if [[ ! -d "$HIST_DIR" ]]; then
+  mkdir -p "$HIST_DIR"
+  touch "$HIST_DIR/.zsh_history" \
+    "$HIST_DIR/.psql_history" \
+    "$HIST_DIR/.mysql_history" \
+    "$HIST_DIR/.python_history" \
+    "$HIST_DIR/.psysh_history"
+fi
 export HISTFILE="$HIST_DIR/.zsh_history"
 export PSQL_HISTORY="$HIST_DIR/.psql_history"
 export MYSQL_HISTFILE="$HIST_DIR/.mysql_history"
