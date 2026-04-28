@@ -26,62 +26,61 @@ zstyle ':completion:*' rehash true
 zstyle ':omz:plugins:nvm' autoload yes
 zstyle ':omz:plugins:nvm' silent-autoload yes
 
-
 plugins=(
-	aws
-	artisan
-	composer
-	branch
-	docker
-	docker-compose
-	direnv
-	encode64
-	eza
-	sudo
-	fzf
-	zsh-autosuggestions
-	fzf-tab
-	gh
-	git
-	git-auto-fetch
-	git-commit
-	git-escape-magic
-	git-extras
-	gitfast
-	gitignore
-	history
-	kubectl
-	kubectx
-	last-working-dir
-	man
-	nmap
-	npm
-	nvm
-	nodenv
-	# yarn
-	rust
-	ssh
-	ssh-agent
-	tldr
-	terraform
-	vault
-	redis-cli
-	react-native
-	qrcode
-	you-should-use
-	zsh-completions
-	fancy-ctrl-z
-	python
-	pip
-	pipenv
-	virtualenv
-	postgres
-	laravel
-	jsontools
-	golang
-	ng
-	nestjs
-	zsh-syntax-highlighting
+  aws
+  artisan
+  composer
+  branch
+  docker
+  docker-compose
+  direnv
+  encode64
+  eza
+  sudo
+  fzf
+  zsh-autosuggestions
+  fzf-tab
+  gh
+  git
+  git-auto-fetch
+  git-commit
+  git-escape-magic
+  git-extras
+  gitfast
+  gitignore
+  history
+  kubectl
+  kubectx
+  last-working-dir
+  man
+  nmap
+  npm
+  nvm
+  nodenv
+  # yarn
+  rust
+  ssh
+  ssh-agent
+  tldr
+  terraform
+  vault
+  redis-cli
+  react-native
+  qrcode
+  you-should-use
+  zsh-completions
+  fancy-ctrl-z
+  python
+  pip
+  pipenv
+  virtualenv
+  postgres
+  laravel
+  jsontools
+  golang
+  ng
+  nestjs
+  zsh-syntax-highlighting
 )
 
 export RUSTFLAGS="-C opt-level=3 -C target-cpu=native" # Rust app build optimization
@@ -92,12 +91,15 @@ export RUSTFLAGS="-C opt-level=3 -C target-cpu=native" # Rust app build optimiza
 . "$ZSH/../aliases.zsh"
 . "$ZSH/../functions.zsh"
 . "$ZSH/../fzf.zsh"
+. "$ZSH/../llm.zsh"
 
 [ -x "$(command -v zoxide)" ] && eval "$(zoxide init zsh)"
 [ -x "$(command -v phpenv)" ] && eval "$(phpenv init -)"
-[ -x "$(command -v pyenv)"  ] && eval "$(pyenv init - zsh)"
-
+[ -x "$(command -v pyenv)" ] && eval "$(pyenv init - zsh)"
 
 export NVM_DIR="$HOME/.config/nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
+
+# opencode
+export PATH=/home/evernight/.opencode/bin:$PATH

@@ -13,7 +13,6 @@ export LANG="en_US.UTF-8"
 export LC_ALL="${LANG}"
 export LC_CTYPE="${LANG}"
 
-
 #* nvim
 # ---------
 # export PATH="/usr/local/bin:$PATH"
@@ -75,6 +74,7 @@ export CMAKE_CONFIG_DIR="$XDG_CONFIG_HOME/.cmake"
 
 #* docker & k8
 export DOCKER_CONFIG="$XDG_CONFIG_HOME/.docker"
+export DOCKER_HOST=unix:///var/run/docker.sock
 export MINIKUBE_HOME="$XDG_CONFIG_HOME/.minikube"
 export ANSIBLE_HOME="$XDG_CONFIG_HOME/.ansible"
 
@@ -104,12 +104,12 @@ export AWS_SHARED_CREDENTIALS_FILE="$AWS_HOME/credentials"
 export PYENV_ROOT="${PYENV_ROOT:-${XDG_CONFIG_HOME:-$HOME/.config}/.pyenv}"
 
 if [ -d "$PYENV_ROOT/bin" ]; then
-    export PATH="$PYENV_ROOT/bin:$PATH"
+  export PATH="$PYENV_ROOT/bin:$PATH"
 fi
 
 if command -v pyenv >/dev/null; then
-    export PIPENV_PYTHON="$PYENV_ROOT/shims/python"
-    export PYENV_VIRTUALENV_DISABLE_PROMPT=1
+  export PIPENV_PYTHON="$PYENV_ROOT/shims/python"
+  export PYENV_VIRTUALENV_DISABLE_PROMPT=1
 fi
 
 #* pnpm
@@ -145,11 +145,16 @@ export PATH="$XDG_LOCAL_HOME/julia-1.8.1/bin:$PATH"
 
 # Perl
 # ---------
-PATH="$XDG_CONFIG_HOME/perl5/bin${PATH:+:${PATH}}"; export PATH;
-PERL5LIB="$XDG_CONFIG_HOME/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"; export PERL5LIB;
-PERL_LOCAL_LIB_ROOT="$XDG_CONFIG_HOME/perl5${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"; export PERL_LOCAL_LIB_ROOT;
-PERL_MB_OPT="--install_base \"$XDG_CONFIG_HOME/perl5\""; export PERL_MB_OPT;
-PERL_MM_OPT="INSTALL_BASE=$XDG_CONFIG_HOME/perl5"; export PERL_MM_OPT;
+PATH="$XDG_CONFIG_HOME/perl5/bin${PATH:+:${PATH}}"
+export PATH
+PERL5LIB="$XDG_CONFIG_HOME/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"
+export PERL5LIB
+PERL_LOCAL_LIB_ROOT="$XDG_CONFIG_HOME/perl5${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"
+export PERL_LOCAL_LIB_ROOT
+PERL_MB_OPT="--install_base \"$XDG_CONFIG_HOME/perl5\""
+export PERL_MB_OPT
+PERL_MM_OPT="INSTALL_BASE=$XDG_CONFIG_HOME/perl5"
+export PERL_MM_OPT
 
 # Setup fzf
 # ---------
@@ -169,3 +174,4 @@ export RIPGREP_CONFIG_PATH="$DOTFILES_PATH/.ripgreprc"
 export EZA_COLORS="di=1;34:ln=36:ex=1;32"
 export ZELLIJ_CONFIG_DIR="$DOTFILES_PATH/zellij"
 
+export PATH=/usr/local/cuda/bin:$PATH
