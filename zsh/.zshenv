@@ -123,15 +123,10 @@ fi
 #* pnpm
 # ---------
 export PNPM_HOME="$XDG_DATA_HOME/pnpm"
-# export PATH="$PNPM_HOME:$PATH"
 case ":$PATH:" in
 *":$PNPM_HOME:"*) ;;
 *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
-
-#* nvm
-# ---------
-export NVM_DIR="$XDG_CONFIG_HOME/.nvm"
 
 #* git
 # ---------

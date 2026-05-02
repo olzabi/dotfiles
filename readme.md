@@ -9,5 +9,6 @@ sudo apt update && sudo apt-get install \
   libcurl4-openssl-dev \
   libtidy-dev libonig-dev \
   gcc make pkg-config bison \
-  libevent-dev libncurses-dev
+  libevent-dev libncurses-dev \
+  clangd-15
 ```

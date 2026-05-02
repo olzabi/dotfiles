@@ -1,7 +1,11 @@
 vim.filetype.add {
-  pattern = { [".*%.overlay"] = "c", [".*%.dts"] = "c" },
+  pattern = {
+    [".*%.overlay"] = "c",
+    [".*%.dts"] = "c",
+    [".*%.dtsi"] = "devicetree",
+    [".*%.keymap"] = "devicetree"
+  },
 }
-vim.cmd [[autocmd BufNewFile,BufRead *.keymap setfiletype c]]
 
 vim.filetype.add {
   extension = {
@@ -47,3 +51,9 @@ vim.filetype.add {
   pattern = { [".*%.blade%.php"] = "blade" },
 }
 
+vim.filetype.add {
+  extension = {
+    keymap = "devicetree",
+    dtsi = "devicetree",
+  },
+}

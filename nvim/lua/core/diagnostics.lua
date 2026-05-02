@@ -52,9 +52,5 @@ vim.diagnostic.config {
 }
 
 local map = vim.keymap.set
-map("n", "[d", vim.diagnostic.goto_prev,  { desc = "Prev diagnostic" })
-map("n", "]d", vim.diagnostic.goto_next,  { desc = "Next diagnostic" })
-map("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show diagnostic float" })
-map("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Diagnostics to loclist" })
-
-
+map("n", "[d", vim.diagnostic.goto_prev, { desc = "Prev diagnostic" })
+map("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })

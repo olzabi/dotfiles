@@ -33,6 +33,7 @@ plugins=(
   branch
   docker
   docker-compose
+  dotenv
   direnv
   encode64
   eza
