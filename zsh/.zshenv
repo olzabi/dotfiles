@@ -65,7 +65,7 @@ export YAZI_CONFIG_HOME="$DOTFILES_PATH/yazi"
 
 #* tmux
 # ---------
-export TMUX_CONF_DIR="$DOTFILES_PATH"
+export TMUX_CONF_DIR="$XDG_CONFIG_HOME/tmux"
 
 #* eza
 # ---------
@@ -181,5 +181,4 @@ export RIPGREP_CONFIG_PATH="$DOTFILES_PATH/.ripgreprc"
 # ---------
 export EZA_COLORS="di=1;34:ln=36:ex=1;32"
 export ZELLIJ_CONFIG_DIR="$DOTFILES_PATH/zellij"
-
 export PATH=/usr/local/cuda/bin:$PATH

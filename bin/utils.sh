@@ -1,23 +1,13 @@
 #!/bin/bash
 
-default_color=$(tput sgr 0)
-re="$(tput setaf 1)"
-yellow="$(tput setaf 3)"
-green="$(tput setaf 2)"
-blue="$(tput setaf 4)"
+BOLD="\033[1m"
+GREEN="\033[0;32m"
+YELLOW="\033[0;33m"
+RED="\033[0;31m"
+RESET="\033[0m"
 
-info() {
-    printf "%s==> %s%s\n" "$blue" "$1" "$default_color"
-}
+info()    { echo -e "${BOLD}$*${RESET}"; }
+success() { echo -e "${GREEN}✅ $*${RESET}"; }
+warn()    { echo -e "${YELLOW}⚠️  $*${RESET}"; }
+error()   { echo -e "${RED}❌ $*${RESET}" >&2; exit 1; }
 
-success() {
-    printf "%s==> %s%s\n" "$green" "$1" "$default_color"
-}
-
-error() {
-    printf "%s==> %s%s\n" "$red" "$1" "$default_color"
-}
-
-warning() {
-    printf "%s==> %s%s\n" "$yellow" "$1" "$default_color"
-}

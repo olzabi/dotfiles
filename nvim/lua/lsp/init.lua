@@ -15,9 +15,9 @@ return {
     opts = {
       library = {
         { path = "${3rd}/luv/library", words = { "vim%.uv" } },
-        { path = "snacks.nvim", words = { "Snacks" } },
-        { path = "lazy.nvim", words = { "LazyVim" } },
-        { path = "wezterm-types", modes = { "wezterm" } },
+        { path = "snacks.nvim",        words = { "Snacks" } },
+        { path = "lazy.nvim",          words = { "LazyVim" } },
+        { path = "wezterm-types",      modes = { "wezterm" } },
         "neotest",
       },
     },
@@ -96,16 +96,6 @@ return {
                     client:exec_cmd(action.command)
                   end
                 end
-              end,
-            })
-          end
-
-          if client:supports_method "textDocument/formatting" then
-            vim.api.nvim_create_autocmd("BufWritePre", {
-              buffer = buf,
-              group = vim.api.nvim_create_augroup("lsp_format_" .. buf, { clear = true }),
-              callback = function()
-                vim.lsp.buf.format { bufnr = buf, id = client.id, async = false }
               end,
             })
           end

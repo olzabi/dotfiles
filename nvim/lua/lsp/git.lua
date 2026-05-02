@@ -17,8 +17,8 @@ return {
       }
     end,
     keys = {
-      { "<leader>Gp", "<cmd>Gitsigns preview_hunk<cr>",              desc = "Preview hunk" },
-      { "<leader>GB", function() require("gitsigns").blame() end,    desc = "Blame" },
+      { "<leader>Gp", "<cmd>Gitsigns preview_hunk<cr>",           desc = "Preview hunk" },
+      { "<leader>GB", function() require("gitsigns").blame() end, desc = "Blame" },
     },
   },
 

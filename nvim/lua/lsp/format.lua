@@ -1,4 +1,4 @@
-local prettier = { "prettierd", "prettier", stop_after_first = true }
+local prettier = { "prettierd" }
 
 return {
 
@@ -108,7 +108,10 @@ return {
         end,
       })
 
-      vim.keymap.set("n", "<leader>cl", function() lint.try_lint() end, { desc = "Trigger linting" }) end,
+      vim.keymap.set("n", "<leader>cl", function()
+        lint.try_lint()
+      end, { desc = "Trigger linting" })
+    end,
   },
 
   {
@@ -121,6 +124,7 @@ return {
     event = { "BufWritePre", "BufReadPre", "BufNewFile" },
     cmd = { "ConformInfo" },
     opts = {
+      format_on_save = false,
       formatters = {
         ["shfmt"] = { prepend_args = { "-i", "2" } },
         prettier = {
@@ -173,11 +177,7 @@ return {
       {
         "<leader>cp",
         function()
-          require("conform").format {
-            notify_on_error = true,
-            async = true,
-            lsp_fallback = true,
-          }
+          require("conform").format { notify_on_error = true, async = true, lsp_fallback = true }
         end,
         mode = { "n", "v" },
         desc = "Format",

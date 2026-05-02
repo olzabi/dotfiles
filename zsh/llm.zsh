@@ -1,5 +1,8 @@
 export PATH=/usr/bin:$PATH llmfit
 export PATH=$DEV/llama.cpp/build/bin:$PATH
+export PATH=$XDG_CONFIG_HOME/.opencode/bin:$PATH
+
+export CLAUDE_CONFIG_DIR=$XDG_CONFIG_HOME/.claude
 
 export LOCAL_HOST="http://localhost:11434"
 
