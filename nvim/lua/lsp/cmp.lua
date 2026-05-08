@@ -77,7 +77,7 @@ return {
       sources = {
         default = { "lsp", "snippets", "path", "buffer", "lazydev", "dictionary" },
         per_filetype = {
-          sql = {  "buffer" },
+          sql = { "buffer" },
           gitcommit = { "git", "buffer" },
           gitrebase = { "git", "buffer" },
         },
@@ -99,7 +99,10 @@ return {
       fuzzy = { implementation = "prefer_rust" },
       keymap = {
         preset = "default",
-        ["<CR>"] = { "select_and_accept", "fallback" },
+        ["<C-Space>"] = { "show", "hide" },
+        ["<CR>"] = { "accept", "fallback" },
+        ["<C-j>"] = { "select_next", "fallback" },
+        ["<C-k>"] = { "select_prev", "fallback" },
         ["<C-p>"] = {
           function(cmp)
             cmp.show { providers = { "path", "buffer" } }
@@ -114,5 +117,11 @@ return {
       },
     },
     opts_extend = { "sources.default" },
+
+    config = function()
+      vim.lsp.config["*"] = {
+        capabilities = require("blink.cmp").get_lsp_capabilities(),
+      }
+    end,
   },
 }

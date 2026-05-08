@@ -1,8 +1,3 @@
-local capabilities = function()
-  local ok, blink = pcall(require, "blink.cmp")
-  return ok and blink.get_lsp_capabilities() or vim.lsp.protocol.make_client_capabilities()
-end
-
 return {
   "b0o/SchemaStore.nvim",
   "artemave/workspace-diagnostics.nvim",
@@ -35,7 +30,6 @@ return {
 
   {
     "LSP",
-    dependencies = "williamboman/mason.nvim",
     virtual = true,
     config = function()
       local groups = {
@@ -71,7 +65,6 @@ return {
             callback = function()
               pcall(vim.api.nvim_del_augroup_by_name, "lsp_organize_" .. buf)
               pcall(vim.api.nvim_del_augroup_by_name, "lsp_format_" .. buf)
-              pcall(vim.api.nvim_del_augroup_by_name, "lsp_codelens_" .. buf)
             end,
           })
 
@@ -104,18 +97,6 @@ return {
             vim.lsp.inlay_hint.enable(true, { bufnr = buf })
           end
 
-          if client:supports_method "textDocument/codeLens" then
-            vim.lsp.codelens.enable(true, { bufnr = buf })
-            vim.lsp.codelens.refresh { bufnr = buf }
-            vim.api.nvim_create_autocmd({ "BufEnter", "InsertLeave", "BufWritePost" }, {
-              buffer = buf,
-              group = vim.api.nvim_create_augroup("lsp_codelens_" .. buf, { clear = true }),
-              callback = function()
-                vim.lsp.codelens.refresh { bufnr = buf }
-              end,
-            })
-          end
-
           local wd_ok, wd = pcall(require, "workspace-diagnostics")
           if wd_ok then
             wd.populate_workspace_diagnostics(client, buf)
@@ -135,7 +116,6 @@ return {
           map({ "n", "i" }, "<C-h>", vim.lsp.buf.signature_help, "Signature help")
           map({ "n", "v" }, "g..", vim.lsp.buf.code_action, "Code action")
           map("n", "<leader>ws", vim.lsp.buf.workspace_symbol, "Workspace symbols")
-          map("n", "<leader>cL", vim.lsp.codelens.run, "Run codelens")
         end,
       })
     end,

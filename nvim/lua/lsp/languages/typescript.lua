@@ -12,7 +12,6 @@ return {
     ft = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
     code_lens = "all",
     config = function()
-      local lsp = require "configs.lsp"
       require("typescript-tools").setup {
         filetypes = {
           "javascript",
@@ -38,8 +37,6 @@ return {
           publish_diagnostic_on = "insert_leave",
           composite_mode = "separate_diagnostic",
         },
-        capabilities = lsp.capabilities(),
-        on_attach = lsp.on_attach,
       }
 
       vim.api.nvim_create_autocmd("BufWritePre", {

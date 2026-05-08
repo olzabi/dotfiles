@@ -1,17 +1,29 @@
 return {
+  {
+    "crusj/structrue-go.nvim",
+    ft = "go",
+    config = true,
+  },
 
   {
     -- WARN: not updated since added
     "ray-x/go.nvim",
     dependencies = { -- optional packages
       "ray-x/guihua.lua",
-      "theHamsta/nvim-dap-virtual-text",
     },
     event = "CmdlineEnter",
     build = ':lua require("go.install").update_all_sync()',
     config = function()
-      require("go").setup({
+      require("go").setup {
         lsp_cfg = true,
+      }
+      local format_sync_grp = vim.api.nvim_create_augroup("GoFormat", {})
+      vim.api.nvim_create_autocmd("BufWritePre", {
+        pattern = "*.go",
+        callback = function()
+          require("go.format").goimports()
+        end,
+        group = format_sync_grp,
       })
     end,
     keys = {

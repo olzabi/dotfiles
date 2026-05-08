@@ -11,8 +11,6 @@ return {
     },
     config = function()
       local lint = require "lint"
-      local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
-      local eslint = lint.linters.eslint_d
       local php_linters = {}
 
       -- Use either composer or phive tools.
@@ -24,28 +22,27 @@ return {
         table.insert(php_linters, "psalm")
       end
 
-      -- if Eslint error configuration not found : change MasonInstall eslint@version or npm i -g eslint at a specific version
       lint.linters_by_ft = {
         javascript = { "eslint_d" },
         typescript = { "eslint_d" },
         javascriptreact = { "eslint_d" },
         typescriptreact = { "eslint_d" },
+        json = { "eslint_d" },
+
+        go = { "golangcilint" },
+        rust = { "clippy" },
 
         terraform = { "terraform_validate", "tflint", "tfsec" },
         cmake = { "cmakelint", "cmakelang" },
-        json = { "eslint_d" },
         yaml = { "yamllint" },
-
         php = php_linters,
         python = { "ruff", "pylint" },
         sh = { "shellcheck" },
         bash = { "shellcheck" },
         zsh = { "zsh" },
-
-        go = { "golangcilint" },
       }
 
-      eslint.args = {
+      lint.linters.eslint_d.args = {
         "--no-warn-ignored",
         "--format",
         "json",
@@ -62,12 +59,23 @@ return {
         "-",
       }
 
+      lint.linters.shellcheck.args = {
+        "-e",
+        "SC2016",
+        "--format=json",
+        "-x",
+        "-",
+      }
+
       lint.linters.golangcilint = {
         cmd = "golangci-lint",
+        stdin = false,
+        stream = "stdout",
+        ignore_exitcode = true,
         args = {
           "run",
           "--output.json.path=stdout",
-          -- Overwrite values possibly set in .golangci.yml
+          -- silence all other output formats
           "--output.text.path=",
           "--output.tab.path=",
           "--output.html.path=",
@@ -78,35 +86,94 @@ return {
           "--output.sarif.path=",
           "--issues-exit-code=0",
           "--show-stats=false",
-          -- Get absolute path of the linted file
           "--path-mode=abs",
           function()
+            -- lint the directory of the current file so module-level
+            -- linters (e.g. unused, depguard) work correctly
             return vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":h")
           end,
         },
-        stdin = false,
-        stream = "stdout",
-        ignore_exitcode = true,
-        -- parser = require("lint.parser").from_json({
-        --   source = "golangci-lint",
-        -- }),
-      }
-
-      lint.linters.shellcheck.args = {
-        "-e",
-        "SC2016",
-        "--format=json",
-        "-x",
-        "-",
-      }
-
-      -- Auto-lint
-      vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
-        group = lint_augroup,
-        callback = function()
-          lint.try_lint()
+        parser = function(output, bufnr)
+          if output == "" then
+            return {}
+          end
+          local ok, decoded = pcall(vim.json.decode, output)
+          if not ok or not decoded or not decoded.Issues then
+            return {}
+          end
+          local diagnostics = {}
+          local bufname = vim.api.nvim_buf_get_name(bufnr)
+          for _, issue in ipairs(decoded.Issues) do
+            -- only report issues that belong to this file
+            if issue.Pos and vim.fn.fnamemodify(issue.Pos.Filename, ":p") == bufname then
+              table.insert(diagnostics, {
+                lnum = (issue.Pos.Line or 1) - 1,
+                col = (issue.Pos.Column or 1) - 1,
+                message = ("[%s] %s"):format(issue.FromLinter, issue.Text),
+                severity = vim.diagnostic.severity.WARN,
+                source = "golangci-lint",
+              })
+            end
+          end
+          return diagnostics
         end,
-      })
+      }
+
+      lint.linters.clippy = {
+        cmd = "cargo",
+        stdin = false,
+        stream = "stderr", -- cargo emits JSON on stderr
+        ignore_exitcode = true,
+        args = {
+          "clippy",
+          "--message-format=json",
+          "--quiet",
+          "--",
+          "-W",
+          "clippy::pedantic",
+          "-W",
+          "clippy::nursery",
+          "-A",
+          "clippy::missing_docs_in_private_items",
+        },
+        parser = function(output, bufnr)
+          if output == "" then
+            return {}
+          end
+          local diagnostics = {}
+          local bufname = vim.api.nvim_buf_get_name(bufnr)
+          for line in output:gmatch "[^\n]+" do
+            local ok, msg = pcall(vim.json.decode, line)
+            if ok and msg and msg.reason == "compiler-message" then
+              local m = msg.message
+              -- skip `help` and `note` spans (too noisy)
+              if m and m.level ~= "help" and m.level ~= "note" then
+                for _, span in ipairs(m.spans or {}) do
+                  if span.is_primary and vim.fn.fnamemodify(span.file_name, ":p") == bufname then
+                    local severity = vim.diagnostic.severity.HINT
+                    if m.level == "error" then
+                      severity = vim.diagnostic.severity.ERROR
+                    elseif m.level == "warning" then
+                      severity = vim.diagnostic.severity.WARN
+                    end
+                    table.insert(diagnostics, {
+                      lnum = span.line_start - 1,
+                      col = span.column_start - 1,
+                      end_lnum = span.line_end - 1,
+                      end_col = span.column_end - 1,
+                      message = m.message,
+                      severity = severity,
+                      source = "clippy",
+                      code = m.code and m.code.code or nil,
+                    })
+                  end
+                end
+              end
+            end
+          end
+          return diagnostics
+        end,
+      }
 
       vim.keymap.set("n", "<leader>cl", function()
         lint.try_lint()
@@ -126,7 +193,7 @@ return {
     opts = {
       format_on_save = false,
       formatters = {
-        ["shfmt"] = { prepend_args = { "-i", "2" } },
+        shfmt = { prepend_args = { "-i", "2" } },
         prettier = {
           command = "prettier",
           args = {
@@ -143,34 +210,48 @@ return {
           args = { "format", "-" },
           stdin = true,
         },
+        golines = {
+          command = "golines",
+          args = { "--max-len=120", "--base-formatter=gofumpt" },
+          stdin = true,
+        },
       },
 
       formatters_by_ft = {
         ["*"] = { "trim_whitespace" },
-        go = { "gofumpt", "golines" },
+
+        -- Go: goimports (imports + base fmt) → golines (line length) → gofumpt (style)
+        -- golines calls gofumpt internally so the last step just enforces style.
+        go = { "goimports", "golines" },
+
+        rust = { "rustfmt" },
+
         c = { "clang-format" },
         cpp = { "clang-format" },
+
         javascript = prettier,
         javascriptreact = prettier,
         typescript = prettier,
         typescriptreact = prettier,
+        vue = prettier,
         css = prettier,
         html = prettier,
-        json = { "jq", "prettier", "prettierd" },
-        -- json = { "jq" },
-        yaml = { "prettier", "yamlfmt" },
+
+        -- jq for structural formatting only; no prettierd fallback (they conflict)
+        json = { "jq" },
+        yaml = { "yamlfmt" },
         xml = { "xmlformatter" },
+        toml = { "taplo" },
+
         lua = { "stylua" },
-        python = { "isort" },
-        php = { "pint", "php_cs_fixer" },
-        rust = { "rustfmt" },
+        python = { "isort", "ruff_format" },
+        php = { "pint" },
         sql = { "sqlfluff" },
         sh = { "shfmt" },
         bash = { "shfmt" },
-        vue = prettier,
+
         markdown = { "prettier", "markdownlint-cli2", "markdown-toc" },
         ["markdown.mdx"] = { "prettier", "markdownlint-cli2", "markdown-toc" },
-        toml = { "taplo" },
       },
     },
     keys = {

@@ -8,6 +8,7 @@ local is_llama_cpp_running = check_llama_cpp_host(host)
 
 return {
   "ggml-org/llama.vim",
+  enabled = false,
   init = function()
     vim.g.llama_config = {
       endpoint = host .. "/infill",

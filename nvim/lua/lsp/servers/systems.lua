@@ -81,6 +81,7 @@ return {
           run_govulncheck = true,
         },
         hints = {
+          assignVariableTypes = true,
           parameterNames = true,
           rangeVariableTypes = true,
           compositeLiteralFields = true,
@@ -109,5 +110,4 @@ return {
       },
     },
   },
-
 }
