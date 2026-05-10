@@ -1,7 +1,7 @@
 --hidden
 --follow
+--glob=!{node_modules,Trash,vendor,target,bzl-build}/**
+--glob=!*.{lock,svg,ttf,woff,woff2,eot}
+--glob=!package-lock.json
+--glob=!*.min.{js,css}
 
---glob=!.{git,svn,svg,ttf,}
---glob=!{node_modules,Trash,vendor}
---glob=!*.{lock}
---glob=!{package-lock.json}

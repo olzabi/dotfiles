@@ -161,19 +161,22 @@ export PERL_MM_OPT
 
 # Setup fzf
 # ---------
+
 export FZF_BASE=$DOTFILES_PATH/zsh/custom/plugins/fzf
 if [[ ! "$PATH" == *$FZF_BASE/bin* ]]; then
   PATH="${PATH:+${PATH}:}$FZF_BASE/bin"
 fi
+export RIPGREP_CONFIG_PATH="$DOTFILES_PATH/.ripgreprc"
 
 # Yaml
 # ---------
 export YAMLLINT_CONFIG_FILE="$DOTFILES_PATH/yamllint/.yamllint.yml"
 
 # ---------
-export RIPGREP_CONFIG_PATH="$DOTFILES_PATH/.ripgreprc"
-
-# ---------
 export EZA_COLORS="di=1;34:ln=36:ex=1;32"
 export ZELLIJ_CONFIG_DIR="$DOTFILES_PATH/zellij"
 export PATH=/usr/local/cuda/bin:$PATH
+
+export RBENV_ROOT="$XDG_CONFIG_HOME/.rbenv"
+export PATH="$RBENV_ROOT/bin:$PATH"
+

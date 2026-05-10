@@ -74,7 +74,7 @@ opt.updatetime = 200 -- faster CursorHold, faster sign updates
 opt.timeoutlen = vim.g.vscode and 1000 or 300 -- which-key trigger speed
 opt.jumpoptions = "view"
 opt.spelllang = { "en" }
-opt.sessionoptions = { "buffers", "curdir", "tabpages", "winsize", "help", "globals", "skiprtp", "folds" }
+opt.sessionoptions = { "buffers", "curdir", "tabpages", "winsize", "winpos", "help", "globals", "skiprtp", "folds" }
 opt.shortmess:append({ W = true, I = true, c = true, C = true })
 opt.wildmode = "longest:full,full"
 opt.shell = "zsh"

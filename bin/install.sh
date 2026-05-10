@@ -169,6 +169,41 @@ install_rust() {
   fi
 }
 
+install_ruby() {
+  info "Installing rbenv + ruby-build..."
+  already_installed rbenv && return 0
+
+  if git clone https://github.com/rbenv/rbenv.git ~/.config/.rbenv &&
+    git clone https://github.com/rbenv/ruby-build.git ~/.config/.rbenv/plugins/ruby-build; then
+    success "rbenv cloned"
+  else
+    error "rbenv installation failed"
+    return 1
+  fi
+
+  if [ -z "${RBENV_ROOT:-}" ] && [ -f "$HOME/.zshenv" ]; then
+    info "  Sourcing ~/.zshenv..."
+    source "$HOME/.zshenv"
+  fi
+
+  local version
+  version=$(rbenv install -l 2>/dev/null | grep -E '^\s*[0-9]+\.[0-9]+\.[0-9]+$' | tail -1 | tr -d ' ')
+  [[ -z "$version" ]] && {
+    error "Failed to fetch latest Ruby version"
+    return 1
+  }
+  info "  Latest stable Ruby: $version"
+
+  rbenv install "$version"
+  rbenv global "$version"
+
+  command -v ruby &>/dev/null || {
+    error "ruby installation failed"
+    return 1
+  }
+  success "Ruby $version installed → run: ruby --version"
+}
+
 install_pyenv() {
   info "Installing pyenv..."
   already_installed pyenv && return 0
@@ -235,12 +270,13 @@ install_lazy() {
 install_languages() {
   install_go
   install_rust
-  install_pyenv
-  install_phpenv
 }
 
 install_vc() {
   install_nvm
+  install_pyenv
+  install_phpenv
+  install_ruby
 }
 
 TARGET="${1:-all}"
@@ -252,6 +288,7 @@ lazygit) install_lazygit ;;
 lazysql) install_lazysql ;;
 go) install_go ;;
 rust) install_rust ;;
+ruby) install_ruby ;;
 pyenv) install_pyenv ;;
 phpenv) install_phpenv ;;
 nvm) install_nvm ;;
@@ -291,7 +328,7 @@ all)
   echo ""
   echo "  Categories:  lazy | languages | vc | all"
   echo "  Lazy:        lazydocker | lazygit | lazysql"
-  echo "  Languages:   go | rust | pyenv | phpenv"
-  echo "  VC managers: nvm"
+  echo "  Languages:   go | rust  "
+  echo "  VC managers: nvm | ruby | pyenv | phpenv"
   ;;
 esac

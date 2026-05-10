@@ -10,9 +10,9 @@ return {
     opts = {
       library = {
         { path = "${3rd}/luv/library", words = { "vim%.uv" } },
-        { path = "snacks.nvim",        words = { "Snacks" } },
-        { path = "lazy.nvim",          words = { "LazyVim" } },
-        { path = "wezterm-types",      modes = { "wezterm" } },
+        { path = "snacks.nvim", words = { "Snacks" } },
+        { path = "lazy.nvim", words = { "LazyVim" } },
+        { path = "wezterm-types", modes = { "wezterm" } },
         "neotest",
       },
     },
@@ -32,19 +32,12 @@ return {
     "LSP",
     virtual = true,
     config = function()
-      local groups = {
-        "scripting",
-        "systems",
-        "misc",
-        "php",
-        "infra",
-        "typescript",
-        "web",
-      }
-      local group = { "scripting", "systems", "misc", "php", "infra", "typescript", "web" }
+      local capabilities = require("blink.cmp").get_lsp_capabilities()
+      local groups = { "scripting", "systems", "misc", "php", "infra", "typescript", "web" }
       for _, group in ipairs(groups) do
         local servers = require("lsp.servers." .. group)
         for name, cfg in pairs(servers) do
+          cfg.capabilities = vim.tbl_deep_extend("force", cfg.capabilities or {}, capabilities)
           vim.lsp.config(name, cfg)
           vim.lsp.enable(name)
         end

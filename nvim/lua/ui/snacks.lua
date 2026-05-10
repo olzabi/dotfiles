@@ -6,7 +6,6 @@ return {
     dependencies = {
       "gbprod/yanky.nvim",
       "folke/todo-comments.nvim",
-      "kdheepak/lazygit.nvim",
     },
 
     opts = {
@@ -100,7 +99,9 @@ return {
             },
           },
         },
-        projects = { pattern = { ".git", "package.json" } },
+        projects = {
+          pattern = { ".git", "package.json" }
+        },
         matcher = {
           fuzzy = true,
           smartcase = true,
@@ -134,35 +135,6 @@ return {
       },
     },
 
-    init = function()
-      vim.api.nvim_create_autocmd("User", {
-        pattern = "VeryLazy",
-        callback = function()
-          -- Setup some globals for debugging (lazy-loaded)
-          _G.dd = function(...)
-            Snacks.debug.inspect(...)
-          end
-          _G.bt = function()
-            Snacks.debug.backtrace()
-          end
-          vim.print = _G.dd -- Override print to use snacks for `:=` command
-
-          -- Create some toggle mappings
-          Snacks.toggle.option("spell", { name = "Spelling" }):map "<leader>uCs"
-          Snacks.toggle.option("wrap", { name = "Wrap" }):map "<leader>uCw"
-          Snacks.toggle.option("relativenumber", { name = "Relative Number" }):map "<leader>uEL"
-          Snacks.toggle.diagnostics():map "<leader>uCD"
-          Snacks.toggle.line_number():map "<leader>uEl"
-          Snacks.toggle
-              .option("conceallevel", { off = 0, on = vim.o.conceallevel > 0 and vim.o.conceallevel or 2 })
-              :map "<leader>uEcl"
-          Snacks.toggle.treesitter():map "<leader>uET"
-          -- Snacks.toggle.option("background", { off = "light", on = "dark", name = "Dark Background" }):map("<leader>ub")
-          Snacks.toggle.inlay_hints():map "<leader>uEh"
-        end,
-      })
-    end,
-
     keys = {
       { ";;",         function() Snacks.picker.grep() end,                                                                            desc = "Grep" },
       { ";<leader>",  function() Snacks.picker.smart() end,                                                                           desc = "Smart find files" },
@@ -179,5 +151,21 @@ return {
       { ";r",         function() Snacks.picker.recent() end,                                                                          desc = "Recent files" },
       { ";xT",        function() Snacks.picker.todo_comments({ keywords = { "TODO", "FIX", "WARN", "HACK", "PERF", "NOTE", "TEST" } }) end, desc = "Todo/Fix/Fixme" },
     },
+
+    init = function()
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "VeryLazy",
+        callback = function()
+          -- Setup some globals for debugging (lazy-loaded)
+          _G.dd = function(...)
+            Snacks.debug.inspect(...)
+          end
+          _G.bt = function()
+            Snacks.debug.backtrace()
+          end
+          vim.print = _G.dd -- Override print to use snacks for `:=` command
+        end,
+      })
+    end,
   },
 }

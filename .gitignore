@@ -1,7 +1,5 @@
-TODO.md
-TODO*
-
-
+.vscode/
+.idea/
 .DS_Store
 Thumbs.db
 
@@ -19,18 +17,6 @@ Thumbs.db
 *.rar
 *.bzip
 *.bzip2
-
-.vscode/
-.idea/
-
-#* custom
-zsh/.oh-my-zsh/*
-!zsh/.oh-my-zsh/.git
-
-yazi/flavors
-
-eza/eza*
-
 tt.*
 .tests
 doc/tags
@@ -39,8 +25,22 @@ debug
 foo.*
 *.log
 data
-
 .venv
-
 node_modules
+
+TODO.md
+TODO*
+
+eza/eza*
 lazysql/config.toml
+tmux/plugins/
+yazi/flavors
+yazi/plugins
+zsh/.oh-my-zsh/*
+!zsh/.oh-my-zsh/.git
+
+
+
+
+
+

@@ -97,6 +97,7 @@ export RUSTFLAGS="-C opt-level=3 -C target-cpu=native" # Rust app build optimiza
 [ -x "$(command -v zoxide)" ] && eval "$(zoxide init zsh)"
 [ -x "$(command -v phpenv)" ] && eval "$(phpenv init -)"
 [ -x "$(command -v pyenv)" ] && eval "$(pyenv init - zsh)"
+eval "$(rbenv init -)"
 
 export NVM_DIR="$HOME/.config/nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
