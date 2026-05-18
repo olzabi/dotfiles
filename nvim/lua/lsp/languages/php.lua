@@ -1,6 +1,9 @@
+local is_php_enabled = false
+
 return {
   {
     "ccaglak/phptools.nvim",
+    enabled = is_php_enabled,
     cond = function()
       return vim.fn.executable "php" == 1
     end,
@@ -16,12 +19,11 @@ return {
           root_markers = { ".git" }, -- Project root markers
           autoload_file = "/vendor/composer/autoload_psr4.php", -- Autoload file path
         },
-        custom_toggles = {
-          enable = false,
-        },
+        custom_toggles = { enable = false },
       }
     end,
     keys = {
+      -- stylua: ignore start
       { ";Pl", "<cmd>PhpTools Method<cr>", desc = "Method" },
       { ";Pc", "<cmd>PhpTools Class<cr>", desc = "Class" },
       { ";Ps", "<cmd>PhpTools Scripts<cr>", desc = "Scripts" },
@@ -30,90 +32,19 @@ return {
       { ";Pf", "<cmd>PhpTools Create<cr>", desc = "Create" },
       { ";Pd", "<cmd>PhpTools DrupalAutoLoader<cr>", desc = "DrupalAutoLoader" },
       { ";Pr", mode = "v", "<cmd>PhpTools Refactor<cr>", desc = "Refactor" },
-      {
-        ";Pha",
-        function()
-          require("phptools.ide_helper").generate_all()
-        end,
-        desc = "Generate all IDE helpers",
-      },
-      {
-        ";Phm",
-        function()
-          require("phptools.ide_helper").generate_models()
-        end,
-        desc = "Generate model helpers",
-      },
-      {
-        ";Phf",
-        function()
-          require("phptools.ide_helper").generate_facades()
-        end,
-        desc = "Generate facade helpers",
-      },
-      {
-        ";Pht",
-        function()
-          require("phptools.ide_helper").generate_meta()
-        end,
-        desc = "Generate meta helper",
-      },
-      {
-        ";Phi",
-        function()
-          require("phptools.ide_helper").install()
-        end,
-        desc = "Install IDE Helper",
-      },
-      {
-        ";Plta",
-        function()
-          require("phptools.tests").test.all()
-        end,
-        desc = "Run all tests",
-      },
-      {
-        ";Ptf",
-        function()
-          require("phptools.tests").test.file()
-        end,
-        desc = "Run file tests",
-      },
-      {
-        ";Ptl",
-        function()
-          require("phptools.tests").test.line()
-        end,
-        desc = "Run test at cursor",
-      },
-      {
-        ";Pts",
-        function()
-          require("phptools.tests").test.filter()
-        end,
-        desc = "Search and run test",
-      },
-      {
-        ";Ptp",
-        function()
-          require("phptools.tests").test.parallel()
-        end,
-        desc = "Run in parallel",
-      },
-      {
-        ";Ptr",
-        function()
-          require("phptools.tests").test.rerun()
-        end,
-        desc = "Rerun last test",
-      },
-      {
-        ";Pti",
-        function()
-          require("phptools.tests").test.selected()
-        end,
-        desc = "Run selected test",
-      },
+      { ";Pha", function() require("phptools.ide_helper").generate_all() end, desc = "Generate all IDE helpers", },
+      { ";Phm", function() require("phptools.ide_helper").generate_models() end, desc = "Generate model helpers", },
+      { ";Phf", function() require("phptools.ide_helper").generate_facades() end, desc = "Generate facade helpers", },
+      { ";Pht", function() require("phptools.ide_helper").generate_meta() end, desc = "Generate meta helper", },
+      { ";Phi", function() require("phptools.ide_helper").install() end, desc = "Install IDE Helper", },
+      { ";Plta", function() require("phptools.tests").test.all() end, desc = "Run all tests", },
+      { ";Ptf", function() require("phptools.tests").test.file() end, desc = "Run file tests", },
+      { ";Ptl", function() require("phptools.tests").test.line() end, desc = "Run test at cursor", },
+      { ";Pts", function() require("phptools.tests").test.filter() end, desc = "Search and run test", },
+      { ";Ptp", function() require("phptools.tests").test.parallel() end, desc = "Run in parallel", },
+      { ";Ptr", function() require("phptools.tests").test.rerun() end, desc = "Rerun last test", },
+      { ";Pti", function() require("phptools.tests").test.selected() end, desc = "Run selected test", },
+      -- stylua: ignore end
     },
   },
 
@@ -121,44 +52,30 @@ return {
     -- Add the blade-nav.nvim plugin which provides Goto File capabilities
     -- for Blade files.
     "ricardoramirezr/blade-nav.nvim",
+    enabled = is_php_enabled,
     cond = function()
       return vim.fn.executable "php" == 1
     end,
     dependencies = "saghen/blink.cmp",
-    opts = {
-      close_tag_on_complete = true,
-    },
+    opts = { close_tag_on_complete = true },
   },
 
   {
     "adalessa/laravel.nvim",
+    enabled = false,
     cond = function()
       return vim.fn.filereadable(vim.fn.getcwd() .. "/artisan") == 1 and vim.fn.executable "php" == 1
     end,
-    dependencies = {
-      "tpope/vim-dotenv",
-      "MunifTanjim/nui.nvim",
-      "kevinhwang91/promise-async",
-      "nvim-neotest/nvim-nio",
-      "saghen/blink.cmp",
-    },
+    dependencies = { "tpope/vim-dotenv", "MunifTanjim/nui.nvim", "kevinhwang91/promise-async", "nvim-neotest/nvim-nio", "saghen/blink.cmp" },
     opts = {
       lsp_server = "intelephense",
       features = {
         pickers = {
           provider = "snacks", -- "snacks | telescope | fzf-lua | ui-select"
         },
-        route_info = {
-          enable = true,
-          position = "top",
-        },
+        route_info = { enable = true, position = "top" },
       },
-      register = {
-        views = false,
-        configs = true,
-        model_field_completion = true,
-        routes = true,
-      },
+      register = { views = false, configs = true, model_field_completion = true, routes = true },
     },
     config = function(_, opts)
       require("laravel").setup(opts)
@@ -177,92 +94,30 @@ return {
       })
     end,
     keys = {
+      -- stylua: ignore start
       { ";Li", "<cmd>Laravel install<cr>", desc = "Laravel Install" },
       { ";LR", "<cmd>Laravel related<cr>", desc = "Laravel Related" },
-      {
-        ";Ll",
-        function()
-          Laravel.pickers.laravel()
-        end,
-        desc = "Laravel Picker",
-      },
-      {
-        ";La",
-        function()
-          Laravel.pickers.artisan()
-        end,
-        desc = "Laravel Artisan",
-      },
-      {
-        ";Lr",
-        function()
-          Laravel.pickers.routes()
-        end,
-        desc = "Laravel Routes",
-      },
-      {
-        ";Lm",
-        function()
-          Laravel.pickers.make()
-        end,
-        desc = "Laravel Make",
-      },
-      {
-        ";Lc",
-        function()
-          Laravel.pickers.commands()
-        end,
-        desc = "Laravel Commands",
-      },
-      {
-        ";Lo",
-        function()
-          Laravel.pickers.resources()
-        end,
-        desc = "Laravel Resources",
-      },
-      {
-        ";Lt",
-        function()
-          Laravel.commands.run "actions"
-        end,
-        desc = "Laravel Actions",
-      },
-      {
-        ";Lp",
-        function()
-          Laravel.commands.run "command_center"
-        end,
-        desc = "Laravel Command Center",
-      },
-      {
-        ";Lh",
-        function()
-          Laravel.run "artisan docs"
-        end,
-        desc = "Laravel Docs",
-      },
-      {
-        "<C-g>",
-        function()
-          Laravel.commands.run "view:finder"
-        end,
-        desc = "Laravel View Finder",
-      },
+      { ";Ll", function() Laravel.pickers.laravel() end, desc = "Laravel Picker", },
+      { ";La", function() Laravel.pickers.artisan() end, desc = "Laravel Artisan", },
+      { ";Lr", function() Laravel.pickers.routes() end, desc = "Laravel Routes", },
+      { ";Lm", function() Laravel.pickers.make() end, desc = "Laravel Make", },
+      { ";Lc", function() Laravel.pickers.commands() end, desc = "Laravel Commands", },
+      { ";Lo", function() Laravel.pickers.resources() end, desc = "Laravel Resources", },
+      { ";Lt", function() Laravel.commands.run "actions" end, desc = "Laravel Actions", },
+      { ";Lp", function() Laravel.commands.run "command_center" end, desc = "Laravel Command Center", },
+      { ";Lh", function() Laravel.run "artisan docs" end, desc = "Laravel Docs", },
+      { "<C-g>", function() Laravel.commands.run "view:finder" end, desc = "Laravel View Finder", },
+      -- stylua: ignore end
     },
   },
 
   {
     "ta-tikoma/php.easy.nvim",
-    enabled = false,
+    enabled = is_php_enabled,
     cond = function()
       return vim.fn.executable "php" == 1
     end,
-    opts = {
-      onAppend = {
-        engine = "LuaSnip",
-      },
-    },
+    opts = { onAppend = { engine = "LuaSnip" } },
     config = true,
     keys = {
       { "-#", "<CMD>PHPEasyAttribute<CR>", desc = "Attribute" },
@@ -289,6 +144,7 @@ return {
 
   {
     "barryvdh/laravel-ide-helper",
+    enabled = is_php_enabled,
     cond = function()
       return vim.fn.filereadable(vim.fn.getcwd() .. "/artisan") == 1 and vim.fn.executable "php" == 1
     end,
@@ -296,7 +152,7 @@ return {
 
   {
     "phpactor/phpactor",
-    enabled = false,
+    enabled = is_php_enabled,
     cond = function()
       return vim.fn.executable "php" == 1 and vim.fn.executable "composer" == 1
     end,

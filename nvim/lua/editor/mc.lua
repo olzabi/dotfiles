@@ -8,6 +8,7 @@ return {
 
       mc.setup()
 
+      -- stylua: ignore start
       set({ "n", "x" }, "<up>", function() mc.lineAddCursor(-1) end)
       set({ "n", "x" }, "<down>", function() mc.lineAddCursor(1) end)
       set({ "n", "x" }, "<leader><up>", function() mc.lineSkipCursor(-1) end)
@@ -26,6 +27,7 @@ return {
         layerSet({ "n", "x" }, "<leader>x", mc.deleteCursor)
         layerSet("n", "<esc>", function() if not mc.cursorsEnabled() then mc.enableCursors() else mc.clearCursors() end end)
       end)
+      -- stylua: ignore end
 
       -- Customize how cursors look.
       local hl = vim.api.nvim_set_hl

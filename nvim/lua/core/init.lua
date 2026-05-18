@@ -1,6 +1,5 @@
 require "core.autocmds"
 require "core.options"
 require "core.diagnostics"
-require "core.globals"
 require "core.ft"
 require "core.keymaps"

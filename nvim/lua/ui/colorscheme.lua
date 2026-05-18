@@ -1,8 +1,7 @@
 return {
-      "kdheepak/monochrome.nvim",
+  "kdheepak/monochrome.nvim",
   "slugbyte/lackluster.nvim",
   "robertmeta/nofrils",
-
 
   {
     "aliqyan-21/darkvoid.nvim",
@@ -31,6 +30,5 @@ return {
         },
       }
     end,
-    -- NOTE: TabLine is temporary fix after switching from nvim 0.10 to 0.11
   },
 }

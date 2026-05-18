@@ -17,6 +17,12 @@ return {
         "x x x x x x _ x x x x x x",
         "x x x x x x _ x x x x x x",
         "_ _ _ x x x _ x x x _ _ _",
+        -- sofle
+        -- "x x x x x x _ _ _ _ x x x x x x",
+        -- "x x x x x x _ _ _ _ x x x x x x",
+        -- "x x x x x x _ _ _ _ x x x x x x",
+        -- "x x x x x x x _ _ x x x x x x x",
+        -- "_ _ x x x x x _ _ x x x x x _ _",
       },
     },
   },
@@ -57,5 +63,4 @@ return {
     },
     cmd = { "CsvViewEnable", "CsvViewDisable", "CsvViewToggle" },
   },
-
 }

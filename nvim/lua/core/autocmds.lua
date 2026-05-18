@@ -1,6 +1,3 @@
-local function augroup(name)
-  return vim.api.nvim_create_augroup("U_" .. name, { clear = true })
-end
 
 -- trim whitespace
 vim.api.nvim_create_autocmd("BufWritePre", {
@@ -9,20 +6,10 @@ vim.api.nvim_create_autocmd("BufWritePre", {
     vim.cmd([[keeppatterns %s/\s\+$//e]])
     vim.api.nvim_win_set_cursor(0, pos)
   end,
-  group = augroup("TrimWhitespace"),
-})
-
--- * Highlight on yank
-vim.api.nvim_create_autocmd("TextYankPost", {
-  group = augroup("highlight_yank"),
-  callback = function()
-    (vim.hl or vim.highlight).on_yank()
-  end,
 })
 
 -- resize splits if window got resized
 vim.api.nvim_create_autocmd({ "VimResized" }, {
-  group = augroup("resize_splits"),
   callback = function()
     local tab = vim.fn.tabpagenr()
     vim.cmd("tabdo wincmd =")
@@ -32,7 +19,6 @@ vim.api.nvim_create_autocmd({ "VimResized" }, {
 
 -- close some filetypes with <q>
 vim.api.nvim_create_autocmd("FileType", {
-  group = augroup("close_with_q"),
   pattern = {
     "PlenaryTestPopup",
     "checkhealth",
@@ -73,3 +59,10 @@ vim.api.nvim_create_autocmd("TextYankPost", {
     copy_to_unnamed(vim.v.event.regcontents)
   end,
 })
+
+vim.api.nvim_create_autocmd("TextYankPost", {
+  callback = function()
+    (vim.hl or vim.highlight).on_yank()
+  end,
+})
+

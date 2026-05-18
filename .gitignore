@@ -34,13 +34,7 @@ TODO*
 eza/eza*
 lazysql/config.toml
 tmux/plugins/
-yazi/flavors
-yazi/plugins
 zsh/.oh-my-zsh/*
 !zsh/.oh-my-zsh/.git
-
-
-
-
 
 

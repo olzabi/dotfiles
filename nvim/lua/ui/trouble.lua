@@ -9,9 +9,8 @@ return {
         },
       },
     },
----@diagnostic disable-next-line: missing-parameter
     keys = {
----@diagnostic disable-next-line: missing-parameter
+      -- stylua: ignore start
       { ";xx", "<cmd>Trouble diagnostics toggle<cr>", desc = "Diagnostics" },
       { ";xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "Buffer diagnostics" },
       { ";xs", "<cmd>Trouble symbols toggle<cr>", desc = "Symbols" },
@@ -47,5 +46,6 @@ return {
         desc = "Next trouble/quickfix",
       },
     },
+    -- stylua: ignore end
   },
 }

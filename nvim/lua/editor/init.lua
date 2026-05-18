@@ -1,15 +1,31 @@
 return {
-
   {
     "folke/persistence.nvim",
     event = "BufReadPre",
-    opts = { branch = true },
+    opts = {
+      branch = true,
+      dir = vim.fn.stdpath "state" .. "/sessions/",
+    },
     keys = {
-      { ";qs", function() require("persistence").load() end,              desc = "Restore Session" },
-      { ";qS", function() require("persistence").select() end,            desc = "Select Session", },
-      { ";ql", function() require("persistence").load({ last = true }) end, desc = "Restore Last Session" },
-      { ";qd", function() require("persistence").stop() end,              desc = "Don't Save Session" },
-    }
+      -- stylua: ignore start
+      { ";qs", function()
+        require("persistence").load()
+      end, desc = "Restore Session", },
+      { ";ql", function()
+        require("persistence").load { last = true }
+      end, desc = "Restore Last Session", },
+      { ";qd", function() require("persistence").stop() end, desc = "Don't Save Session", },
+      { ";qx", function()
+        local path = vim.fn.glob(vim.fn.stdpath("state") .. "/sessions/.vim", true, true)
+        for _, file in ipairs(path) do
+          vim.fn.delete(file)
+        end
+        vim.notify("All sessions deleted", vim.log.levels.INFO)
+      end, desc = "Don't Save Session", },
+      { ";qD", function() Snacks.picker("persistence_delete") end, desc = "Delete a Session" },
+      { ";qS", function() Snacks.picker("persistence_load") end,   desc = "Select Session" },
+      -- stylua: ignore end
+    },
   },
 
   {
@@ -59,16 +75,12 @@ return {
     opts = {},
     dependencies = "folke/snacks.nvim",
     keys = {
+      -- stylua: ignore start
       { "y", "<Plug>(YankyYank)", mode = { "n", "x" }, desc = "Yank" },
       { "p", "<Plug>(YankyPutAfter)", mode = { "n", "x" }, desc = "Put after" },
       { "P", "<Plug>(YankyPutBefore)", mode = { "n", "x" }, desc = "Put before" },
       { "gp", "<Plug>(YankyGPutAfter)", mode = { "n", "x" }, desc = "Put after selection" },
-      {
-        "gP",
-        "<Plug>(YankyGPutBefore)",
-        mode = { "n", "x" },
-        desc = "Put before selection",
-      },
+      { "gP", "<Plug>(YankyGPutBefore)", mode = { "n", "x" }, desc = "Put before selection", },
       { "]p", "<Plug>(YankyPutIndentAfterLinewise)", desc = "Put indented after" },
       { "[p", "<Plug>(YankyPutIndentBeforeLinewise)", desc = "Put indented before" },
       { "]P", "<Plug>(YankyPutIndentAfterLinewise)", desc = "Put indented after" },
@@ -79,6 +91,7 @@ return {
       { "<P", "<Plug>(YankyPutIndentBeforeShiftLeft)", desc = "Put before indent left" },
       { "=p", "<Plug>(YankyPutAfterFilter)", desc = "Put after filter" },
       { "=P", "<Plug>(YankyPutBeforeFilter)", desc = "Put before filter" },
+      -- stylua: ignore end
     },
   },
 
@@ -105,7 +118,7 @@ return {
     "aznhe21/actions-preview.nvim",
     event = { "LspAttach" },
     opts = {
-      backend = { "snacks", "telescope", "nui" },
+      backend = { "snacks", "nui" },
       nui = {
         layout = {
           position = "50%",
@@ -117,15 +130,14 @@ return {
         preview = { size = "60%", border = { padding = { 0, 1 } } },
         select = { size = "40%", border = { padding = { 0, 1 } } },
       },
-      snacks = { layout = { preset = "telescope" } },
+      snacks = {
+        layout = { preset = "vertical" },
+      },
     },
     keys = {
-      {
-        "..",
-        function()
-          require("actions-preview").code_actions()
-        end,
-      },
+      -- stylua: ignore start
+      { "..", function() require("actions-preview").code_actions() end, },
+      -- stylua: ignore end
     },
   },
 

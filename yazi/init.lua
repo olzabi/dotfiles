@@ -1,3 +1,7 @@
+require("motions"):setup({
+  show_numbers = "relative",
+  show_motion = true,
+})
 
 require("projects"):setup({
 	save = { method = "yazi" },
@@ -23,7 +27,7 @@ require("git"):setup({
 })
 
 require("bookmarks"):setup({
-	last_directory = { enable = false, persist = true, mode="dir" },
+	last_directory = { enable = false, persist = true, mode = "dir" },
 	persist = "vim",
 	desc_format = "full",
 	file_pick_mode = "hover",

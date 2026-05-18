@@ -52,5 +52,5 @@ vim.diagnostic.config {
 }
 
 local map = vim.keymap.set
-map("n", "[d", vim.diagnostic.goto_prev, { desc = "Prev diagnostic" })
-map("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
+map("n", "[e", vim.diagnostic.goto_prev, { desc = "Prev diagnostic" })
+map("n", "]e", vim.diagnostic.goto_next, { desc = "Next diagnostic" })

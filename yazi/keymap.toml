@@ -1,4 +1,4 @@
-"$schema" = "https://yazi-rs.github.io/schemas/keymap.json"
+# "$schema" = "https://yazi-rs.github.io/schemas/keymap.json"
 
 [mgr]
 prepend_keymap = [
@@ -14,8 +14,10 @@ prepend_keymap = [
     { on = ["d", "U"], run = "plugin restore -- --interactive", desc = "Restore deleted files/folders (Interactive)" },
     { on = "l",        run = "plugin --sync smart-enter",       desc = "Enter the child directory, or open the file" },
 
-    { on = "f",        run = "plugin jump-to-char",             desc = "Jump to char" },
-    { on = "F",        run = "plugin smart-filter",             desc = "Smart filter" },
+    { on = ["<Space>", "j"],        run = [ "toggle", "arrow next" ],  desc = "Toggle the current selection state" },
+    { on = ["<Space>", "<Space>"],  run = "plugin motions",            desc = "Relative Motions" },
+    { on = "f",                     run = "plugin jump-to-char",       desc = "Jump to char" },
+    { on = "F",                     run = "plugin smart-filter",       desc = "Smart filter" },
 
     { on = ["P", "s"], run = "plugin projects save",        desc = "Save project" },
     { on = ["P", "l"], run = "plugin projects load",        desc = "Load project" },

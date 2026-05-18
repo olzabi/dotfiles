@@ -63,11 +63,11 @@ local views = {
 local lsp = {
   enabled = true,
   override = {
-    ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
-    ["vim.lsp.util.stylize_markdown"] = true,
+    ["vim.lsp.util.convert_input_to_markdown_lines"] = false,
+    ["vim.lsp.util.stylize_markdown"] = false,
   },
-  hover = { enabled = true },
-  signature = { enabled = true },
+  hover = { enabled = false },
+  signature = { enabled = false },
   progress = { enabled = true, view = "mini", format = "lsp_progress" },
   message = { enabled = true, view = "mini" },
 }
@@ -81,14 +81,33 @@ return {
       progress = {
         suppress_on_insert = true,
         ignore_done_already = false,
-        ignore_empty_message = false,
+        ignore_empty_message = true,
+        display = {
+          done_ttl = 2,
+          done_icon = "✔",
+          progress_icon = { "dots" },
+          skip_history = true,
+          group_style = "Title",
+          priority = 10,
+        },
       },
       notification = {
+        view = {
+          stack_upwards = false,
+          align = "message",
+          line_margin = 1,
+        },
         override_vim_notify = false,
         window = {
-          winblend = 0,
+          winblend = 5,
           border = "none",
+          zindex = 45,
+          align = "bottom",
+          relative = "editor",
         },
+      },
+      logger = {
+        level = vim.log.levels.ERROR,
       },
     },
   },
@@ -119,10 +138,12 @@ return {
       routes = routes,
     },
     keys = {
+      -- stylua: ignore start
       { "<leader>nh", function() Snacks.picker.notifications() end, desc = "Notifications" },
+      { "<leader>nH", function() Snacks.notifier.show_history() end, desc = "Notifications (buffer)" },
       { "<leader>nn", "<cmd>NoiceDismiss<cr>", desc = "Dismiss" },
-      { "<leader>nH", "<cmd>Noice history<cr>", desc = "History" },
       { "<leader>nl", "<cmd>Noice last<cr>", desc = "Last message" },
+      -- stylua: ignore end
     },
   },
 }

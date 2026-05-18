@@ -1,18 +1,28 @@
 {
-    "diagnostics.disable": [
-        "missing-fields",
-        "trailing-space",
-        "redefined-local",
-        "need-check-nil",
-        "inject-field",
-        "deprecated",
-        "redundant-parameter",
-        "param-type-mismatch",
-        "undefined-field",
-        "missing-parameter",
-        "redundant-value",
-        "unused-local",
-        "unused-function",
-        "assign-type-mismatch"
-    ]
+  "diagnostics.disable": [
+    "missing-fields",
+    "trailing-space",
+    "redefined-local",
+    "need-check-nil",
+    "inject-field",
+    "deprecated",
+    "redundant-parameter",
+    "param-type-mismatch",
+    "undefined-field",
+    "missing-parameter",
+    "redundant-value",
+    "unused-local",
+    "unused-function",
+    "assign-type-mismatch"
+  ],
+  "diagnostics.globals": [
+    "vim",
+    "bit",
+    "it",
+    "describe",
+    "before_each",
+    "after_each",
+    "TODO"
+  ]
 }
+

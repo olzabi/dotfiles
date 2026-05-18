@@ -1,16 +1,11 @@
 return {
-  {
-    "crusj/structrue-go.nvim",
-    ft = "go",
-    config = true,
-  },
+  { "crusj/structrue-go.nvim", config = true },
 
   {
     -- WARN: not updated since added
     "ray-x/go.nvim",
-    dependencies = { -- optional packages
-      "ray-x/guihua.lua",
-    },
+    enabled = false,
+    dependencies = { "ray-x/guihua.lua" },
     event = "CmdlineEnter",
     build = ':lua require("go.install").update_all_sync()',
     config = function()

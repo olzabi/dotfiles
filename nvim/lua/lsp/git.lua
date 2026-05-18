@@ -1,5 +1,3 @@
----@diagnostic disable: redundant-value
----@diagnostic disable: redundant-value
 return {
   {
     "lewis6991/gitsigns.nvim",
@@ -25,7 +23,9 @@ return {
   {
     "kdheepak/lazygit.nvim",
     dependencies = { "nvim-lua/plenary.nvim" },
-    keys = { { "<leader>Gl", "<cmd>LazyGit<cr>", desc = "LazyGit" } },
+    keys = {
+      { ";G", "<cmd>LazyGit<cr>", desc = "LazyGit" }
+    },
     init = function()
       vim.g.lazygit_floating_window_scaling_factor = 0.9
       vim.g.lazygit_floating_window_winblend = 0

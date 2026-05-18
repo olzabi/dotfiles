@@ -1,3 +1,24 @@
+local function session_finder()
+  local dir = vim.fn.stdpath "state" .. "/sessions/"
+  local files = vim.fn.glob(dir .. "*.vim", false, true)
+  local items = {}
+  for _, f in ipairs(files) do
+    local name = vim.fn.fnamemodify(f, ":t")
+    local readable = name:gsub("%%", "/"):gsub("%.vim$", "")
+    table.insert(items, { text = readable, file = f })
+  end
+  return items
+end
+
+local session_layout = {
+  preset = "select",
+  preview = false,
+}
+
+local function session_format(item)
+  return { { item.text, "SnacksPickerLabel" } }
+end
+
 return {
   {
     "folke/snacks.nvim",
@@ -8,7 +29,8 @@ return {
       "folke/todo-comments.nvim",
     },
 
-    opts = {
+    -- stylua: ignore start
+      opts = {
       bigfile   = { enabled = true, notify = false, size = 1.5 * 1024 * 1024 },
       indent    = { enabled = true },
       input     = { enabled = true },
@@ -45,7 +67,7 @@ return {
         end,
       },
 
-      picker    = {
+      picker = {
         enabled = true,
         ui_select = true,
         layout = { cycle = true, preset = "vertical" },
@@ -94,7 +116,7 @@ return {
               position = "right",
               border = "none",
               box = "vertical",
-              { win = "input", height = 1,     border = "rounded", title = "{title} {live} {flags}", title_pos = "center" },
+              { win = "input", height = 1, border = "rounded", title = "{title} {live} {flags}", title_pos = "center" },
               { win = "list",  border = "none" },
             },
           },
@@ -109,9 +131,36 @@ return {
           filename_bonus = true,
           frecency = true,
         },
-        exclude = { ".git", "node_modules", }
+        exclude = { ".git", "node_modules" },
+        sources = {
+          persistence_delete = {
+            title = "Delete Session",
+            finder = session_finder,
+            format = session_format,
+            layout = session_layout,
+            confirm = function(picker, item)
+              picker:close()
+              if item then
+                vim.fn.delete(item.file)
+                vim.notify("Deleted: " .. item.text)
+              end
+            end,
+          },
+          persistence_load = {
+            title = "Load Session",
+            finder = session_finder,
+            format = session_format,
+            layout = session_layout,
+            confirm = function(picker, item)
+              picker:close()
+              if item then
+                require("persistence").load({ session = item.file })
+              end
+            end,
+          },
+        },
       },
-      styles    = {
+      styles = {
         terminal = {
           relative = "editor",
           border = "rounded",
@@ -124,46 +173,51 @@ return {
         notification_history = {
           border = "rounded",
           zindex = 100,
-          width = 0.6,
+          width  = 0.6,
           height = 0.6,
           minimal = false,
           title = " Notification History ",
           title_pos = "center",
           ft = "markdown",
-          bo = { filetype = "snacks_notif_history", modifiable = false },
+          bo = {
+            filetype = "snacks_notif_history",
+            modifiable = true,
+            readonly = true
+          },
+          keys = { q = "close" },
         },
       },
     },
 
     keys = {
-      { ";;",         function() Snacks.picker.grep() end,                                                                            desc = "Grep" },
-      { ";<leader>",  function() Snacks.picker.smart() end,                                                                           desc = "Smart find files" },
-      { "<leader>hp", function() Snacks.picker.yanky() end,                                                                           mode = { "n", "x" },      desc = "Yank history" },
-      { "<leader>sw", function() Snacks.picker.grep_word() end,                                                                       mode = { "n", "x" },      desc = "Visual selection or word" },
-      { "<leader>hu", function() Snacks.picker.undo() end,                                                                            desc = "Undo history" },
-      { "<leader>bd", function() Snacks.bufdelete() end,                                                                              desc = "Delete buffer" },
-      { '<leader>"',  function() Snacks.picker.registers() end,                                                                       desc = "Registers" },
-      { ";ff",        function() Snacks.picker.files() end,                                                                           desc = "Find files" },
-      { ";q",         function() Snacks.picker.qflist() end,                                                                          desc = "Quickfix list" },
-      { ";m",         function() Snacks.picker.marks() end,                                                                           desc = "Marks" },
-      { ";P",         function() Snacks.picker.projects() end,                                                                        desc = "Projects" },
-      { ";s<leader>", function() Snacks.scratch.select() end,                                                                         desc = "Select scratch" },
-      { ";r",         function() Snacks.picker.recent() end,                                                                          desc = "Recent files" },
+      { ";;",         function() Snacks.picker.grep() end,                                                                                   desc = "Grep" },
+      { ";<leader>",  function() Snacks.picker.smart() end,                                                                                  desc = "Smart find files" },
+      { "<leader>hp", function() Snacks.picker.yanky() end,                                                                                  mode = { "n", "x" }, desc = "Yank history" },
+      { "<leader>sw", function() Snacks.picker.grep_word() end,                                                                              mode = { "n", "x" }, desc = "Visual selection or word" },
+      { "<leader>hu", function() Snacks.picker.undo() end,                                                                                   desc = "Undo history" },
+      { "<leader>bd", function() Snacks.bufdelete() end,                                                                                     desc = "Delete buffer" },
+      { '<leader>"',  function() Snacks.picker.registers() end,                                                                              desc = "Registers" },
+      { ";ff",        function() Snacks.picker.files() end,                                                                                  desc = "Find files" },
+      { ";q",         function() Snacks.picker.qflist() end,                                                                                 desc = "Quickfix list" },
+      { ";m",         function() Snacks.picker.marks() end,                                                                                  desc = "Marks" },
+      { ";P",         function() Snacks.picker.projects() end,                                                                               desc = "Projects" },
+      { ";s<leader>", function() Snacks.scratch.select() end,                                                                                desc = "Select scratch" },
+      { ";r",         function() Snacks.picker.recent() end,                                                                                 desc = "Recent files" },
       { ";xT",        function() Snacks.picker.todo_comments({ keywords = { "TODO", "FIX", "WARN", "HACK", "PERF", "NOTE", "TEST" } }) end, desc = "Todo/Fix/Fixme" },
     },
+    -- stylua: ignore end
 
     init = function()
       vim.api.nvim_create_autocmd("User", {
         pattern = "VeryLazy",
         callback = function()
-          -- Setup some globals for debugging (lazy-loaded)
           _G.dd = function(...)
             Snacks.debug.inspect(...)
           end
           _G.bt = function()
             Snacks.debug.backtrace()
           end
-          vim.print = _G.dd -- Override print to use snacks for `:=` command
+          vim.print = _G.dd
         end,
       })
     end,

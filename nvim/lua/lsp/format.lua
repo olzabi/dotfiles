@@ -4,11 +4,7 @@ return {
 
   {
     "mfussenegger/nvim-lint",
-    event = {
-      "BufWritePost",
-      "BufReadPost",
-      "InsertLeave",
-    },
+    event = { "BufWritePost", "BufReadPost", "InsertLeave" },
     config = function()
       local lint = require "lint"
       local php_linters = {}
@@ -175,19 +171,15 @@ return {
         end,
       }
 
-      vim.keymap.set("n", "<leader>cl", function()
-        lint.try_lint()
-      end, { desc = "Trigger linting" })
+      -- stylua: ignore start
+      vim.keymap.set("n", "<leader>cl", function() lint.try_lint() end, { desc = "Trigger linting" })
+      -- stylua: ignore end
     end,
   },
 
   {
     "stevearc/conform.nvim",
-    dependencies = {
-      "MunifTanjim/prettier.nvim",
-      "mcauley-penney/tidy.nvim",
-      "bennypowers/svgo.nvim",
-    },
+    dependencies = { "MunifTanjim/prettier.nvim", "mcauley-penney/tidy.nvim", "bennypowers/svgo.nvim" },
     event = { "BufWritePre", "BufReadPre", "BufNewFile" },
     cmd = { "ConformInfo" },
     opts = {
@@ -219,16 +211,10 @@ return {
 
       formatters_by_ft = {
         ["*"] = { "trim_whitespace" },
-
-        -- Go: goimports (imports + base fmt) → golines (line length) → gofumpt (style)
-        -- golines calls gofumpt internally so the last step just enforces style.
         go = { "goimports", "golines" },
-
         rust = { "rustfmt" },
-
         c = { "clang-format" },
         cpp = { "clang-format" },
-
         javascript = prettier,
         javascriptreact = prettier,
         typescript = prettier,
@@ -236,33 +222,24 @@ return {
         vue = prettier,
         css = prettier,
         html = prettier,
-
-        -- jq for structural formatting only; no prettierd fallback (they conflict)
         json = { "jq" },
         yaml = { "yamlfmt" },
         xml = { "xmlformatter" },
         toml = { "taplo" },
-
         lua = { "stylua" },
         python = { "isort", "ruff_format" },
         php = { "pint" },
         sql = { "sqlfluff" },
         sh = { "shfmt" },
         bash = { "shfmt" },
-
         markdown = { "prettier", "markdownlint-cli2", "markdown-toc" },
         ["markdown.mdx"] = { "prettier", "markdownlint-cli2", "markdown-toc" },
       },
     },
     keys = {
-      {
-        "<leader>cp",
-        function()
-          require("conform").format { notify_on_error = true, async = true, lsp_fallback = true }
-        end,
-        mode = { "n", "v" },
-        desc = "Format",
-      },
+      -- stylua: ignore start
+      { "<leader>cp", function() require("conform").format { notify_on_error = true, async = true, lsp_fallback = true } end, mode = { "n", "v" }, desc = "Format", },
+      -- stylua: ignore end
     },
   },
 }

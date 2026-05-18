@@ -10,6 +10,10 @@ HISTSIZE=100000
 HISTFILESIEZE=10000
 FUNCNEST=500
 
+set -o vi
+export MANPAGER='nvim +Man!'
+export MANPATH="/usr/local/man:$MANPATH"
+
 setopt append_history
 setopt extended_history
 setopt hist_expire_dups_first
@@ -85,10 +89,10 @@ plugins=(
 )
 
 export RUSTFLAGS="-C opt-level=3 -C target-cpu=native" # Rust app build optimization
+export RUST_SRC_PATH="$(rustc --print sysroot)/lib/rustlib/src/rust/src"
 # ---------
 
 . "$ZSH/oh-my-zsh.sh"
-#. "$XDG_LOCAL_HOME/bin/env"
 . "$ZSH/../aliases.zsh"
 . "$ZSH/../functions.zsh"
 . "$ZSH/../fzf.zsh"
@@ -102,3 +106,6 @@ eval "$(rbenv init -)"
 export NVM_DIR="$HOME/.config/nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
+
+# PATH dedup
+PATH=$(printf %s "$PATH" | awk -v RS=: -v ORS=: '!seen[$0]++' | sed 's/:$//')

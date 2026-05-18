@@ -102,7 +102,6 @@ require("lazy").setup {
           "terraform",
           "terraform-ls",
           "tflint",
-          "typescript-language-server",
           "vtsls",
           "vue-language-server",
           "yaml-language-server",

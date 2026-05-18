@@ -37,6 +37,24 @@ return {
         ft = { "gitcommit", "gitrebase" },
         opts = { filetypes = { "gitcommit", "octo", "markdown" } },
       },
+      {
+        "L3MON4D3/LuaSnip",
+        build = "make install_jsregexp",
+        config = function()
+          local luasnip = require "luasnip"
+
+          -- Loads all the snippets installed by extensions in vscode.
+          -- require('luasnip.loaders.from_vscode').lazy_load()
+          require("luasnip.loaders.from_vscode").load { paths = "~/.config/nvim/snippets" }
+
+          luasnip.config.set_config {
+            region_check_events = "InsertEnter",
+            delete_check_events = "InsertLeave",
+          }
+
+          luasnip.config.setup {}
+        end,
+      },
     },
 
     ---@module "blink.cmp"
@@ -58,18 +76,10 @@ return {
             },
             components = {
               kind_icon = {
-                text = function(ctx)
-                  return " " .. ctx.kind_icon .. " "
-                end,
-                highlight = function(ctx)
-                  return "BlinkCmpKindIcon" .. ctx.kind
-                end,
+                text = function(ctx) return " " .. ctx.kind_icon .. " " end,
+                highlight = function(ctx) return "BlinkCmpKindIcon" .. ctx.kind end,
               },
-              kind = {
-                text = function(ctx)
-                  return " " .. ctx.kind .. " "
-                end,
-              },
+              kind = { text = function(ctx)return" " .. ctx.kind .. " "end,  },
             },
           },
         },
@@ -95,25 +105,21 @@ return {
           dictionary = { module = "blink-cmp-dictionary", min_keyword_length = 3 },
         },
       },
-      snippets = { preset = "default" },
+      snippets = { preset = "luasnip" },
+      appearance = { nerd_font_variant = "mono" },
       fuzzy = { implementation = "prefer_rust" },
       keymap = {
+        -- stylua: ignore start
         preset = "default",
         ["<C-Space>"] = { "show", "hide" },
+        ["<C-s>"] = { "snippet_forward", "fallback" },
         ["<CR>"] = { "accept", "fallback" },
         ["<C-j>"] = { "select_next", "fallback" },
         ["<C-k>"] = { "select_prev", "fallback" },
-        ["<C-p>"] = {
-          function(cmp)
-            cmp.show { providers = { "path", "buffer" } }
-          end,
-        },
-        ["<C-d>"] = {
-          function(cmp)
-            cmp.show { providers = { "dictionary" } }
-          end,
-        },
+        ["<C-p>"] = { function(cmp) cmp.show { providers = { "path", "buffer" } } end, },
+        ["<C-d>"] = { function(cmp) cmp.show { providers = { "dictionary"     } } end, },
         ["K"] = { "show_signature", "fallback" },
+        --stylua: ignore end
       },
     },
     opts_extend = { "sources.default" },
