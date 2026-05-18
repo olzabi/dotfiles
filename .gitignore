@@ -6,6 +6,7 @@ Thumbs.db
 .bak
 *~
 ._*
+.tmp
 
 *.iso
 *.tar
@@ -31,10 +32,20 @@ node_modules
 TODO.md
 TODO*
 
-eza/eza*
+tools/eza/eza*
 lazysql/config.toml
-tmux/plugins/
+editor/tmux/plugins/
 zsh/.oh-my-zsh/*
 !zsh/.oh-my-zsh/.git
+
+# Submodule contents (track refs only)
+tools/.pyenv/*
+!tools/.pyenv/.git
+tools/.phpenv/*
+!tools/.phpenv/.git
+tools/.rbenv/*
+!tools/.rbenv/.git
+tools/nvm/*
+!tools/nvm/.git
 
 

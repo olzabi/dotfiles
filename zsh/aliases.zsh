@@ -11,6 +11,7 @@ alias ls='eza --color=always --icons --group-directories-first'
 alias y='yy'
 alias n='nvim'
 alias zw='zellij --layout layout.kdl'
+alias td='sesh connect default'
 alias leet='nvim leetcode.nvim'
 alias monkey='smassh' # inspired by monkeytype
 alias cal="calcurse"

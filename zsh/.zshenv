@@ -102,7 +102,7 @@ export AWS_SHARED_CREDENTIALS_FILE="$AWS_HOME/credentials"
 
 #* python
 # ---------
-export PYENV_ROOT="${PYENV_ROOT:-${XDG_CONFIG_HOME:-$HOME/.config}/.pyenv}"
+export PYENV_ROOT="$DOTFILES_PATH/tools/.pyenv"
 if [ -d "$PYENV_ROOT/bin" ]; then
   _prepend_path "$PYENV_ROOT/bin"
 fi
@@ -124,7 +124,7 @@ export LG_CONFIG_FILE="$DOTFILES_PATH/git/lazygit.config.yml"
 
 # php
 # ---------
-export PHPENV_ROOT="$XDG_CONFIG_HOME/.phpenv"
+export PHPENV_ROOT="$DOTFILES_PATH/tools/.phpenv"
 _prepend_path "$PHPENV_ROOT/bin"
 _prepend_path "$XDG_CONFIG_HOME/.composer/vendor/bin"
 
@@ -152,10 +152,9 @@ export RIPGREP_CONFIG_PATH="$DOTFILES_PATH/.ripgreprc"
 export YAMLLINT_CONFIG_FILE="$DOTFILES_PATH/yamllint/.yamllint.yml"
 
 # ---------
-export ZELLIJ_CONFIG_DIR="$DOTFILES_PATH/zellij"
+export ZELLIJ_CONFIG_DIR="$DOTFILES_PATH/editor/zellij"
 
-export RBENV_ROOT="$XDG_CONFIG_HOME/.rbenv"
+export RBENV_ROOT="$DOTFILES_PATH/tools/.rbenv"
 _prepend_path "$RBENV_ROOT/bin"
-
 _prepend_path "/usr/local/cuda/bin"
 

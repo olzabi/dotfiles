@@ -25,6 +25,18 @@
 [submodule "zsh/custom/plugins/zsh-completions"]
 	path = zsh/custom/plugins/zsh-completions
 	url = https://github.com/zsh-users/zsh-completions.git
-[submodule "tmux/plugins/tpm"]
-	path = tmux/plugins/tpm
+[submodule "editor/tmux/plugins/tpm"]
+	path = editor/tmux/plugins/tpm
 	url = https://github.com/tmux-plugins/tpm
+[submodule "tools/.pyenv"]
+	path = tools/.pyenv
+	url = https://github.com/pyenv/pyenv.git
+[submodule "tools/.phpenv"]
+	path = tools/.phpenv
+	url = https://github.com/phpenv/phpenv.git
+[submodule "tools/.rbenv"]
+	path = tools/.rbenv
+	url = https://github.com/rbenv/rbenv.git
+[submodule "tools/nvm"]
+	path = tools/nvm
+	url = https://github.com/nvm-sh/nvm.git
