@@ -100,7 +100,8 @@ export RUST_SRC_PATH="$(rustc --print sysroot)/lib/rustlib/src/rust/src"
 
 [ -x "$(command -v zoxide)" ] && eval "$(zoxide init zsh)"
 [ -x "$(command -v phpenv)" ] && eval "$(phpenv init -)"
-[ -x "$(command -v pyenv)" ] && eval "$(pyenv init - zsh)"
+[ -x "$(command -v pyenv)" ]  && eval "$(pyenv init - zsh)"
+[ -x "$(command -v gh)" ]     && eval "$(gh enhance completion zsh)"
 eval "$(rbenv init -)"
 
 export NVM_DIR="$DOTFILES_PATH/tools/nvm"

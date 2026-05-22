@@ -39,13 +39,7 @@ zsh/.oh-my-zsh/*
 !zsh/.oh-my-zsh/.git
 
 # Submodule contents (track refs only)
-tools/.pyenv/*
-!tools/.pyenv/.git
-tools/.phpenv/*
-!tools/.phpenv/.git
-tools/.rbenv/*
-!tools/.rbenv/.git
-tools/nvm/*
-!tools/nvm/.git
+!tools/.*/.git
+tools/.*
 
 

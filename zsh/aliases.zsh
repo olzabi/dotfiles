@@ -3,18 +3,16 @@
 #*
 # ---------
 alias q=exit
-alias quit=exit
 alias sudo='sudo '
 alias view="explorer.exe"
 alias ls='eza --color=always --icons --group-directories-first'
 # alias rm='trash'
 alias y='yy'
 alias n='nvim'
-alias zw='zellij --layout layout.kdl'
 alias td='sesh connect default'
-alias leet='nvim leetcode.nvim'
 alias monkey='smassh' # inspired by monkeytype
 alias cal="calcurse"
+alias oc="opencode"
 
 #* git
 # ---------

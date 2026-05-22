@@ -1,0 +1,245 @@
+# ╔══════════════════════════════════════════════════════════════╗
+# ║              DARKVOID — Yazi Theme                          ║
+# ║   Faithful port of darkvoid-theme/darkvoid.nvim             ║
+# ╚══════════════════════════════════════════════════════════════╝
+#
+# Palette (from darkvoid.nvim colors.lua):
+#   bg               #1c1c1c
+#   fg               #c0c0c0
+#   cursor           #bdfe58  (lime accent)
+#   visual           #303030
+#   comment          #585858
+#   line_nr          #404040
+#   string           #d1d1d1
+#   func             #e1e1e1
+#   kw               #f1f1f1
+#   identifier       #b1b1b1
+#   type             #a1a1a1
+#   type_builtin     #c5c5c5
+#   operator/glow    #1bfd9c  (green accent)
+#   search_highlight #1bfd9c
+#   bracket          #e6e6e6
+#   bool             #66b2b2
+#   constant         #b2d8d8
+#   preprocessor     #6a7a8a
+#   eob              #3c3c3c
+#   border           #585858
+#   title            #bdfe58
+#   added            #baffc9
+#   changed          #ffffba
+#   removed          #ffb3ba
+#   error            #dea6a0
+#   warning          #d6efd8
+#   hint             #bedc74
+#   info             #7fa1c3
+
+[manager]
+cwd = { fg = "#1bfd9c", bold = true }
+
+hovered         = { fg = "#f1f1f1", bg = "#303030", bold = true }
+preview_hovered = { fg = "#bdfe58", underline = true }
+
+find_keyword  = { fg = "#bdfe58", bold = true, italic = true, underline = true }
+find_position = { fg = "#1bfd9c", bold = true }
+
+marker_copied   = { fg = "#baffc9", bg = "#baffc9" }
+marker_cut      = { fg = "#ffb3ba", bg = "#ffb3ba" }
+marker_marked   = { fg = "#ffffba", bg = "#ffffba" }
+marker_selected = { fg = "#1bfd9c", bg = "#1bfd9c" }
+
+tab_active   = { fg = "#bdfe58", bg = "#303030", bold = true }
+tab_inactive = { fg = "#585858", bg = "#1c1c1c" }
+
+border_symbol = "│"
+border_style  = { fg = "#585858" }
+
+syntect_theme = ""
+
+[status]
+separator_open  = ""
+separator_close = ""
+separator_style = { fg = "#303030", bg = "#303030" }
+
+mode_normal = { fg = "#1c1c1c", bg = "#1bfd9c", bold = true }
+mode_select = { fg = "#1c1c1c", bg = "#bdfe58", bold = true }
+mode_unset  = { fg = "#1c1c1c", bg = "#ffb3ba", bold = true }
+
+progress_label  = { fg = "#c0c0c0", bold = true }
+progress_normal = { fg = "#1bfd9c", bg = "#1c1c1c" }
+progress_error  = { fg = "#dea6a0", bg = "#1c1c1c" }
+
+perm_type  = { fg = "#7fa1c3" }
+perm_read  = { fg = "#b2d8d8" }
+perm_write = { fg = "#ffffba" }
+perm_exec  = { fg = "#1bfd9c" }
+perm_sep   = { fg = "#404040" }
+
+[input]
+border   = { fg = "#585858" }
+title    = { fg = "#bdfe58", bold = true }
+value    = { fg = "#c0c0c0" }
+selected = { fg = "#1c1c1c", bg = "#1bfd9c" }
+
+[select]
+border   = { fg = "#585858" }
+active   = { fg = "#1bfd9c", bold = true }
+inactive = { fg = "#585858" }
+
+[tasks]
+border  = { fg = "#585858" }
+title   = { fg = "#bdfe58", bold = true }
+hovered = { fg = "#1bfd9c", underline = true }
+
+[which]
+mask            = { bg = "#1c1c1c" }
+cand            = { fg = "#1bfd9c", bold = true }
+rest            = { fg = "#585858" }
+desc            = { fg = "#b1b1b1" }
+separator       = "  "
+separator_style = { fg = "#404040" }
+
+[notify]
+title_info  = { fg = "#7fa1c3", bold = true }
+title_warn  = { fg = "#ffffba", bold = true }
+title_error = { fg = "#dea6a0", bold = true }
+
+icon_info  = "󰋽"
+icon_warn  = "󰀪"
+icon_error = "󰅚"
+
+[spot]
+border = { fg = "#585858" }
+title  = { fg = "#bdfe58", bold = true }
+
+[completion]
+border   = { fg = "#585858" }
+active   = { fg = "#1bfd9c", bg = "#303030", bold = true }
+inactive = { fg = "#585858" }
+
+[help]
+on      = { fg = "#bdfe58", bold = true }
+exec    = { fg = "#1bfd9c" }
+desc    = { fg = "#585858" }
+hovered = { fg = "#f1f1f1", bg = "#303030", bold = true }
+footer  = { fg = "#1c1c1c", bg = "#1bfd9c" }
+
+# ── File type coloring (mime only in new Yazi API) ───────────────
+[filetype]
+rules = [
+  { mime = "image/*",    fg = "#b2d8d8" },
+  { mime = "video/*",    fg = "#c5c5c5" },
+  { mime = "audio/*",    fg = "#66b2b2" },
+
+  { mime = "application/zip",              fg = "#dea6a0" },
+  { mime = "application/gzip",             fg = "#dea6a0" },
+  { mime = "application/x-tar",            fg = "#dea6a0" },
+  { mime = "application/x-bzip",           fg = "#dea6a0" },
+  { mime = "application/x-bzip2",          fg = "#dea6a0" },
+  { mime = "application/x-7z-compressed",  fg = "#dea6a0" },
+  { mime = "application/x-rar",            fg = "#dea6a0" },
+  { mime = "application/x-xz",             fg = "#dea6a0" },
+  { mime = "application/zstd",             fg = "#dea6a0" },
+
+  { mime = "application/pdf",              fg = "#7fa1c3" },
+  { mime = "application/msword",           fg = "#7fa1c3" },
+  { mime = "application/vnd.openxmlformats-officedocument.*", fg = "#7fa1c3" },
+  { mime = "application/vnd.oasis.opendocument.*",            fg = "#7fa1c3" },
+
+  { mime = "text/*", fg = "#d1d1d1" },
+  { mime = "*",      fg = "#a1a1a1" },
+]
+
+# ── Icons ────────────────────────────────────────────────────────
+[icon]
+rules = [
+  # Folders
+  { name = "*/",            text = "󰉋", fg = "#1bfd9c" },
+  { name = ".git/",         text = "󰊢", fg = "#ffb3ba" },
+  { name = "node_modules/", text = "󰎙", fg = "#585858" },
+  { name = "src/",          text = "󰴉", fg = "#c0c0c0" },
+  { name = "docs/",         text = "󰈙", fg = "#b1b1b1" },
+  { name = "test/",         text = "󰤑", fg = "#bedc74" },
+  { name = "tests/",        text = "󰤑", fg = "#bedc74" },
+
+  # Special files
+  { name = ".gitignore",       text = "󰊢", fg = "#585858" },
+  { name = "Dockerfile",       text = "󰡨", fg = "#7fa1c3" },
+  { name = "docker-compose.*", text = "󰡨", fg = "#7fa1c3" },
+  { name = "Makefile",         text = "󱁤", fg = "#bdfe58" },
+  { name = "LICENSE",          text = "󰿃", fg = "#585858" },
+  { name = "README*",          text = "󰈙", fg = "#e1e1e1" },
+  { name = "package.json",     text = "󰎙", fg = "#bedc74" },
+  { name = "Cargo.toml",       text = "󱘗", fg = "#dea6a0" },
+  { name = "go.mod",           text = "󰟓", fg = "#b2d8d8" },
+
+  # Source code
+  { name = "*.rs",    text = "󱘗", fg = "#dea6a0" },
+  { name = "*.go",    text = "󰟓", fg = "#b2d8d8" },
+  { name = "*.py",    text = "󰌠", fg = "#c5c5c5" },
+  { name = "*.js",    text = "󰌞", fg = "#d1d1d1" },
+  { name = "*.ts",    text = "󰛦", fg = "#b2d8d8" },
+  { name = "*.jsx",   text = "󰜈", fg = "#d1d1d1" },
+  { name = "*.tsx",   text = "󰜈", fg = "#b2d8d8" },
+  { name = "*.vue",   text = "󰡄", fg = "#bedc74" },
+  { name = "*.svelte",text = "󰡄", fg = "#dea6a0" },
+  { name = "*.html",  text = "󰌝", fg = "#c5c5c5" },
+  { name = "*.css",   text = "󰌜", fg = "#b2d8d8" },
+  { name = "*.scss",  text = "󰌜", fg = "#b2d8d8" },
+  { name = "*.lua",   text = "󰢱", fg = "#7fa1c3" },
+  { name = "*.sh",    text = "󰆍", fg = "#1bfd9c" },
+  { name = "*.bash",  text = "󰆍", fg = "#1bfd9c" },
+  { name = "*.zsh",   text = "󰆍", fg = "#1bfd9c" },
+  { name = "*.fish",  text = "󰆍", fg = "#1bfd9c" },
+  { name = "*.c",     text = "󰙱", fg = "#a1a1a1" },
+  { name = "*.cpp",   text = "󰙲", fg = "#a1a1a1" },
+  { name = "*.h",     text = "󰙱", fg = "#585858" },
+  { name = "*.java",  text = "󰬷", fg = "#dea6a0" },
+  { name = "*.kt",    text = "󱈙", fg = "#bedc74" },
+  { name = "*.swift", text = "󰛥", fg = "#dea6a0" },
+  { name = "*.rb",    text = "󰴭", fg = "#dea6a0" },
+  { name = "*.php",   text = "󰌟", fg = "#a1a1a1" },
+  { name = "*.zig",   text = "󱚀", fg = "#bdfe58" },
+
+  # Config / data
+  { name = "*.md",   text = "󰈙", fg = "#c0c0c0" },
+  { name = "*.txt",  text = "󰈙", fg = "#a1a1a1" },
+  { name = "*.pdf",  text = "󰈦", fg = "#7fa1c3" },
+  { name = "*.toml", text = "󱁻", fg = "#6a7a8a" },
+  { name = "*.yaml", text = "󱁻", fg = "#6a7a8a" },
+  { name = "*.yml",  text = "󱁻", fg = "#6a7a8a" },
+  { name = "*.json", text = "󰘦", fg = "#b1b1b1" },
+  { name = "*.xml",  text = "󰗀", fg = "#6a7a8a" },
+  { name = "*.env",  text = "󰙋", fg = "#bdfe58" },
+  { name = "*.lock", text = "󰌾", fg = "#404040" },
+  { name = "*.log",  text = "󰌱", fg = "#404040" },
+
+  # Archives
+  { name = "*.zip", text = "󰗄", fg = "#dea6a0" },
+  { name = "*.tar", text = "󰗄", fg = "#dea6a0" },
+  { name = "*.gz",  text = "󰗄", fg = "#dea6a0" },
+  { name = "*.bz2", text = "󰗄", fg = "#dea6a0" },
+  { name = "*.xz",  text = "󰗄", fg = "#dea6a0" },
+  { name = "*.zst", text = "󰗄", fg = "#dea6a0" },
+  { name = "*.7z",  text = "󰗄", fg = "#dea6a0" },
+  { name = "*.rar", text = "󰗄", fg = "#dea6a0" },
+
+  # Images
+  { name = "*.png",  text = "󰈟", fg = "#b2d8d8" },
+  { name = "*.jpg",  text = "󰈟", fg = "#b2d8d8" },
+  { name = "*.jpeg", text = "󰈟", fg = "#b2d8d8" },
+  { name = "*.gif",  text = "󰈟", fg = "#c5c5c5" },
+  { name = "*.webp", text = "󰈟", fg = "#b2d8d8" },
+  { name = "*.svg",  text = "󰜡", fg = "#b2d8d8" },
+
+  # Audio / Video
+  { name = "*.mp3",  text = "󰎇", fg = "#66b2b2" },
+  { name = "*.flac", text = "󰎇", fg = "#66b2b2" },
+  { name = "*.wav",  text = "󰎇", fg = "#66b2b2" },
+  { name = "*.mp4",  text = "󰈫", fg = "#c5c5c5" },
+  { name = "*.mkv",  text = "󰈫", fg = "#c5c5c5" },
+  { name = "*.avi",  text = "󰈫", fg = "#c5c5c5" },
+  { name = "*.mov",  text = "󰈫", fg = "#c5c5c5" },
+
+  # Fallback
+  { name = "*", text = "󰈔", fg = "#a1a1a1" },
+]

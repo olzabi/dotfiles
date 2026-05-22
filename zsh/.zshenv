@@ -121,6 +121,7 @@ _prepend_path "$PNPM_HOME"
 # ---------
 export GIT_CONFIG_GLOBAL="$XDG_CONFIG_HOME/git/.gitconfig"
 export LG_CONFIG_FILE="$DOTFILES_PATH/git/lazygit.config.yml"
+export GH_DASH_CONFIG="$DOTFILES_PATH/git/gh-dash.config.yml"
 
 # php
 # ---------
