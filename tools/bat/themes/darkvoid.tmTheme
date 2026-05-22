@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>name</key>
+  <string>darkvoid</string>
+  <key>settings</key>
+  <array>
+
+    <!-- Global / Editor settings -->
+    <dict>
+      <key>settings</key>
+      <dict>
+        <key>background</key>        <string>#1c1c1c</string>
+        <key>foreground</key>        <string>#c0c0c0</string>
+        <key>caret</key>             <string>#bdfe58</string>
+        <key>selection</key>         <string>#303030</string>
+        <key>selectionBorder</key>   <string>#404040</string>
+        <key>lineHighlight</key>     <string>#252525</string>
+        <key>findHighlight</key>     <string>#1bfd9c</string>
+        <key>findHighlightForeground</key> <string>#1c1c1c</string>
+        <key>bracketsForeground</key><string>#e6e6e6</string>
+        <key>bracketsOptions</key>   <string>underline</string>
+        <key>invisibles</key>        <string>#404040</string>
+        <key>gutterForeground</key>  <string>#404040</string>
+      </dict>
+    </dict>
+
+    <!-- Comments -->
+    <dict>
+      <key>name</key><string>Comment</string>
+      <key>scope</key><string>comment, punctuation.definition.comment</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#585858</string>
+        <key>fontStyle</key><string>italic</string>
+      </dict>
+    </dict>
+
+    <!-- Strings -->
+    <dict>
+      <key>name</key><string>String</string>
+      <key>scope</key><string>string, string.quoted, string.template</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#d1d1d1</string>
+      </dict>
+    </dict>
+
+    <!-- String punctuation -->
+    <dict>
+      <key>name</key><string>String Punctuation</string>
+      <key>scope</key><string>punctuation.definition.string</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#b1b1b1</string>
+      </dict>
+    </dict>
+
+    <!-- Keywords -->
+    <dict>
+      <key>name</key><string>Keyword</string>
+      <key>scope</key><string>keyword, keyword.control, keyword.operator.word, storage, storage.type, storage.modifier</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#f1f1f1</string>
+        <key>fontStyle</key><string>bold</string>
+      </dict>
+    </dict>
+
+    <!-- Operators -->
+    <dict>
+      <key>name</key><string>Operator</string>
+      <key>scope</key><string>keyword.operator</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#1bfd9c</string>
+      </dict>
+    </dict>
+
+    <!-- Functions -->
+    <dict>
+      <key>name</key><string>Function Definition</string>
+      <key>scope</key><string>entity.name.function, meta.function entity.name.function, support.function</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#e1e1e1</string>
+        <key>fontStyle</key><string>bold</string>
+      </dict>
+    </dict>
+
+    <!-- Function calls -->
+    <dict>
+      <key>name</key><string>Function Call</string>
+      <key>scope</key><string>meta.function-call, variable.function</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#e1e1e1</string>
+      </dict>
+    </dict>
+
+    <!-- Types / Classes -->
+    <dict>
+      <key>name</key><string>Type</string>
+      <key>scope</key><string>entity.name.type, entity.name.class, support.class</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#a1a1a1</string>
+      </dict>
+    </dict>
+
+    <!-- Built-in types -->
+    <dict>
+      <key>name</key><string>Built-in Type</string>
+      <key>scope</key><string>support.type, support.type.primitive</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#c5c5c5</string>
+      </dict>
+    </dict>
+
+    <!-- Identifiers / Variables -->
+    <dict>
+      <key>name</key><string>Variable / Identifier</string>
+      <key>scope</key><string>variable, variable.other, meta.definition.variable variable.other</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#b1b1b1</string>
+      </dict>
+    </dict>
+
+    <!-- Constants -->
+    <dict>
+      <key>name</key><string>Constant</string>
+      <key>scope</key><string>constant, constant.other, constant.language, variable.other.constant</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#b2d8d8</string>
+      </dict>
+    </dict>
+
+    <!-- Boolean -->
+    <dict>
+      <key>name</key><string>Boolean</string>
+      <key>scope</key><string>constant.language.boolean</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#66b2b2</string>
+      </dict>
+    </dict>
+
+    <!-- Numbers -->
+    <dict>
+      <key>name</key><string>Number</string>
+      <key>scope</key><string>constant.numeric</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#b2d8d8</string>
+      </dict>
+    </dict>
+
+    <!-- Preprocessor / Macro -->
+    <dict>
+      <key>name</key><string>Preprocessor</string>
+      <key>scope</key><string>meta.preprocessor, keyword.control.import, keyword.other.include, entity.name.tag</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#4b8902</string>
+      </dict>
+    </dict>
+
+    <!-- Brackets and punctuation -->
+    <dict>
+      <key>name</key><string>Bracket / Punctuation</string>
+      <key>scope</key><string>punctuation.section, punctuation.brackets, meta.brace</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#e6e6e6</string>
+      </dict>
+    </dict>
+
+    <!-- Attributes (HTML, XML, etc.) -->
+    <dict>
+      <key>name</key><string>Attribute Name</string>
+      <key>scope</key><string>entity.other.attribute-name</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#c5c5c5</string>
+      </dict>
+    </dict>
+
+    <!-- Tag name -->
+    <dict>
+      <key>name</key><string>Tag Name</string>
+      <key>scope</key><string>entity.name.tag</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#f1f1f1</string>
+      </dict>
+    </dict>
+
+    <!-- Invalid / deprecated -->
+    <dict>
+      <key>name</key><string>Invalid</string>
+      <key>scope</key><string>invalid</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#ffb3ba</string>
+        <key>fontStyle</key><string>underline</string>
+      </dict>
+    </dict>
+
+    <!-- Diff: added -->
+    <dict>
+      <key>name</key><string>Diff Added</string>
+      <key>scope</key><string>markup.inserted</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#baffc9</string>
+      </dict>
+    </dict>
+
+    <!-- Diff: changed -->
+    <dict>
+      <key>name</key><string>Diff Changed</string>
+      <key>scope</key><string>markup.changed</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#ffffba</string>
+      </dict>
+    </dict>
+
+    <!-- Diff: removed -->
+    <dict>
+      <key>name</key><string>Diff Removed</string>
+      <key>scope</key><string>markup.deleted</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#ffb3ba</string>
+      </dict>
+    </dict>
+
+    <!-- Markdown headings -->
+    <dict>
+      <key>name</key><string>Markdown Heading</string>
+      <key>scope</key><string>markup.heading, entity.name.section</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#f1f1f1</string>
+        <key>fontStyle</key><string>bold</string>
+      </dict>
+    </dict>
+
+    <!-- Markdown bold -->
+    <dict>
+      <key>name</key><string>Markdown Bold</string>
+      <key>scope</key><string>markup.bold</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#e1e1e1</string>
+        <key>fontStyle</key><string>bold</string>
+      </dict>
+    </dict>
+
+    <!-- Markdown italic -->
+    <dict>
+      <key>name</key><string>Markdown Italic</string>
+      <key>scope</key><string>markup.italic</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#d1d1d1</string>
+        <key>fontStyle</key><string>italic</string>
+      </dict>
+    </dict>
+
+    <!-- Markdown inline code -->
+    <dict>
+      <key>name</key><string>Markdown Code</string>
+      <key>scope</key><string>markup.inline.raw, markup.raw</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#1bfd9c</string>
+      </dict>
+    </dict>
+
+    <!-- Markdown link -->
+    <dict>
+      <key>name</key><string>Markdown Link</string>
+      <key>scope</key><string>markup.underline.link, string.other.link</string>
+      <key>settings</key>
+      <dict>
+        <key>foreground</key><string>#66b2b2</string>
+        <key>fontStyle</key><string>underline</string>
+      </dict>
+    </dict>
+
+  </array>
+  <key>uuid</key>
+  <string>a1b2c3d4-e5f6-7890-abcd-ef1234567890</string>
+</dict>
+</plist>

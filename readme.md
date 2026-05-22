@@ -12,3 +12,14 @@ sudo apt update && sudo apt-get install \
   libevent-dev libncurses-dev \
   clangd-15
 ```
+
+
+
+
+## Installation
+
+### bat
+
+```
+bat cache --build
+```

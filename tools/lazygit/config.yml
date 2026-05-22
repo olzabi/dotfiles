@@ -1,8 +1,7 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
 git:
   pagers:
     - colorArg: always
-      pager: delta --dark --paging=never --features=collared-coracias-caudatus --diff-so-fancy
+      pager: delta --paging=never --features=darkvoid
   autoFetch: true
   autoRefresh: false
   disableForcePushing: true
@@ -25,28 +24,33 @@ gui:
   filterMode: fuzzy
   splitDiff: auto
   portraitMode: never
+  skipStashWarning: true
   theme:
+    # Active panel border — neon green accent (operator/search color)
     activeBorderColor:
-      - magenta
+      - '#1bfd9c'
       - bold
+    # Inactive panel borders — dim grey
     inactiveBorderColor:
-      - white
+      - '#404040'
+    # Border color when searching/filtering
     searchingActiveBorderColor:
-      - cyan
+      - '#bdfe58'
       - bold
-    optionsTextColor:
-      - white
+    # Selected line background — subtle highlight row
     selectedLineBgColor:
-      - "#453461"
-    cherryPickedCommitBgColor:
-      - cyan
-    cherryPickedCommitFgColor:
-      - blue
-    markedBaseCommitBgColor:
-      - yellow
-    markedBaseCommitFgColor:
-      - blue
-    unstagedChangesColor:
-      - white
+      - '#303030'
+    # Bottom bar options text
+    optionsTextColor:
+      - '#585858'
+    # Default text color
     defaultFgColor:
-      - default
+      - '#c0c0c0'
+    # Unstaged changes — soft red
+    unstagedChangesColor:
+      - '#ffb3ba'
+    # Cherry-picked commit highlight
+    cherryPickedCommitBgColor:
+      - '#303030'
+    cherryPickedCommitFgColor:
+      - '#1bfd9c'

@@ -4,31 +4,38 @@ export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_LOCAL_HOME="$HOME/.local"
 export XDG_BIN_HOME="$XDG_LOCAL_HOME/bin"
 export XDG_DATA_HOME="$XDG_LOCAL_HOME/share"
+export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/run/user/$(id -u)}
 
-export DOTFILES_PATH="$XDG_CONFIG_HOME/dotfiles"
+export DOTFILES="$XDG_CONFIG_HOME/dotfiles"
+export DOTFILES_GIT="$DOTFILES/git"
+export DOTFILES_EDITOR="$DOTFILES/editor"
+export DOTFILES_TOOLS="$DOTFILES/tools"
+export DOTFILES_AI="$DOTFILES/ai"
+
 export DEV="$HOME/dev"
+export YAZI_CONFIG_HOME="$DOTFILES/yazi"
+export BAT_CONFIG_DIR="$DOTFILES_TOOLS/bat"
 
 _prepend_path() { case ":$PATH:" in *":$1:"*) ;; *) export PATH="$1:$PATH" ;; esac }
 _append_path()  { case ":$PATH:" in *":$1:"*) ;; *) export PATH="$PATH:$1" ;; esac }
 
-# ---------
-export LANG="en_US.UTF-8"
-export LC_ALL="${LANG}"
-export LC_CTYPE="${LANG}"
-
-#* nvim
-# ---------
 _append_path "/opt/nvim-linux-x86_64/bin"
+_prepend_path "$XDG_LOCAL_HOME/bin"
+_append_path "$FZF_BASE/bin"
+_prepend_path "/usr/local/cuda/bin"
+_prepend_path "/usr/lib/jvm/default-java/bin"
+
+export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig
+export ZSH="$DOTFILES/zsh/.oh-my-zsh"
+export ZSH_CUSTOM="$DOTFILES/zsh/custom"
+export ZSH_COMPDUMP="$XDG_CACHE_HOME/zsh/.zcomdump-$HOST"
+_prepend_path "$ZSH_CUSTOM/plugins/git-fuzzy/bin"
 
 if [[ -n $SSH_CONNECTION ]]; then
   export EDITOR='vim'
 else
   export EDITOR='nvim'
 fi
-
-# ---------
-export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig
-_prepend_path "$XDG_LOCAL_HOME/bin"
 
 #* history
 # ---------
@@ -47,20 +54,9 @@ export MYSQL_HISTFILE="$HIST_DIR/.mysql_history"
 export PYTHON_HISTORY="$HIST_DIR/.python_history"
 export PSYSH_CONFIG="$HIST_DIR/psysh_history"
 
-#* zsh
-# ---------
-export ZSH="$DOTFILES_PATH/zsh/.oh-my-zsh"
-export ZSH_CUSTOM="$DOTFILES_PATH/zsh/custom"
-export ZSH_COMPDUMP="$XDG_CACHE_HOME/zsh/.zcomdump-$HOST"
-_prepend_path "$ZSH_CUSTOM/plugins/git-fuzzy/bin"
-
-# ---------
-export YAZI_CONFIG_HOME="$DOTFILES_PATH/yazi"
-export TMUX_CONF_DIR="$XDG_CONFIG_HOME/tmux"
-
-export EZA_CONFIG_DIR="$DOTFILES_PATH/eza"
+export EZA_CONFIG_DIR="$DOTFILES_TOOLS/eza"
 export EZA_COLORS="di=1;34:ln=36:ex=1;32"
-_prepend_path "$DOTFILES_PATH/eza/completions/zsh"
+_prepend_path "$DOTFILES_TOOLS/eza/completions/zsh"
 
 #* C++
 # ---------
@@ -90,19 +86,11 @@ _append_path "$GOPATH/bin"
 export RUSTUP_HOME="$XDG_CONFIG_HOME/.rustup"
 export CARGO_HOME="$XDG_CONFIG_HOME/.cargo"
 _prepend_path "$CARGO_HOME/bin"
-# RUST_SRC_PATH goes in .zshrc — spawning rustc on every shell is too slow:
-# export RUST_SRC_PATH="$(rustc --print sysroot)/lib/rustlib/src/rust/src"
 [ -f "$CARGO_HOME/env" ] && source "$CARGO_HOME/env"
-
-#* aws
-# ---------
-export AWS_HOME="$DOTFILES_PATH/aws"
-export AWS_CONFIG_FILE="$AWS_HOME/config"
-export AWS_SHARED_CREDENTIALS_FILE="$AWS_HOME/credentials"
 
 #* python
 # ---------
-export PYENV_ROOT="$DOTFILES_PATH/tools/.pyenv"
+export PYENV_ROOT="$DOTFILES_TOOLS/.pyenv"
 if [ -d "$PYENV_ROOT/bin" ]; then
   _prepend_path "$PYENV_ROOT/bin"
 fi
@@ -119,20 +107,14 @@ _prepend_path "$PNPM_HOME"
 
 #* git
 # ---------
-export GIT_CONFIG_GLOBAL="$XDG_CONFIG_HOME/git/.gitconfig"
-export LG_CONFIG_FILE="$DOTFILES_PATH/git/lazygit.config.yml"
-export GH_DASH_CONFIG="$DOTFILES_PATH/git/gh-dash.config.yml"
+export GH_DASH_CONFIG="$DOTFILES_GIT/gh-dash.config.yml"
 
 # php
 # ---------
-export PHPENV_ROOT="$DOTFILES_PATH/tools/.phpenv"
+export PHPENV_ROOT="$DOTFILES_TOOLS/.phpenv"
 _prepend_path "$PHPENV_ROOT/bin"
 _prepend_path "$XDG_CONFIG_HOME/.composer/vendor/bin"
 
-# java
-# ---------
-_prepend_path "/usr/lib/jvm/java-11-openjdk-amd64/bin"
-_prepend_path "$XDG_LOCAL_HOME/julia-1.8.1/bin"
 
 # Perl
 # ---------
@@ -142,20 +124,16 @@ export PERL_LOCAL_LIB_ROOT="$XDG_CONFIG_HOME/perl5${PERL_LOCAL_LIB_ROOT:+:${PERL
 export PERL_MB_OPT="--install_base \"$XDG_CONFIG_HOME/perl5\""
 export PERL_MM_OPT="INSTALL_BASE=$XDG_CONFIG_HOME/perl5"
 
-# fzf
-# ---------
-export FZF_BASE="$DOTFILES_PATH/zsh/custom/plugins/fzf"
-_append_path "$FZF_BASE/bin"
-export RIPGREP_CONFIG_PATH="$DOTFILES_PATH/.ripgreprc"
+export RIPGREP_CONFIG_PATH="$DOTFILES/.ripgreprc"
 
-# Yaml
-# ---------
-export YAMLLINT_CONFIG_FILE="$DOTFILES_PATH/yamllint/.yamllint.yml"
+export YAMLLINT_CONFIG_FILE="$DOTFILES_TOOLS/yamllint/.yamllint.yml"
+export ZELLIJ_CONFIG_DIR="$DOTFILES_EDITOR/zellij"
+export RBENV_ROOT="$DOTFILES_TOOLS/.rbenv"
 
-# ---------
-export ZELLIJ_CONFIG_DIR="$DOTFILES_PATH/editor/zellij"
-
-export RBENV_ROOT="$DOTFILES_PATH/tools/.rbenv"
 _prepend_path "$RBENV_ROOT/bin"
-_prepend_path "/usr/local/cuda/bin"
+# ---------
 
+# export FZF_BASE="$DOTFILES/zsh/custom/plugins/fzf"
+# export AWS_HOME="$DOTFILES/aws"
+# export AWS_CONFIG_FILE="$AWS_HOME/config"
+# export AWS_SHARED_CREDENTIALS_FILE="$AWS_HOME/credentials"

@@ -58,5 +58,10 @@ use = "dedukun/bookmarks"
 rev = "9ef1254"
 hash = "92fbb5483657fa7976cdf4e0104e18e0"
 
+[[plugin.deps]]
+use = "yazi-rs/plugins:piper"
+rev = "5d5c480"
+hash = "384464b6df8cb807425c521f8cd790f3"
+
 [flavor]
 deps = []

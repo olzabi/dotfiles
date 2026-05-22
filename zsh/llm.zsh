@@ -1,12 +1,12 @@
-_AI_DOTFILES="$DOTFILES_PATH/ai"
 _localhost=http://localhost:11434
 
 export PATH=/usr/bin:$PATH
 export PATH=$DEV/llama.cpp/build/bin:$PATH
 
-export PI_CONFIG_DIR=$_AI_DOTFILES/pi
+export UA_DIR=$XDG_CONFIG_HOME/.understand-anything
+export PI_CONFIG_DIR=$DOTFILES_AI/pi
 export PI_CODING_AGENT_DIR=$PI_CONFIG_DIR/agents
-export CLAUDE_CONFIG_DIR=$_AI_DOTFILES/claude
+export CLAUDE_CONFIG_DIR=$DOTFILES_AI/claude
 export OPENCODE_CONFIG_DIR=$XDG_CONFIG_HOME/opencode
 _prepend_path "$OPENCODE_CONFIG_DIR/bin"
 

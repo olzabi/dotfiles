@@ -42,7 +42,7 @@ prepend_previewers = [
   { url = "*.toml",               run = "rich-preview" }, # for toml (.toml) files
   { url = "*.{yml,yaml}",         run = "rich-preview" },
   { mime = "{audio,video,image}/*", run = "mediainfo --no-metadata"},
-  # { mime = "text/*", run = 'piper -- bat --number --color=always "$1"' },
+  { mime = "text/*", run = 'piper -- cat --theme=darkvoid --number --color=always "$1"' },
 ]
 prepend_preloaders = [
   { mime = "{audio,video,image}/*", run = "mediainfo" },

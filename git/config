@@ -1,7 +1,7 @@
 [include]
-	path = ~/.config/git/user.gitconfig
-	path = ~/.config/git/delta.gitconfig
-	path = ~/.config/git/aliases.gitconfig
+	 path = user.gitconfig
+	 path = delta.gitconfig
+	 path = aliases.gitconfig
 
 [core]
 	editor = nvim
@@ -21,9 +21,13 @@
 	autoSetupRemote = true
 	followTags = true
 
+[merge]
+  ff = false
+  conflictStyle = zdiff3
+
 [rebase]
-	authStash = true
-	autoSquah = true
+	authstash = true
+	autosquash = true
 	updateRefs = true
 
 [credential]

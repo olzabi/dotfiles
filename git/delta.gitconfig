@@ -1,13 +1,14 @@
+[include]
+  path = darkvoid.gitconfig
+
 [core]
   pager = delta
 
 [delta]
   navigate = true
-  side-by-side = false
   line-numbers = true
   decorations = true
   white-space-error-style = 22 reverse
-  features = decorations
 
 [pager]
   diff = delta
@@ -15,11 +16,6 @@
   reflog = delta
   show = delta
 
-[merge]
-  ff=false
-  conflictStyle = zdiff3
-
 [interactive]
   diffFilter = delta --color-only --features=interactive
 
-# vim: filetype=gitconfig

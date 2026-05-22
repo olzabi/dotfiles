@@ -48,7 +48,6 @@ plugins=(
   gh
   git
   git-auto-fetch
-  git-commit
   git-escape-magic
   git-extras
   gitfast
@@ -104,7 +103,7 @@ export RUST_SRC_PATH="$(rustc --print sysroot)/lib/rustlib/src/rust/src"
 [ -x "$(command -v gh)" ]     && eval "$(gh enhance completion zsh)"
 eval "$(rbenv init -)"
 
-export NVM_DIR="$DOTFILES_PATH/tools/nvm"
+export NVM_DIR="$DOTFILES_TOOLS/nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
 

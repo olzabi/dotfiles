@@ -42,4 +42,5 @@ zsh/.oh-my-zsh/*
 !tools/.*/.git
 tools/.*
 
+user.gitconfig
 
