@@ -28,6 +28,7 @@ foo.*
 data
 .venv
 node_modules
+bun.lock
 
 TODO.md
 TODO*

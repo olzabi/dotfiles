@@ -11,6 +11,28 @@
   ],
   "mcp": {},
   "tools": {},
-  "permission": {},
-  "provider": {}
+  "permission": {
+    "*": "ask",
+    "read": {
+      "*": "allow",
+      "*.env.*": "deny",
+      ".env.example": "deny"
+    },
+    "write": "allow",
+    "grep": "allow",
+    "list": "allow",
+    "glob": "allow",
+    "edit":"allow",
+    "bash":"ask",
+    "webfetch": "allow"
+  },
+  "provider": {
+    "ollama": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "ollama (local)",
+      "options": {
+        "baseURL": "http://localhost:11434/v1"
+      }
+    }
+  }
 }

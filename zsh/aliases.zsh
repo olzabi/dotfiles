@@ -13,6 +13,7 @@ alias td='sesh connect default'
 alias monkey='smassh' # inspired by monkeytype
 alias cal="calcurse"
 alias oc="opencode"
+alias hs='history | grep'
 
 #* git
 # ---------

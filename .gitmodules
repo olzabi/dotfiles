@@ -40,3 +40,9 @@
 [submodule "tools/nvm"]
 	path = tools/nvm
 	url = https://github.com/nvm-sh/nvm.git
+[submodule "tools/.fzf"]
+	path = tools/.fzf
+	url = https://github.com/junegunn/fzf.git
+[submodule "zsh/custom/plugins/zsh-autopair"]
+	path = zsh/custom/plugins/zsh-autopair
+	url = https://github.com/hlissner/zsh-autopair

@@ -15,15 +15,16 @@ export DOTFILES_AI="$DOTFILES/ai"
 export DEV="$HOME/dev"
 export YAZI_CONFIG_HOME="$DOTFILES/yazi"
 export BAT_CONFIG_DIR="$DOTFILES_TOOLS/bat"
+export STARSHIP_CONFIG="$DOTFILES/zsh/starship.toml"
 
 _prepend_path() { case ":$PATH:" in *":$1:"*) ;; *) export PATH="$1:$PATH" ;; esac }
 _append_path()  { case ":$PATH:" in *":$1:"*) ;; *) export PATH="$PATH:$1" ;; esac }
 
 _append_path "/opt/nvim-linux-x86_64/bin"
 _prepend_path "$XDG_LOCAL_HOME/bin"
-_append_path "$FZF_BASE/bin"
 _prepend_path "/usr/local/cuda/bin"
 _prepend_path "/usr/lib/jvm/default-java/bin"
+_prepend_path "$DOTFILES_TOOLS/.fzf/bin"
 
 export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig
 export ZSH="$DOTFILES/zsh/.oh-my-zsh"
@@ -39,7 +40,7 @@ fi
 
 #* history
 # ---------
-export HIST_DIR="$XDG_DATA_HOME/histfiles"
+export HIST_DIR="$XDG_LOCAL_HOME/histfiles"
 if [[ ! -d "$HIST_DIR" ]]; then
   mkdir -p "$HIST_DIR"
   touch "$HIST_DIR/.zsh_history" \
@@ -129,11 +130,10 @@ export RIPGREP_CONFIG_PATH="$DOTFILES/.ripgreprc"
 export YAMLLINT_CONFIG_FILE="$DOTFILES_TOOLS/yamllint/.yamllint.yml"
 export ZELLIJ_CONFIG_DIR="$DOTFILES_EDITOR/zellij"
 export RBENV_ROOT="$DOTFILES_TOOLS/.rbenv"
-
 _prepend_path "$RBENV_ROOT/bin"
+
 # ---------
 
-# export FZF_BASE="$DOTFILES/zsh/custom/plugins/fzf"
 # export AWS_HOME="$DOTFILES/aws"
 # export AWS_CONFIG_FILE="$AWS_HOME/config"
 # export AWS_SHARED_CREDENTIALS_FILE="$AWS_HOME/credentials"

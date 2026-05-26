@@ -1,0 +1,13 @@
+{
+  "name": "dotfiles",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "symlinks": "bin/symlinks.sh",
+    "submodule:init": "git submodule update --init --recursive --jobs 8",
+    "submodules:update": "git submodule update --remote --merge --jobs 8"
+  },
+  "keywords": [
+    "dotfiles"
+  ]
+}

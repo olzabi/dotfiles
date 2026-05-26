@@ -1,10 +1,7 @@
 #!/bin/bash
 
-# Get the absolute path of thedirectory where the script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
 CONFIG_FILE="$SCRIPT_DIR/../symlinks.conf"
-
 . "$SCRIPT_DIR/utils.sh"
 
 if [ ! -f "$CONFIG_FILE" ]; then
@@ -15,43 +12,43 @@ fi
 create_symlinks() {
   info "Creating symbolic links..."
 
-  # Read dotfile links from the config file
   while IFS=: read -r source target || [ -n "$source" ]; do
-
-    # Skip empty or invalid lines in the config file
     if [[ -z "$source" || -z "$target" || "$source" == \#* ]]; then
       continue
     fi
 
-    # Evaluate variables
     source=$(eval echo "$source")
     target=$(eval echo "$target")
 
-    # Check if the source file exists
     if [ ! -e "$source" ]; then
-      error "Error: Source file '$source' not found. Skipping link creation for '$target'."
+      error "Source not found: '$source' — skipping '$target'."
       continue
     fi
 
-    # Check if the symbolic link already exists
     if [ -L "$target" ]; then
-      warning "Symbolic link already exists: $target"
-    elif [ -f "$target" ]; then
-      warning "File already exists: $target"
-    else
-      # Extract the directory portion of the target path
-      target_dir=$(dirname "$target")
-
-      # Check if the target directory exists, and if not, create it
-      if [ ! -d "$target_dir" ]; then
-        mkdir -p "$target_dir"
-        info "Created directory: $target_dir"
+      existing=$(readlink "$target")
+      if [ "$existing" = "$source" ]; then
+        info "Already linked: $target → $source"
+      else
+        warning "Symlink exists but points elsewhere: $target → $existing (expected $source)"
       fi
-
-      # Create the symbolic link
-      ln -s "$source" "$target"
-      success "Created symbolic link: $target"
+      continue
     fi
+
+    if [ -e "$target" ]; then
+      warning "File or directory already exists (not a symlink): $target"
+      continue
+    fi
+
+    target_dir=$(dirname "$target")
+    if [ ! -d "$target_dir" ]; then
+      mkdir -p "$target_dir"
+      info "Created directory: $target_dir"
+    fi
+
+    ln -s "$source" "$target"
+    success "Created symlink: $target → $source"
+
   done <"$CONFIG_FILE"
 }
 
@@ -59,27 +56,25 @@ delete_symlinks() {
   info "Deleting symbolic links..."
 
   while IFS=: read -r _ target || [ -n "$target" ]; do
-
-    # Skip empty and invalid lines
     if [[ -z "$target" ]]; then
       continue
     fi
 
-    # Evaluate variables
     target=$(eval echo "$target")
 
-    # Check if the symbolic link or file exists
-    if [ -L "$target" ] || { [ "$include_files" == true ] && [ -f "$target" ]; }; then
-      # Remove the symbolic link or file
+    if [ -L "$target" ]; then
+      rm "$target"
+      success "Deleted symlink: $target"
+    elif [ "$include_files" == true ] && [ -f "$target" ]; then
       rm -rf "$target"
-      success "Deleted: $target"
+      success "Deleted file: $target"
     else
-      warning "Not found: $target"
+      warning "Not found (or not a symlink): $target"
     fi
   done <"$CONFIG_FILE"
 }
 
-# shellcheck disable=SC2317  # functions are called via case dispatch below
+# shellcheck disable=SC2317
 if [ "$(basename "$0")" = "$(basename "${BASH_SOURCE[0]}")" ]; then
   case "$1" in
   "--create")
@@ -95,7 +90,7 @@ if [ "$(basename "$0")" = "$(basename "${BASH_SOURCE[0]}")" ]; then
     echo "Usage: $0 [--create | --delete [--include-files] | --help]"
     ;;
   *)
-    error "Error: Unknown argument '$1'"
+    error "Unknown argument: '$1'"
     error "Usage: $0 [--create | --delete [--include-files] | --help]"
     exit 1
     ;;

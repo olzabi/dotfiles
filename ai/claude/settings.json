@@ -1,0 +1,48 @@
+{
+  "includeCoAuthoredBy": false,
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(cat:*)",
+      "Bash(ls:*)",
+      "Bash(rg:*)",
+      "Bash(which:*)",
+      "Bash(pwd)",
+      "Bash(touch:*)",
+      "Bash(gh:*)",
+      "Bash(git status)",
+      "Bash(git stash:*)",
+      "Bash(git diff:*)",
+      "Bash(git diff --stat)",
+      "Bash(git log:*)",
+      "Bash(git log --oneline 5)",
+      "Bash(git show:*)",
+      "Bash(npm run)",
+      "Read",
+      "Write",
+      "Read(./**)",
+      "Grep",
+      "WebSearch",
+      "WebFetch(domain:docs.anthropic.com)",
+      "WebFetch(domain:docs.claude.com)",
+      "WebFetch(domain:github.com)"
+    ],
+    "deny": [
+      "Read(**/id_dsa*)",
+      "Read(**/id_ecdsa*)",
+      "Read(**/id_ed25519*)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(**/.envrc)",
+      "Read(**/*.secrets)",
+      "Read(**/.*env)",
+      "Read(**/.aws/credentials*)",
+      "Read(**/*.env)",
+      "Read(**/*.key)",
+      "Read(**/id_rsa*)"
+    ],
+    "defaultMode": "default"
+  },
+  "tui": "default",
+  "theme": "custom:darkvoid"
+}

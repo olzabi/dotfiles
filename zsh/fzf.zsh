@@ -1,23 +1,21 @@
-export FZF_DEFAULT_COMMAND='rg --follow --hidden \
-  --glob "!{.git,node_modules,target,bzl-build,.svn}/**" \
-  --glob "!*.{lock,svg,ttf}" \
-  --glob "!package-lock.json"'
-
+export FZF_DEFAULT_COMMAND='rg --files'
 export FZF_DEFAULT_OPTS="
   --color=bg:#1c1c1c,bg+:#303030,gutter:#1c1c1c
   --color=fg:#c0c0c0,fg+:#f1f1f1
   --color=hl:#1bfd9c,hl+:#bdfe58
-  --color=info:#585858,border:#404040,separator:#404040
-  --color=prompt:#1bfd9c,pointer:#bdfe58,marker:#bdfe58
+  --color=info:#585858,border:#585858,separator:#404040
+  --color=prompt:#1bfd9c,pointer:#bdfe58,marker:#1bfd9c
   --color=spinner:#1bfd9c,header:#585858,label:#585858
-  --color=query:#d1d1d1,scrollbar:#404040
+  --color=query:#d1d1d1,scrollbar:#404040,preview-bg:#1c1c1c
+  --color=preview-border:#585858,preview-label:#585858
+  --color=selected-bg:#303030,selected-fg:#f1f1f1
   --border=rounded
   --prompt='❯ ' --pointer='▌' --marker='●'
   --separator='╌' --scrollbar='▐'
   --layout=reverse --height=60%
   --info=right
   --preview-window=right:55%:border-left:wrap
-  --preview='bat --color=always --style=numbers,changes --line-range :200 {}'
+  --preview='cat --color=always --style=numbers,changes --line-range :200 {}'
   --bind='ctrl-p:toggle-preview'
   --bind='ctrl-/:change-preview-window(right:70%|right:30%|hidden)'
   --bind='ctrl-y:execute-silent(echo {} | wl-copy)'
@@ -51,15 +49,14 @@ export FZF_ALT_C_OPTS="
 rg-fzf() {
   local RG_PREFIX="rg --column --line-number --no-heading --color=always --smart-case"
   local INITIAL_QUERY="${*:-}"
-
   fzf --ansi --disabled --query "$INITIAL_QUERY" \
     --bind "start:reload:$RG_PREFIX {q}" \
     --bind "change:reload:sleep 0.1; $RG_PREFIX {q} || true" \
     --bind "ctrl-f:unbind(change,ctrl-f)+change-prompt(fzf ❯ )+enable-search+clear-query" \
-    --color "hl:-1:underline,hl+:-1:underline:reverse" \
+    --color "hl:#1bfd9c:underline,hl+:#bdfe58:underline:reverse" \
     --prompt 'rg ❯ ' \
     --delimiter : \
-    --preview 'bat --color=always {1} --highlight-line {2} --style=numbers,changes' \
+    --preview 'cat --color=always {1} --highlight-line {2} --style=numbers,changes' \
     --preview-window 'right:55%:border-left:+{2}+3/3:wrap' \
     --header 'ctrl-f: switch to fzf mode' \
     | awk -F: '{print $1" +"$2}' \
@@ -67,5 +64,30 @@ rg-fzf() {
 }
 
 bindkey -s '^G' 'rg-fzf\n'
+
+fcd() {
+  local dir
+  dir=$(zoxide query --list --score | awk '{print $2}' | \
+    fzf --height=40% --layout=reverse \
+        --preview='eza --tree --level=2 --color=always {}' \
+        --preview-window='right:40%:border-left' \
+        --scheme=history)
+  if [[ -n "$dir" ]]; then
+    cd "$dir"
+    zle reset-prompt
+  fi
+  zle redisplay
+}
+zle -N fcd
+bindkey '^F' fcd
+
+ts() {
+  local session
+  session=$(tmux list-sessions -F '#{session_name}' 2>/dev/null | \
+    fzf --layout=reverse --height=30% \
+        --preview='tmux list-windows -t {} 2>/dev/null' \
+        --preview-window='right:40%:border-left') && \
+  tmux switch-client -t "$session" 2>/dev/null || tmux attach -t "$session"
+}
 
 

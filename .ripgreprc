@@ -4,4 +4,3 @@
 --glob=!*.{lock,svg,ttf,woff,woff2,eot}
 --glob=!package-lock.json
 --glob=!*.min.{js,css}
-

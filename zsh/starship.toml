@@ -1,0 +1,188 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+format = """
+[╭─](fg:#404040)\
+$os\
+$username\
+$hostname\
+$directory\
+$git_branch\
+$git_status\
+$git_state\
+$fill\
+$nodejs\
+$python\
+$rust\
+$golang\
+$lua\
+$docker_context\
+$terraform\
+$package\
+$nix_shell\
+$cmd_duration\
+$jobs\
+$battery\
+$time\
+[─╮](fg:#404040)
+[╰─](fg:#404040)\
+$character"""
+
+right_format = ""
+
+add_newline = true
+
+palette = "darkvoid"
+
+[palettes.darkvoid]
+bg         = "#1c1c1c"
+fg         = "#c0c0c0"
+fg_bright  = "#e1e1e1"
+fg_dim     = "#b1b1b1"
+comment    = "#585858"
+line_nr    = "#404040"
+visual     = "#303030"
+cursor     = "#bdfe58"       # yellow-green accent
+glow       = "#1bfd9c"       # neon mint accent
+bool_blue  = "#66b2b2"
+const      = "#b2d8d8"
+added      = "#baffc9"
+changed    = "#ffffba"
+removed    = "#ffb3ba"
+error      = "#dea6a0"
+warning    = "#d6efd8"
+hint       = "#bedc74"
+info       = "#7fa1c3"
+border     = "#585858"
+title      = "#bdfe58"
+
+[os]
+disabled = false
+format = "[$symbol]($style) "
+style = "fg:fg_dim"
+
+[os.symbols]
+Arch      = ""
+Debian    = ""
+Fedora    = ""
+Macos     = ""
+NixOS     = ""
+Ubuntu    = ""
+Windows   = ""
+Unknown   = ""
+
+[username]
+show_always = false
+format      = "[$user]($style)[@](fg:border)"
+style_user  = "bold fg:fg_bright"
+style_root  = "bold fg:removed"
+
+[hostname]
+ssh_only  = true
+format    = "[$hostname](fg:const) "
+style     = "fg:const"
+
+[directory]
+format            = "[ ](fg:comment)[$path](bold fg:fg_bright)[$read_only](fg:warning) "
+truncation_length = 3
+truncate_to_repo  = true
+read_only         = " 󰌾"
+
+[directory.substitutions]
+"~" = "󰜛 "
+
+[git_branch]
+format = "[  ](fg:border)[$branch(:$remote_branch)](bold fg:cursor) "
+
+[git_status]
+format    = "([$all_status$ahead_behind](fg:fg_dim) )"
+style     = "fg:fg_dim"
+ahead     = "[⇡${count}](fg:glow)"
+behind    = "[⇣${count}](fg:info)"
+diverged  = "[⇕⇡${ahead_count}⇣${behind_count}](fg:warning)"
+conflicted= "[󰞇 ${count}](fg:removed)"
+untracked = "[?${count}](fg:comment)"
+stashed   = "[\\$$count](fg:const)"
+modified  = "[!${count}](fg:changed)"
+staged    = "[+${count}](fg:added)"
+deleted   = "[-${count}](fg:removed)"
+renamed   = "[»${count}](fg:hint)"
+
+[git_state]
+format = "[$state( $progress_current/$progress_total)](fg:warning) "
+
+[fill]
+symbol = "─"
+style  = "fg:line_nr"
+
+[cmd_duration]
+min_time           = 2_000
+format             = "[ 󱦟 $duration]($style) "
+style              = "fg:fg_dim"
+show_milliseconds  = false
+
+[jobs]
+symbol   = "󰒓"
+format   = "[$symbol $number]($style) "
+style    = "fg:info"
+threshold= 1
+
+[time]
+disabled  = false
+format    = "[󱑃 $time](fg:comment) "
+time_format = "%H:%M"
+
+[character]
+success_symbol = "[❯](bold fg:glow)"
+error_symbol   = "[❯](bold fg:removed)"
+vimcmd_symbol  = "[❮](bold fg:cursor)"
+
+# ── Language / Tool Versions ───────────────────────────────────────────────────
+[nodejs]
+format  = "[$symbol$version](fg:fg_dim) "
+
+[python]
+format  = "[$symbol${pyenv_prefix}${version}( \\($virtualenv\\))](fg:fg_dim) "
+
+[rust]
+format  = "[$symbol$version](fg:fg_dim) "
+
+[golang]
+format  = "[$symbol$version](fg:fg_dim) "
+
+[lua]
+format  = "[$symbol$version](fg:fg_dim) "
+
+[ruby]
+format  = "[$symbol$version](fg:fg_dim) "
+
+[java]
+format  = "[$symbol$version](fg:fg_dim) "
+
+[kotlin]
+format  = "[$symbol$version](fg:fg_dim) "
+
+[swift]
+format  = "[$symbol$version](fg:fg_dim) "
+
+[c]
+format  = "[$symbol$version](fg:fg_dim) "
+
+[zig]
+format  = "[$symbol$version](fg:fg_dim) "
+
+[docker_context]
+format  = "[$symbol$context](fg:info) "
+
+[terraform]
+format  = "[$symbol$version $workspace](fg:fg_dim) "
+
+[kubernetes]
+format   = "[$symbol$context](fg:info) "
+disabled = false
+
+[package]
+format  = "[$symbol$version](fg:fg_dim) "
+
+[nix_shell]
+format = "[ $symbol$state( \\($name\\))](fg:info) "
+symbol = "󱄅"
