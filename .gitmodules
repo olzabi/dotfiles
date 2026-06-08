@@ -46,3 +46,24 @@
 [submodule "zsh/custom/plugins/zsh-autopair"]
 	path = zsh/custom/plugins/zsh-autopair
 	url = https://github.com/hlissner/zsh-autopair
+[submodule "tools/act"]
+	path = tools/act
+	url = git@github.com:nektos/act.git
+[submodule "tools/calcurse"]
+	path = tools/calcurse
+	url = git@github.com:lfos/calcurse.git
+[submodule "tools/lazyactions"]
+	path = tools/lazyactions
+	url = git@github.com:nnnkkk7/lazyactions.git
+[submodule "tools/LightRAG"]
+	path = tools/LightRAG
+	url = git@github.com:HKUDS/LightRAG.git
+[submodule "tools/llama.cpp"]
+	path = tools/llama.cpp
+	url = git@github.com:ggml-org/llama.cpp.git
+[submodule "tools/tmux"]
+	path = tools/tmux
+	url = git@github.com:tmux/tmux.git
+[submodule "tools/zmk-config"]
+	path = tools/zmk-config
+	url = git@github.com:olzabi/zmk-config.git

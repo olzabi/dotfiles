@@ -19,12 +19,6 @@ return {
       end
 
       lint.linters_by_ft = {
-        javascript = { "eslint_d" },
-        typescript = { "eslint_d" },
-        javascriptreact = { "eslint_d" },
-        typescriptreact = { "eslint_d" },
-        json = { "eslint_d" },
-
         go = { "golangcilint" },
         rust = { "clippy" },
 
@@ -236,6 +230,17 @@ return {
         ["markdown.mdx"] = { "prettier", "markdownlint-cli2", "markdown-toc" },
       },
     },
+    config = function(_, opts)
+      local conform = require "conform"
+      conform.setup(opts)
+
+      vim.api.nvim_create_autocmd("BufWritePre", {
+        pattern = "*.go",
+        callback = function()
+          conform.format { bufnr = vim.api.nvim_get_current_buf(), timeout_ms = 3000 }
+        end,
+      })
+    end,
     keys = {
       -- stylua: ignore start
       { "<leader>cp", function() require("conform").format { notify_on_error = true, async = true, lsp_fallback = true } end, mode = { "n", "v" }, desc = "Format", },

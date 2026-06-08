@@ -71,7 +71,7 @@ return {
         completeUnimported = true,
         semanticTokens = true,
         directoryFilters = { "-.git", "-.vscode", "-.idea", "-node_modules" },
-        analyses = { unusedparams = true },
+        analyses = { unusedparams = true, shadow = true, fieldalignment = true },
         codelenses = {
           generate = true,
           tidy = true,

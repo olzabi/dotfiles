@@ -22,6 +22,8 @@ alias gf='git fuzzy'
 alias ld="lazydocker"
 alias lg='lazygit'
 alias lq='lazysql'
+alias la='lazyactions'
+alias lr='posting'
 
 # ---------
 alias clearswap="sudo swapoff -a && sudo swapon -a"

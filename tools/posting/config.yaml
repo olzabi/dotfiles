@@ -1,0 +1,5 @@
+theme: darkvoid
+layout: vertical
+keymap:
+  send-request: ctrl+enter
+  new-request: alt+N

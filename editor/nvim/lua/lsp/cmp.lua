@@ -23,8 +23,13 @@ return {
       {
         "windwp/nvim-autopairs",
         event = "InsertEnter",
-        config = true,
-        opts = {},
+        opts = {
+          check_ts = true,
+          enable_check_bracket_line = true,
+          ts_config = {
+            javascript = { "string", "template_string" },
+          },
+        },
       },
       {
         "saghen/blink.compat",
@@ -76,19 +81,28 @@ return {
             },
             components = {
               kind_icon = {
-                text = function(ctx) return " " .. ctx.kind_icon .. " " end,
-                highlight = function(ctx) return "BlinkCmpKindIcon" .. ctx.kind end,
+                text = function(ctx)
+                  return " " .. ctx.kind_icon .. " "
+                end,
+                highlight = function(ctx)
+                  return "BlinkCmpKindIcon" .. ctx.kind
+                end,
               },
-              kind = { text = function(ctx)return" " .. ctx.kind .. " "end,  },
+              kind = {
+                text = function(ctx)
+                  return " " .. ctx.kind .. " "
+                end,
+              },
             },
           },
         },
       },
       sources = {
-        default = { "lsp", "snippets", "path", "buffer", "lazydev", "dictionary" },
+        default = { "lsp", "snippets", "path", "buffer", "lazydev" },
         per_filetype = {
           sql = { "buffer" },
-          gitcommit = { "git", "buffer" },
+          markdown = { "lsp", "snippets", "path", "buffer", "dictionary" },
+          gitcommit = { "git", "buffer", "dictionary" },
           gitrebase = { "git", "buffer" },
         },
         providers = {

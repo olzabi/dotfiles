@@ -25,7 +25,7 @@ M.vtsls = {
     },
     typescript = {
       preferences = {
-        importModuleSpecifier = "non-relative",
+        importModuleSpecifier = "shortest",
         updateImportsOnFileMove = { enabled = "always" },
       },
     },

@@ -84,10 +84,7 @@ return {
           if c:supports_method "textDocument/inlayHint" then
             vim.lsp.inlay_hint.enable(true, { bufnr = buf })
           end
-          if c.supports_method "workspace/diagnostic" then
-            vim.lsp.buf.workspace_diagnostics()
-          end
-          if c.supports_method "textDocument/documentHighlight" then
+          if c:supports_method "textDocument/documentHighlight" then
             cursor_highlight(buf)
           end
 

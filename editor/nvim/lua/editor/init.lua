@@ -47,7 +47,12 @@ return {
       },
     },
     config = function()
-      require("grug-far").setup()
+      require("grug-far").setup({
+        startInInsertMode = false,
+        prefills = {
+          flags = "--smart-case --no-ignore --hidden",
+        },
+      })
     end,
   },
 

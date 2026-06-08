@@ -12,9 +12,9 @@ export OLLAMA_HOST="${OLLAMA_HOST:-0.0.0.0:11434}"
 export OLLAMA_TIMEOUT_MS=10000
 export OLLAMA_KEEP_ALIVE=10m
 
-export ANTHROPIC_AUTH_TOKEN="ollama"
-export ANTHROPIC_API_KEY="local"
-export ANTHROPIC_BASE_URL="${LOCAL_HOST}"
+# export ANTHROPIC_AUTH_TOKEN="ollama"
+# export ANTHROPIC_API_KEY="local"
+# export ANTHROPIC_BASE_URL="${LOCAL_HOST}"
 
 _prepend_path "$OPENCODE_CONFIG_DIR/bin"
 _prepend_path /usr/bin:$PATH

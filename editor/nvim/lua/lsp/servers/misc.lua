@@ -45,10 +45,6 @@ M.yamlls = {
       format = { enable = true },
     },
   },
-  -- yamlls benefits from autotrigger completion; also chain the global on_attach.
-  on_attach = function(client, bufnr)
-    vim.lsp.completion.enable(true, client.id, bufnr, { autotrigger = true })
-  end,
 }
 
 return M
