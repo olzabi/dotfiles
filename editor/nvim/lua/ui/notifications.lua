@@ -139,8 +139,7 @@ return {
     },
     keys = {
       -- stylua: ignore start
-      { "<leader>nh", function() Snacks.picker.notifications() end, desc = "Notifications" },
-      { "<leader>nH", function() Snacks.notifier.show_history() end, desc = "Notifications (buffer)" },
+      { "<leader>nh", function() Snacks.notifier.show_history() end, desc = "Notifications" },
       { "<leader>nn", "<cmd>NoiceDismiss<cr>", desc = "Dismiss" },
       { "<leader>nl", "<cmd>Noice last<cr>", desc = "Last message" },
       -- stylua: ignore end

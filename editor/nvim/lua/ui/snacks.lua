@@ -1,36 +1,11 @@
-local function session_finder()
-  local dir = vim.fn.stdpath "state" .. "/sessions/"
-  local files = vim.fn.glob(dir .. "*.vim", false, true)
-  local items = {}
-  for _, f in ipairs(files) do
-    local name = vim.fn.fnamemodify(f, ":t")
-    local readable = name:gsub("%%", "/"):gsub("%.vim$", "")
-    table.insert(items, { text = readable, file = f })
-  end
-  return items
-end
-
-local session_layout = {
-  preset = "select",
-  preview = false,
-}
-
-local function session_format(item)
-  return { { item.text, "SnacksPickerLabel" } }
-end
-
 return {
   {
     "folke/snacks.nvim",
     lazy = false,
     priority = 1000,
-    dependencies = {
-      "gbprod/yanky.nvim",
-      "folke/todo-comments.nvim",
-    },
 
     -- stylua: ignore start
-      opts = {
+    opts = {
       bigfile   = { enabled = true, notify = false, size = 1.5 * 1024 * 1024 },
       indent    = { enabled = true },
       input     = { enabled = true },
@@ -67,99 +42,7 @@ return {
         end,
       },
 
-      picker = {
-        enabled = true,
-        ui_select = true,
-        layout = { cycle = true, preset = "vertical" },
-        previewers = {},
-        layouts = {
-          dropdown = {
-            layout = {
-              backdrop = false,
-              row = 1,
-              width = 0.4,
-              min_width = 80,
-              height = 0.8,
-              border = "none",
-              box = "vertical",
-              { win = "preview", title = "{preview}", height = 0.4, border = "rounded" },
-              {
-                box = "vertical",
-                border = "rounded",
-                title = "{title} {live} {flags}",
-                title_pos = "center",
-                { win = "input", height = 1,     border = "bottom" },
-                { win = "list",  border = "none" },
-              },
-            },
-          },
-          vertical = {
-            layout = {
-              box = "vertical",
-              width = 0.8,
-              min_width = 120,
-              height = 0.8,
-              min_height = 10,
-              { win = "input",   height = 1,          border = "rounded" },
-              { win = "list",    title = "{title}",   border = "rounded" },
-              { win = "preview", title = "{preview}", border = "rounded" },
-            },
-          },
-          explorer = {
-            fullscreen = true,
-            preview = true,
-            layout = {
-              backdrop = true,
-              width = 40,
-              min_width = 40,
-              height = 0,
-              position = "right",
-              border = "none",
-              box = "vertical",
-              { win = "input", height = 1, border = "rounded", title = "{title} {live} {flags}", title_pos = "center" },
-              { win = "list",  border = "none" },
-            },
-          },
-        },
-        projects = {
-          pattern = { ".git", "package.json" }
-        },
-        matcher = {
-          fuzzy = true,
-          smartcase = true,
-          ignorecase = true,
-          filename_bonus = true,
-          frecency = true,
-        },
-        exclude = { ".git", "node_modules" },
-        sources = {
-          persistence_delete = {
-            title = "Delete Session",
-            finder = session_finder,
-            format = session_format,
-            layout = session_layout,
-            confirm = function(picker, item)
-              picker:close()
-              if item then
-                vim.fn.delete(item.file)
-                vim.notify("Deleted: " .. item.text)
-              end
-            end,
-          },
-          persistence_load = {
-            title = "Load Session",
-            finder = session_finder,
-            format = session_format,
-            layout = session_layout,
-            confirm = function(picker, item)
-              picker:close()
-              if item then
-                require("persistence").load({ session = item.file })
-              end
-            end,
-          },
-        },
-      },
+      picker = { enabled = true, ui_select = true },
       styles = {
         terminal = {
           relative = "editor",
@@ -173,7 +56,7 @@ return {
         notification_history = {
           border = "rounded",
           zindex = 100,
-          width  = 0.6,
+          width = 0.6,
           height = 0.6,
           minimal = false,
           title = " Notification History ",
@@ -182,7 +65,7 @@ return {
           bo = {
             filetype = "snacks_notif_history",
             modifiable = true,
-            readonly = true
+            readonly = true,
           },
           keys = { q = "close" },
         },
@@ -190,20 +73,8 @@ return {
     },
 
     keys = {
-      { ";;",         function() Snacks.picker.grep() end,                                                                                   desc = "Grep" },
-      { ";<leader>",  function() Snacks.picker.smart() end,                                                                                  desc = "Smart find files" },
-      { "<leader>hp", function() Snacks.picker.yanky() end,                                                                                  mode = { "n", "x" }, desc = "Yank history" },
-      { "<leader>sw", function() Snacks.picker.grep_word() end,                                                                              mode = { "n", "x" }, desc = "Visual selection or word" },
-      { "<leader>hu", function() Snacks.picker.undo() end,                                                                                   desc = "Undo history" },
-      { "<leader>bd", function() Snacks.bufdelete() end,                                                                                     desc = "Delete buffer" },
-      { '<leader>"',  function() Snacks.picker.registers() end,                                                                              desc = "Registers" },
-      { ";ff",        function() Snacks.picker.files() end,                                                                                  desc = "Find files" },
-      { ";q",         function() Snacks.picker.qflist() end,                                                                                 desc = "Quickfix list" },
-      { ";m",         function() Snacks.picker.marks() end,                                                                                  desc = "Marks" },
-      { ";P",         function() Snacks.picker.projects() end,                                                                               desc = "Projects" },
-      { ";s<leader>", function() Snacks.scratch.select() end,                                                                                desc = "Select scratch" },
-      { ";r",         function() Snacks.picker.recent() end,                                                                                 desc = "Recent files" },
-      { ";xT",        function() Snacks.picker.todo_comments({ keywords = { "TODO", "FIX", "WARN", "HACK", "PERF", "NOTE", "TEST" } }) end, desc = "Todo/Fix/Fixme" },
+      { "<leader>bd", function() Snacks.bufdelete() end,      desc = "Delete buffer" },
+      { ";s<leader>", function() Snacks.scratch.select() end, desc = "Select scratch" },
     },
     -- stylua: ignore end
 

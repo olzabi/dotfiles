@@ -28,7 +28,6 @@ return {
   },
 
   {
-    -- TODO:
     "linux-cultist/venv-selector.nvim",
     enabled = false,
     branch = "regexp",

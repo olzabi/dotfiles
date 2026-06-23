@@ -18,7 +18,6 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup {
   spec = {
-    { import = "ai" },
     { import = "editor" },
     { import = "lsp" },
     { import = "lsp.languages" },

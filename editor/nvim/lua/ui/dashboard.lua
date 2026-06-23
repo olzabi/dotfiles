@@ -106,9 +106,9 @@ return {
       end
       local function buttons()
         return {
-        dashboard.button("<leader><leader>", "  > Smart", "<cmd>lua Snacks.picker.smart()<cr>"),
-        dashboard.button("p", "󰥨  > Projects", "<cmd>lua Snacks.picker.projects()<cr>"),
-        dashboard.button("r", "  > Recent files", "<cmd>lua Snacks.picker.recent()<cr>"),
+        dashboard.button("<leader><leader>", "  > Files", "<cmd>lua require('fff').find_files()<cr>"),
+        dashboard.button("g", "󰱼  > Grep", "<cmd>lua require('fff').live_grep()<cr>"),
+        dashboard.button("r", "  > Resume files", "<cmd>lua require('fff').find_files({ resume = true })<cr>"),
         dashboard.button("s", "  > Restore Session", "<cmd>lua require('persistence').load()<cr>"),
         dashboard.button("S", "  > Last Session", "<cmd>lua require('persistence').load({ last = true })<cr>"),
         dashboard.button("c", "  > Configuration", string.format("<cmd>e %s<cr>", config_dir)),

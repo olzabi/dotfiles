@@ -67,3 +67,6 @@
 [submodule "tools/zmk-config"]
 	path = tools/zmk-config
 	url = git@github.com:olzabi/zmk-config.git
+[submodule "tools/cargo"]
+	path = tools/cargo
+	url = https://github.com/rust-lang/cargo.git

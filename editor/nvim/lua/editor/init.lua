@@ -3,27 +3,38 @@ return {
     "folke/persistence.nvim",
     event = "BufReadPre",
     opts = {
+      dir = vim.fn.stdpath("state") .. "/sessions/",
+      need = 1,
       branch = true,
-      dir = vim.fn.stdpath "state" .. "/sessions/",
     },
     keys = {
       -- stylua: ignore start
       { ";qs", function()
         require("persistence").load()
-      end, desc = "Restore Session", },
+      end, desc = "Restore Session" },
+      { ";qS", function()
+        require("persistence").select()
+      end, desc = "Select Session" },
       { ";ql", function()
-        require("persistence").load { last = true }
-      end, desc = "Restore Last Session", },
-      { ";qd", function() require("persistence").stop() end, desc = "Don't Save Session", },
+        require("persistence").load({ last = true })
+      end, desc = "Restore Last Session" },
+      { ";qw", function()
+        require("persistence").save()
+      end, desc = "Save Session" },
+      { ";qr", function()
+        require("persistence").start()
+      end, desc = "Resume Session Saving" },
+      { ";qd", function()
+        require("persistence").stop()
+      end, desc = "Stop Session Saving" },
       { ";qx", function()
-        local path = vim.fn.glob(vim.fn.stdpath("state") .. "/sessions/.vim", true, true)
-        for _, file in ipairs(path) do
+        local dir = vim.fn.stdpath("state") .. "/sessions/"
+        local files = vim.fn.glob(dir .. "*.vim", false, true)
+        for _, file in ipairs(files) do
           vim.fn.delete(file)
         end
-        vim.notify("All sessions deleted", vim.log.levels.INFO)
-      end, desc = "Don't Save Session", },
-      { ";qD", function() Snacks.picker("persistence_delete") end, desc = "Delete a Session" },
-      { ";qS", function() Snacks.picker("persistence_load") end,   desc = "Select Session" },
+        vim.notify(("Deleted %d sessions"):format(#files), vim.log.levels.INFO)
+      end, desc = "Delete All Sessions" },
       -- stylua: ignore end
     },
   },

@@ -1,0 +1,91 @@
+[env]
+TERM = "xterm-256color"
+
+[terminal]
+osc52 = "CopyPaste"
+
+[terminal.shell]
+program = "wsl.exe"
+args = [
+  "~",
+  "-e",
+  "tmux", "new", "-A", "-s", "main"
+]
+
+[font]
+size = 12.0
+
+[font.glyph_offset]
+x = 0
+y = 0
+
+[font.offset]
+x = -1
+y = -1
+
+[font.normal]
+family = "JetBrainsMono Nerd Font"
+# family = "FiraCode Nerd Font"
+style = "Medium"
+
+[scrolling]
+history = 10000
+multiplier = 1
+
+[cursor]
+unfocused_hollow = true
+vi_mode_style = "Block"
+
+[selection]
+save_to_clipboard = true
+semantic_escape_chars = ",│`|:\"' ()[]{}<>"
+
+[window]
+opacity = 0.9
+dynamic_padding = false
+dynamic_title = false
+# decorations = "none"
+
+[window.padding]
+x = 2
+y = 2
+
+[window.dimensions]
+columns = 180
+lines = 20
+
+[colors.primary]
+background = "#1c1c1c"
+foreground = "#c0c0c0"
+
+[colors.cursor]
+text   = "#1c1c1c"
+cursor = "#bdfe58"
+
+[colors.selection]
+text       = "CellForeground"
+background = "#303030"
+
+[colors.search.matches]
+foreground = "#1c1c1c"
+background = "#1bfd9c"
+
+[colors.normal]
+black   = "#1c1c1c"
+red     = "#dea6a0"
+green   = "#1bfd9c"
+yellow  = "#ffffba"
+blue    = "#7fa1c3"
+magenta = "#66b2b2"
+cyan    = "#b2d8d8"
+white   = "#c0c0c0"
+
+[colors.bright]
+black   = "#585858"
+red     = "#ffb3ba"
+green   = "#baffc9"
+yellow  = "#bdfe58"
+blue    = "#bedc74"
+magenta = "#c5c5c5"
+cyan    = "#d6efd8"
+white   = "#f1f1f1"
