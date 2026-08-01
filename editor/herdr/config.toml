@@ -1,4 +1,5 @@
 onboarding = false
+vershion_check = true
 
 [theme]
 [theme.custom]
@@ -35,14 +36,10 @@ split_horizontal         = "prefix+minus"
 detach                   = "prefix+d"
 open_notification_target = "prefix+o"
 
-# navigate_pane_left  = "h"      # left arrow always focuses the pane to the left
-# navigate_pane_up    = "k"
-# navigate_pane_down  = "j"
-# navigate_pane_right = "l"     # right arrow always focuses the pane to the right
-focus_pane_left     = "prefix+h"
-focus_pane_down     = "prefix+j"
-focus_pane_up       = "prefix+k"
-focus_pane_right    = "prefix+l"
+focus_pane_left   = "alt+left"
+focus_pane_down   = "alt+down"
+focus_pane_up     = "alt+up"
+focus_pane_right  = "alt+right"
 
 new_tab      = "prefix+n"
 switch_tab   = "prefix+1..9"
@@ -50,29 +47,59 @@ previous_tab = "prefix+p"
 next_tab     = "prefix+c"
 rename_tab   = "prefix+,"
 
-
 workspace_picker         = "prefix+;"
+new_workspace            = "alt+w"
 navigate_workspace_up    = "k"
 navigate_workspace_down  = "j"
 rename_workspace         = "prefix+$"
+
+[[keys.command]]
+key = "prefix+ctrl+g"
+type = "pane"
+command = "lazygit"
+description = "run lazygit"
+
+[[keys.command]]
+key = "alt+d"
+type = "popup"
+command = "hunk diff"
+width = "90%"
+height = "90%"
+
+[[keys.command]]
+key = "alt+s"
+type = "popup"
+command = "~/.config/herdr/herdr-picker.sh"
+width = "90%"
+height = "90%"
+
+[[keys.command]]
+key = "prefix+a"
+type = "shell"
+command = '''herdr pane run "$(herdr tab create --cwd "${HERDR_ACTIVE_PANE_CWD:-$HOME}" --focus | jq -r '.result.root_pane.pane_id')" "omp"'''
+description = "new tab"
 
 [worktrees]
 directory = "~/.config/herdr/worktrees"
 
 [ui]
-mouse_capture = true
-redraw_on_focus_gained = true
-confirm_close = true
-prompt_new_tab_name = true
-show_agent_labels_on_pane_borders = true
-agent_panel_scope = "all"
-sidebar_collapsed_mode = "hidden"
+agent_panel_scope            = "spaces"
+agent_panel_sort             = "priority"
+confirm_close                = true
+mouse_capture                = true
+redraw_on_focus_gained       = true
 hide_tab_bar_when_single_tab = true
+show_agent_labels_on_pane_borders = true
+sidebar_collapsed_mode = "hidden"
+pane_gaps              = false
+pane_borders           = true
+prompt_new_tab_name    = false
 
 # Background notification popup delivery
 # off | herdr | terminal | system
 [ui.toast]
-delivery = "herdr"
+delivery = "system"
+delay_seconds = 1
 
 [ui.toast.herdr]
 position = "bottom-right"
@@ -92,6 +119,7 @@ manage_ssh_config = true
 
 [experimental]
 pane_history = true
+switch_ascii_input_source_in_prefix = true
 
 [advanced]
 # scrollback_limit_bytes = 10000000

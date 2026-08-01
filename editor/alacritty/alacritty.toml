@@ -1,6 +1,9 @@
 [env]
 TERM = "xterm-256color"
 
+[general]
+live_config_reload = true
+
 [terminal]
 osc52 = "CopyPaste"
 
@@ -13,7 +16,7 @@ args = [
 ]
 
 [font]
-size = 12.0
+size = 10.0
 
 [font.glyph_offset]
 x = 0
@@ -41,18 +44,21 @@ save_to_clipboard = true
 semantic_escape_chars = ",│`|:\"' ()[]{}<>"
 
 [window]
-opacity = 0.9
+opacity = 0.92
 dynamic_padding = false
 dynamic_title = false
-# decorations = "none"
+decorations = "none"
 
 [window.padding]
 x = 2
 y = 2
 
+[mouse]
+hide_when_typing = true
+
 [window.dimensions]
-columns = 180
-lines = 20
+columns = 220
+lines = 60
 
 [colors.primary]
 background = "#1c1c1c"
@@ -89,3 +95,4 @@ blue    = "#bedc74"
 magenta = "#c5c5c5"
 cyan    = "#d6efd8"
 white   = "#f1f1f1"
+

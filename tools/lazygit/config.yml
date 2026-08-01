@@ -1,7 +1,7 @@
 git:
   pagers:
     - colorArg: always
-      pager: delta --paging=never --features=darkvoid
+      pager: hunk pager
   autoFetch: true
   autoRefresh: false
   disableForcePushing: true
