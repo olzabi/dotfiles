@@ -9,11 +9,8 @@ osc52 = "CopyPaste"
 
 [terminal.shell]
 program = "wsl.exe"
-args = [
-  "~",
-  "-e",
-  "tmux", "new", "-A", "-s", "main"
-]
+# args = [ "~", "-e", "tmux", "new", "-A", "-s", "main" ]
+args = [  "~" ]
 
 [font]
 size = 10.0
@@ -44,7 +41,7 @@ save_to_clipboard = true
 semantic_escape_chars = ",│`|:\"' ()[]{}<>"
 
 [window]
-opacity = 0.92
+opacity = 0.97
 dynamic_padding = false
 dynamic_title = false
 decorations = "none"

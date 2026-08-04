@@ -140,5 +140,9 @@ export NVM_DIR="$DOTFILES_TOOLS/nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
 
+if [[ $- == *i* ]] && [[ -z "$HERDR_ENV" ]]; then
+    exec herdr
+fi
+
 # PATH dedup
 PATH=$(printf %s "$PATH" | awk -v RS=: -v ORS=: '!seen[$0]++' | sed 's/:$//')

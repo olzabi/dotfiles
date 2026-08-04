@@ -1,6 +1,4 @@
 onboarding = false
-vershion_check = true
-
 [theme]
 [theme.custom]
 accent      = "#1bfd9c"  # mint — primary highlight/active borders (your "operator/accent mint")
@@ -27,9 +25,10 @@ new_cwd = "follow"
 
 [update]
 channel = "stable"
+version_check = true
 
 [keys]
-prefix = "ctrl+s"
+prefix = "ctrl+b"
 reload_config            = "prefix+shift+r"
 split_vertical           = "prefix+|"
 split_horizontal         = "prefix+minus"
@@ -41,13 +40,17 @@ focus_pane_down   = "alt+down"
 focus_pane_up     = "alt+up"
 focus_pane_right  = "alt+right"
 
-new_tab      = "prefix+n"
+previous_tab = "ctrl+h"
+next_tab = "ctrl+l"
+new_tab = "ctrl+t"
+previous_workspace = "ctrl+k"
+next_workspace = "ctrl+j"
+previous_agent = "alt+j"
+next_agent =  "alt+k"
 switch_tab   = "prefix+1..9"
-previous_tab = "prefix+p"
-next_tab     = "prefix+c"
 rename_tab   = "prefix+,"
 
-workspace_picker         = "prefix+;"
+workspace_picker         = "prefix+w"
 new_workspace            = "alt+w"
 navigate_workspace_up    = "k"
 navigate_workspace_down  = "j"
@@ -83,7 +86,6 @@ description = "new tab"
 directory = "~/.config/herdr/worktrees"
 
 [ui]
-agent_panel_scope            = "spaces"
 agent_panel_sort             = "priority"
 confirm_close                = true
 mouse_capture                = true
@@ -116,10 +118,6 @@ resume_agents_on_restore = true
 
 [remote]
 manage_ssh_config = true
-
-[experimental]
-pane_history = true
-switch_ascii_input_source_in_prefix = true
 
 [advanced]
 # scrollback_limit_bytes = 10000000
