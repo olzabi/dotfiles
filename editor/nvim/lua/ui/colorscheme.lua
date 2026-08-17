@@ -7,6 +7,14 @@ return {
     "aliqyan-21/darkvoid.nvim",
     lazy = false,
     config = function()
+      require("darkvoid").setup {
+        glow = true,
+        transparent = true,
+        colors = {
+          plugins = { lualine = true },
+        },
+      }
+
       vim.api.nvim_set_hl(0, "TabLine", { reverse = false })
       vim.api.nvim_create_autocmd("ColorScheme", {
         pattern = "*",
@@ -20,15 +28,6 @@ return {
       vim.cmd [[
       colorscheme darkvoid
       ]]
-
-      require("darkvoid").setup {
-        glow = true,
-        colors = {
-          plugins = {
-            lualine = true,
-          },
-        },
-      }
     end,
   },
 }

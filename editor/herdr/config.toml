@@ -1,22 +1,4 @@
 onboarding = false
-[theme]
-[theme.custom]
-accent      = "#1bfd9c"  # mint — primary highlight/active borders (your "operator/accent mint")
-panel_bg    = "#1c1c1c"  # bg
-surface0    = "#3c3c3c"  # eob — selected/focused item background
-surface1    = "#404040"  # line_nr — hover/active background (lightest surface tier)
-surface_dim = "#303030"  # visual — dim separators
-overlay0    = "#585858"  # comment — muted secondary text
-overlay1    = "#a1a1a1"  # type — slightly brighter overlay text
-text        = "#c0c0c0"  # fg — main text
-subtext0    = "#b1b1b1"  # identifier — subdued text
-mauve       = "#bdfe58"  # title/cursor lime — branch name / special label color
-green       = "#1bfd9c"  # operator/mint — done/idle agent state
-yellow      = "#ffffba"  # changed/warning — working/running agent state
-red         = "#dea6a0"  # error — blocked/needs-attention agent state
-blue        = "#7fa1c3"  # info — unseen/done notification accent
-teal        = "#66b2b2"  # bool — notification accent / unseen markers
-peach       = "#bedc74"  # hint — interrupted/warning state
 
 [terminal]
 default_shell = "zsh"
@@ -35,20 +17,15 @@ split_horizontal         = "prefix+minus"
 detach                   = "prefix+d"
 open_notification_target = "prefix+o"
 
-focus_pane_left   = "alt+left"
-focus_pane_down   = "alt+down"
-focus_pane_up     = "alt+up"
-focus_pane_right  = "alt+right"
-
 previous_tab = "ctrl+h"
 next_tab = "ctrl+l"
 new_tab = "ctrl+t"
 previous_workspace = "ctrl+k"
 next_workspace = "ctrl+j"
-previous_agent = "alt+j"
-next_agent =  "alt+k"
-switch_tab   = "prefix+1..9"
-rename_tab   = "prefix+,"
+previous_agent = "prefix+j"
+next_agent     = "prefix+k"
+switch_tab     = "prefix+1..9"
+rename_tab     = "prefix+,"
 
 workspace_picker         = "prefix+w"
 new_workspace            = "alt+w"
@@ -77,16 +54,41 @@ width = "90%"
 height = "90%"
 
 [[keys.command]]
-key = "prefix+a"
-type = "shell"
-command = '''herdr pane run "$(herdr tab create --cwd "${HERDR_ACTIVE_PANE_CWD:-$HOME}" --focus | jq -r '.result.root_pane.pane_id')" "omp"'''
-description = "new tab"
+key = "alt+left"
+type = "plugin_action"
+command = "herdr-splits.nav-left"
+[[keys.command]]
+key = "alt+down"
+type = "plugin_action"
+command = "herdr-splits.nav-down"
+[[keys.command]]
+key = "alt+up"
+type = "plugin_action"
+command = "herdr-splits.nav-up"
+[[keys.command]]
+key = "alt+right"
+type = "plugin_action"
+command = "herdr-splits.nav-right"
 
-[worktrees]
-directory = "~/.config/herdr/worktrees"
+[[keys.command]]
+key = "alt+ctrl+left"
+type = "plugin_action"
+command = "herdr-splits.resize-left"
+[[keys.command]]
+key = "alt+ctrl+down"
+type = "plugin_action"
+command = "herdr-splits.resize-down"
+[[keys.command]]
+key = "alt+ctrl+up"
+type = "plugin_action"
+command = "herdr-splits.resize-up"
+[[keys.command]]
+key = "alt+ctrl+right"
+type = "plugin_action"
+command = "herdr-splits.resize-right"
 
 [ui]
-agent_panel_sort             = "priority"
+agent_panel_sort = "spaces"
 confirm_close                = true
 mouse_capture                = true
 redraw_on_focus_gained       = true
@@ -97,10 +99,40 @@ pane_gaps              = false
 pane_borders           = true
 prompt_new_tab_name    = false
 
+[ui.sidebar.agents]
+rows = [
+  [
+    "state_icon",
+    { token = "workspace", bold = true },
+    { token = "$pr", fg = "#bb9af7" },
+  ],
+  [ { token = "agent", fg = "#7dcfff" }, ],
+]
+
+[ui.sidebar.spaces]
+rows = [
+  ["state_icon", { token = "workspace", bold = true }],
+  [
+    { token = "branch", dim = true },
+    "git_status",
+    { token = "$active_tab", dim = true },
+  ],
+]
+
+[ui.sidebar.agents.rows_by_agent]
+omp = [
+  [
+    "state_icon",
+    { token = "workspace", bold = true },
+    { token = "$pr", fg = "#bb9af7" },
+  ],
+  [ { token = "terminal_title_stripped", fg = "#c0caf5" }, ],
+]
+
 # Background notification popup delivery
 # off | herdr | terminal | system
 [ui.toast]
-delivery = "system"
+delivery = "herdr"
 delay_seconds = 1
 
 [ui.toast.herdr]
@@ -119,5 +151,25 @@ resume_agents_on_restore = true
 [remote]
 manage_ssh_config = true
 
-[advanced]
-# scrollback_limit_bytes = 10000000
+[experimental]
+pane_history = true
+
+[theme]
+[theme.custom]
+accent      = "#1bfd9c"  # mint — primary highlight/active borders (your "operator/accent mint")
+panel_bg    = "#1c1c1c"  # bg
+surface0    = "#3c3c3c"  # eob — selected/focused item background
+surface1    = "#404040"  # line_nr — hover/active background (lightest surface tier)
+surface_dim = "#303030"  # visual — dim separators
+overlay0    = "#585858"  # comment — muted secondary text
+overlay1    = "#a1a1a1"  # type — slightly brighter overlay text
+text        = "#c0c0c0"  # fg — main text
+subtext0    = "#b1b1b1"  # identifier — subdued text
+mauve       = "#bdfe58"  # title/cursor lime — branch name / special label color
+green       = "#1bfd9c"  # operator/mint — done/idle agent state
+yellow      = "#ffffba"  # changed/warning — working/running agent state
+red         = "#dea6a0"  # error — blocked/needs-attention agent state
+blue        = "#7fa1c3"  # info — unseen/done notification accent
+teal        = "#66b2b2"  # bool — notification accent / unseen markers
+peach       = "#bedc74"  # hint — interrupted/warning state
+

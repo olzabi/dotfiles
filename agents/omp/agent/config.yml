@@ -1,0 +1,49 @@
+autolearn: 
+  enabled: true
+  autoContinue: true
+theme: 
+  dark: darkvoid.omp
+  light: darkvoid.omp
+defaultProvider: openai-codex
+defaultModel: gpt-5.5
+defaultThinkingLevel: low
+modelRoles: 
+  default: openai-codex/gpt-5.5:high
+  smol: openai-codex/gpt-5.3-codex-spark:medium
+  commit: openai-codex/gpt-5.3-codex-spark:low
+  advisor: openai-codex/gpt-5.3-codex-spark:high
+providers: 
+  {}
+symbolPreset: nerd
+setupVersion: 1
+statusLine: 
+  preset: ascii
+  separator: powerline-thin
+  sessionAccent: true
+  transparent: true
+  compactThinkingLevel: true
+terminal: 
+  showProgress: true
+tui: 
+  textSizing: true
+  renderMermaid: true
+  tight: true
+display: 
+  showTokenUsage: true
+  cacheMissMarker: true
+  smoothStreaming: true
+colorBlindMode: false
+mcp: 
+  notifications: true
+lsp: null
+formatOnWrite: true
+plan: 
+  enabled: true
+todo: 
+  enabled: true
+speechgen: 
+  enabled: false
+github: 
+  enabled: true
+dev: 
+  autoqaConsent: granted

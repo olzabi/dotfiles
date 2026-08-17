@@ -1,0 +1,10 @@
+{
+  "lastChangelogVersion": "0.80.2",
+  "theme": "darkvoid",
+  "packages": [
+    "npm:@weshipwork/pi-herdr",
+    "npm:@ryan_nookpi/pi-extension-headroom"
+  ],
+  "defaultProvider": "openai-codex",
+  "defaultModel": "gpt-5.4-mini"
+}

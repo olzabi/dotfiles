@@ -27,7 +27,7 @@ prepend_keymap = [
 
     # Goto
     { on = ["g", "h"], run = "cd ~",                            desc = "Go to the Home directory" },
-    { on = ["g", "d"], run = "cd $DOTFILES_PATH",               desc = "Go to the Dotfiles" },
+    { on = ["g", "d"], run = "cd $DOTFILES",               desc = "Go to the Dotfiles" },
     { on = ["g", "<Space>"], run = "cd --interactive",          desc = "Go to a directory interactively" },
 
     { on = [ "J" ], run = "seek 2",  desc = "Seek down 2 lines in preview" },

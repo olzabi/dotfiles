@@ -1,93 +1,83 @@
 return {
   {
     "OXY2DEV/markview.nvim",
+    lazy = false,
     dependencies = {
       "saghen/blink.cmp",
       "nvim-treesitter/nvim-treesitter",
       "3rd/image.nvim",
     },
     opts = {
-      highlight_groups = {
-        RenderMarkdownDoing = { link = "DiagnosticWarn" },
-        RenderMarkdownWontdo = { link = "DiagnosticHint" },
-      },
-
-      preview = {
-        enable = true,
-        hybrid_modes = { "n", "i" },
-        callbacks = {
-          on_enable = function(_, win)
-            local buf = vim.api.nvim_win_get_buf(win)
-            local ft = vim.bo[buf].filetype
-            if vim.tbl_contains({ "Avante", "codecompanion" }, ft) then
-              return false
-            end
-          end,
-        },
-      },
-
       markdown = {
-        headings = {
-          enable = true,
-          shift_width = 0,
-          heading_1 = { style = "label", sign = "", icon = "󰲡 ", hl = "MarkviewHeading1", },
-          heading_2 = { style = "label", icon = "󰲣 ", hl = "MarkviewHeading2" },
-          heading_3 = { style = "label", icon = "󰲥 ", hl = "MarkviewHeading3" },
-          heading_4 = { style = "simple", icon = "󰲧 ", hl = "MarkviewHeading4" },
-          heading_5 = { style = "simple", icon = "󰲩 ", hl = "MarkviewHeading5" },
-          heading_6 = { style = "simple", icon = "󰲫 ", hl = "MarkviewHeading6" },
-        },
-        checkboxes = {
-          enable = true,
-          checked   = {           text = "󰱒", hl = "RenderMarkdownChecked" },
-          unchecked = {           text = "󰄱", hl = "RenderMarkdownUnchecked" },
-          custom = {
-            { match_string = "_", text = "󰄮", hl = "RenderMarkdownDoing", },
-            { match_string = "~", text = "󰅗", hl = "RenderMarkdownWontdo", },
-          },
-        },
+        enable = true,
+
+        markdown_inline = { enable = true },
+        latex = { enable = true },
         list_items = {
-          enable = true,
-          marker_minus = { add_padding = true, text = "●", hl = "MarkviewListItemMinus" },
-          marker_plus = { add_padding = true, text = "◆", hl = "MarkviewListItemPlus" },
-          marker_star = { add_padding = true, text = "◇", hl = "MarkviewListItemStar" },
+          shift_width = 2,
+          indent_size = 2,
+          -- marker_minus = { add_padding = false },
+          -- marker_plus = { add_padding = false },
+          -- marker_star = { add_padding = false },
+          -- marker_dot = { add_padding = false },
+          -- marker_parenthesis = { add_padding = false },
         },
-        tables = {
+
+        preview = {
           enable = true,
-          parts = {
-            top           = { "╭", "─", "╮", "┬" },
-            header        = { "├", "─", "┤", "┼" },
-            separator     = { "├", "─", "┤", "┼" },
-            row           = { "│", " ", "│", "│" },
-            bottom        = { "╰", "─", "╯", "┴" },
-            overlap       = { "┼", "─", "┼", "┼" },
-            align_center  = { "╼", "╾" },
-            align_left    = "╼",
-            align_right   = "╾",
-            align_default = "│",
+          hybrid_modes = { "n", "i", "no", "c" },
+          callbacks = {
+            on_enable = function(_, win)
+              local buf = vim.api.nvim_win_get_buf(win)
+              local ft = vim.bo[buf].filetype
+              vim.wo[win].conceallevel = 2
+              vim.wo[win].concealcursor = "nc"
+            end,
           },
         },
 
-        block_quotes = {
-          enable = true,
-          default = { border = "▋", border_hl = "MarkviewBlockQuoteDefault" },
-          callouts = {
-            { match_string = "NOTE",      callout_preview = "󰋽 Note",      border_hl = "MarkviewBlockQuoteNote", },
-            { match_string = "TIP",       callout_preview = "󰌶 Tip",       border_hl = "MarkviewBlockQuoteTip", },
-            { match_string = "WARNING",   callout_preview = "󰀪 Warning",   border_hl = "MarkviewBlockQuoteWarn", },
-            { match_string = "DANGER",    callout_preview = " Danger",     border_hl = "MarkviewBlockQuoteError", },
-            { match_string = "IMPORTANT", callout_preview = "󰅾 Important", border_hl = "MarkviewBlockQuoteSpecial", },
-          },
+        completion = {
+          blink = { enable = true },
         },
-        horizontal_rules = {
-          enable = true,
-          parts = { { type = "repeating", text = "─", hl = "MarkviewGradient1" } },
-        },
-      },
-      latex = { enable = false },
-      completion = {
-        blink = { enable = true },
       },
     },
+    config = function(_, opts)
+      require("markview").setup(opts)
+
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "MarkviewSplitviewOpen",
+        callback = function(event)
+          local source_buffer = event.data.source
+          local preview_window = event.data.preview_window
+
+          -- Enable scrollbind and cursorbind in both windows
+          for _, win in ipairs(vim.fn.win_findbuf(source_buffer)) do
+            vim.api.nvim_set_option_value("scrollbind", true, { win = win })
+            vim.api.nvim_set_option_value("cursorbind", true, { win = win })
+          end
+
+          -- Enable scrollbind and cursorbind in the preview window
+          vim.api.nvim_set_option_value("scrollbind", true, { win = preview_window })
+          vim.api.nvim_set_option_value("cursorbind", true, { win = preview_window })
+
+          -- Sync the scroll and cursor positions
+          vim.cmd("syncbind")
+        end,
+      })
+
+      -- Optional: Clean up when splitview closes
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "MarkviewSplitviewClose",
+        callback = function(event)
+          local source_buffer = event.data.source
+
+          -- Disable scrollbind and cursorbind in source windows
+          for _, win in ipairs(vim.fn.win_findbuf(source_buffer)) do
+            vim.api.nvim_set_option_value("scrollbind", false, { win = win })
+            vim.api.nvim_set_option_value("cursorbind", false, { win = win })
+          end
+        end,
+      })
+    end,
   },
 }

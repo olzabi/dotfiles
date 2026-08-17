@@ -1,0 +1,8 @@
+# style name or JSON path (default "auto")
+style: "$XDG_CONFIG_HOME/glow/darkvoid.json"
+# mouse support (TUI-mode only)
+mouse: false
+pager: false
+width: 120
+all: true
+showLineNumbers: true

@@ -3,8 +3,8 @@ _localhost=http://localhost:11434
 export LOCAL_HOST=$_localhost
 
 export UA_DIR=$XDG_CONFIG_HOME/.understand-anything
-export PI_CONFIG_DIR=$DOTFILES_AI/pi
-export PI_CODING_AGENT_DIR=$DOTFILES_AI/agents
+# export PI_CONFIG_DIR=$DOTFILES_AI/pi
+# export PI_CODING_AGENT_DIR=$DOTFILES_AI/pi/agent
 export CLAUDE_CONFIG_DIR=$DOTFILES_AI/claude
 export OPENCODE_CONFIG_DIR=$DOTFILES_AI/opencode
 

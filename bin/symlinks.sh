@@ -11,7 +11,7 @@ fi
 
 create_symlinks() {
   info "Creating symbolic links..."
-
+  local created=0 skipped=0 warned=0
   while IFS=: read -r source target || [ -n "$source" ]; do
     if [[ -z "$source" || -z "$target" || "$source" == \#* ]]; then
       continue
@@ -22,21 +22,27 @@ create_symlinks() {
 
     if [ ! -e "$source" ]; then
       error "Source not found: '$source' — skipping '$target'."
+      ((warned++))
       continue
     fi
 
     if [ -L "$target" ]; then
       existing=$(readlink "$target")
-      if [ "$existing" = "$source" ]; then
-        info "Already linked: $target → $source"
+      existing_abs=$(realpath -m "$(dirname "$target")/$existing")
+      source_abs=$(realpath -m "$source")
+      if [ "$existing" = "$source" ] || [ "$existing_abs" = "$source_abs" ]; then
+        # Already correct — no need to spam a line per entry, just tally it.
+        ((skipped++))
       else
-        warning "Symlink exists but points elsewhere: $target → $existing (expected $source)"
+        warn "Symlink exists but points elsewhere: $target → $existing (expected $source)"
+        ((warned++))
       fi
       continue
-    fi
 
+    fi
     if [ -e "$target" ]; then
-      warning "File or directory already exists (not a symlink): $target"
+      warn "File or directory already exists (not a symlink): $target"
+      ((warned++))
       continue
     fi
 
@@ -48,15 +54,16 @@ create_symlinks() {
 
     ln -s "$source" "$target"
     success "Created symlink: $target → $source"
-
-  done <"$CONFIG_FILE"
+    ((created++))
+  done < <(expand_conf "$CONFIG_FILE")
+  info "Done: $created created, $skipped already up to date, $warned need attention."
 }
 
 delete_symlinks() {
   info "Deleting symbolic links..."
 
-  while IFS=: read -r _ target || [ -n "$target" ]; do
-    if [[ -z "$target" ]]; then
+  while IFS=: read -r source target || [ -n "$target" ]; do
+    if [[ -z "$source" || -z "$target" || "$source" == \#* ]]; then
       continue
     fi
 
@@ -69,7 +76,7 @@ delete_symlinks() {
       rm -rf "$target"
       success "Deleted file: $target"
     else
-      warning "Not found (or not a symlink): $target"
+      warn "Not found (or not a symlink): $target"
     fi
   done <"$CONFIG_FILE"
 }

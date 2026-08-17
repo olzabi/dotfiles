@@ -1,0 +1,8 @@
+{
+  "includeCoAuthoredBy": false,
+  "permissions": {
+    "defaultMode": "default"
+  },
+  "tui": "default",
+  "theme": "custom:darkvoid"
+}
