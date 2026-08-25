@@ -1,0 +1,20 @@
+ConfigFile = '/home/evernight/.config/lazysql/config.toml'
+
+[application]
+DefaultPageSize = 300
+DisableSidebar = false
+SidebarOverlay = false
+JSONViewerWordWrap = false
+MaxQueryHistoryPerConnection = 100
+TreeWidth = 30
+
+[[database]]
+Name = 'mysql (localhost)'
+URL = 'mysql://root:rootsecret@localhost:3306'
+Provider = 'mysql'
+
+[[database]]
+Name = 'postgres (localhost)'
+URL = 'postgresql://postgres:postgres@localhost:5432?sslmode=disable'
+Provider = 'postgres'
+ReadOnly = false

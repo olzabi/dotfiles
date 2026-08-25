@@ -140,6 +140,8 @@ export NVM_DIR="$DOTFILES_TOOLS/nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
 
+[ -s "${BUN_INSTALL}/_bun" ] && . "${BUN_INSTALL}/_bun"
+
 if [[ $- == *i* ]] && [[ -z "$HERDR_ENV" ]]; then
     exec herdr
 fi

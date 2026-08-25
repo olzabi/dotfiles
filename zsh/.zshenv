@@ -107,6 +107,10 @@ fi
 export PNPM_HOME="$XDG_DATA_HOME/pnpm"
 _prepend_path "$PNPM_HOME"
 
+# ---------
+export BUN_INSTALL="$XDG_CONFIG_HOME/.bun"
+_prepend_path "$BUN_INSTALL/bin"
+
 #* git
 # ---------
 export GH_DASH_CONFIG="$DOTFILES_GIT/gh-dash.config.yml"
