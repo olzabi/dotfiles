@@ -142,9 +142,14 @@ export NVM_DIR="$DOTFILES_TOOLS/nvm"
 
 [ -s "${BUN_INSTALL}/_bun" ] && . "${BUN_INSTALL}/_bun"
 
-if [[ $- == *i* ]] && [[ -z "$HERDR_ENV" ]]; then
-    exec herdr
-fi
+# herdr startup
+# if [[ $- == *i* ]] && [[ -z "$HERDR_ENV" ]]; then
+#     exec herdr
+# fi
 
 # PATH dedup
 PATH=$(printf %s "$PATH" | awk -v RS=: -v ORS=: '!seen[$0]++' | sed 's/:$//')
+
+
+# Load Angular CLI autocompletion.
+source <(ng completion script)

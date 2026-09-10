@@ -1,4 +1,4 @@
-local prettier = { "prettierd" }
+local prettier = { "eslint_d", "prettier" }
 
 return {
 

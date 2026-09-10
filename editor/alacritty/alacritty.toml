@@ -9,8 +9,8 @@ osc52 = "CopyPaste"
 
 [terminal.shell]
 program = "wsl.exe"
-# args = [ "~", "-e", "tmux", "new", "-A", "-s", "main" ]
-args = [  "~" ]
+args = [ "~", "-e", "tmux", "new", "-A", "-s", "main" ]
+# args = ["~"]
 
 [font]
 size = 10.0

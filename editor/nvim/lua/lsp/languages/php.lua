@@ -83,7 +83,9 @@ return {
       vim.lsp.config("laravel-ls", {
         cmd = { "laravel-ls" },
         filetypes = { "php", "blade" },
-        root_dir = vim.fn.getcwd,
+        root_dir = function(_, on_dir)
+          on_dir(vim.fn.getcwd())
+        end,
       })
 
       vim.api.nvim_create_autocmd("FileType", {

@@ -1,49 +1,62 @@
-autolearn: 
+autolearn:
   enabled: true
   autoContinue: true
-theme: 
+theme:
   dark: darkvoid.omp
   light: darkvoid.omp
 defaultProvider: openai-codex
 defaultModel: gpt-5.5
-defaultThinkingLevel: low
-modelRoles: 
-  default: openai-codex/gpt-5.5:high
-  smol: openai-codex/gpt-5.3-codex-spark:medium
-  commit: openai-codex/gpt-5.3-codex-spark:low
-  advisor: openai-codex/gpt-5.3-codex-spark:high
-providers: 
-  {}
+defaultThinkingLevel: auto
+modelRoles:
+  default: openai-codex/gpt-5.6-sol:medium
+  plan: openai-codex/gpt-5.6-sol
+  advisor: openai-codex/gpt-5.6-sol
+providers:
+  openai-codex:
+    codeMode: auto
 symbolPreset: nerd
-setupVersion: 1
-statusLine: 
-  preset: ascii
+setupVersion: 2
+statusLine:
+  preset: compact
   separator: powerline-thin
   sessionAccent: true
   transparent: true
   compactThinkingLevel: true
-terminal: 
+  showHookStatus: true
+terminal:
   showProgress: true
-tui: 
+tui:
   textSizing: true
   renderMermaid: true
   tight: true
-display: 
+display:
   showTokenUsage: true
   cacheMissMarker: true
   smoothStreaming: true
+  hideToolActivity: false
+  collapseCompacted: true
 colorBlindMode: false
-mcp: 
-  notifications: true
-lsp: null
 formatOnWrite: true
-plan: 
+todo:
   enabled: true
-todo: 
+github:
   enabled: true
-speechgen: 
-  enabled: false
-github: 
-  enabled: true
-dev: 
+dev:
   autoqaConsent: granted
+composer:
+  shape: field
+hideThinkingBlock: false
+omitThinking: true
+prewalk:
+  enabled: true
+advisor:
+  enabled: true
+  syncBacklog: "1"
+memory:
+  backend: mnemopi
+mnemopi:
+  scoping: per-project-tagged
+personality: pragmatic
+plan:
+  enabled: true
+
