@@ -14,4 +14,20 @@ return {
       { "<c-l>", "<cmd>TmuxNavigateRight<cr>", desc = "Navigate right" },
     },
   },
+
+  {
+    "chrisgrieser/nvim-spider",
+    config = function()
+      require("spider").setup({
+        skipInsignificantPunctuation = true,
+        subwordMovement = true,
+        customPatterns = {},
+      })
+
+      vim.keymap.set({ "w", "<cmd>lua require('spider').motion('w')<CR>", mode = { "n", "o", "x" } })
+      vim.keymap.set({ "e", "<cmd>lua require('spider').motion('e')<CR>", mode = { "n", "o", "x" } })
+      vim.keymap.set({ "b", "<cmd>lua require('spider').motion('b')<CR>", mode = { "n", "o", "x" } })
+      vim.keymap.set({ "ge", "<cmd>lua require('spider').motion('ge')<CR>", mode = { "n", "o", "x" } })
+    end,
+  },
 }

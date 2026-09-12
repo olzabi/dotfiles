@@ -1,0 +1,52 @@
+{
+  "lastChangelogVersion": "0.85.1",
+  "collapseChangelog": true,
+  "autoUpdate": true,
+  "quietStartup": true,
+  "defaultModel": "gpt-5.6",
+  "defaultThinkingLevel": "medium",
+  "theme": "darkvoid",
+  "markdown": {
+    "mermaid": "final"
+  },
+  "compaction": {
+    "enabled": true,
+    "reserveTokens": 65536,
+    "keepRecentTokens": 40000
+  },
+  "hideThinkingBlock": true,
+  "enabledModels": [
+    "openai-codex/gpt-5.6-luna",
+    "openai-codex/gpt-5.6-sol",
+    "openai-codex/gpt-5.6-terra",
+    "openai-codex/gpt-5.4-mini"
+  ],
+  "packages": [
+    "npm:pi-mcp-adapter",
+    "npm:context-mode",
+    "npm:@juicesharp/rpiv-todo",
+    "npm:pi-lens",
+    "npm:pi-memory",
+    "npm:pi-tool-display",
+    "npm:pi-headroom",
+    "npm:pi-context",
+    "npm:pi-rtk-optimizer"
+  "tuiMode": "regular",
+  "outputPad": 1,
+  "images": {
+    "blockImages": false
+  },
+  "enableSkillCommands": false,
+  "editorPaddingX": 0,
+  "terminal": {
+    "clearOnShrink": false
+  },
+  "steeringMode": "all",
+  "followUpMode": "all",
+  "transport": "auto",
+  "httpIdleTimeoutMs": 120000,
+  "showCacheMissNotices": true,
+  "doubleEscapeAction": "tree",
+  "treeFilterMode": "default",
+  "fullscreenExitOutput": "transcript"
+}
