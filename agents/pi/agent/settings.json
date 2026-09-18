@@ -33,9 +33,11 @@
     "npm:pi-headroom",
     "npm:pi-context",
     "npm:pi-rtk-optimizer",
+    "npm:pi-web-access",
     "npm:@ff-labs/pi-fff",
     "npm:@aliou/pi-guardrails",
     "npm:@tintinweb/pi-subagents",
+    "npm:pi-chatgpt-limit",
   ],
   "observational-memory": {
     "observeAfterTokens": 10000,
