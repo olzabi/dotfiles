@@ -1,16 +1,16 @@
 agent_notes = true
 vcs = "git"
-mode = "split"
+mode = "auto"
 exclude_untracked = false
 line_numbers = true
 menu_bar = true
-transparent_background = true
-hunk_headers = false
+transparent_background = false
+hunk_headers = true
 
 theme = "custom"
 
 [custom_theme]
-base = "vesper"
+base = "github-dark-default"
 label = "Darkvoid"
 
 background = "#1c1c1c"
@@ -23,12 +23,12 @@ text = "#c0c0c0"
 muted = "#585858"
 
 addedBg = "#0d2010"
-removedBg = "#3a121f"
-movedAddedBg = "#123136"
-movedRemovedBg = "#25183a"
+removedBg = "#2a1018"
+movedAddedBg = "#252525"
+movedRemovedBg = "#303030"
 contextBg = "#1c1c1c"
-addedContentBg = "#245020"
-removedContentBg = "#6a1630"
+addedContentBg = "#1a3a18"
+removedContentBg = "#4a1020"
 contextContentBg = "#1c1c1c"
 addedSignColor = "#baffc9"
 removedSignColor = "#ffb3ba"
