@@ -14,8 +14,8 @@ export DOTFILES_THEMES="$DOTFILES/themes"
 export DOTFILES_AI="$DOTFILES/agents"
 
 export DEV="$HOME/dev"
-export YAZI_CONFIG_HOME="$DOTFILES/yazi"
-export BAT_CONFIG_DIR="$DOTFILES_TOOLS/bat"
+export YAZI_CONFIG_HOME="$DOTFILES_EDITOR/yazi"
+export BAT_CONFIG_DIR="$DOTFILES_EDITOR/bat"
 export STARSHIP_CONFIG="$DOTFILES/zsh/starship.toml"
 
 _prepend_path() { case ":$PATH:" in *":$1:"*) ;; *) export PATH="$1:$PATH" ;; esac }
