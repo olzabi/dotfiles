@@ -34,15 +34,12 @@ prepend_fetchers = [
 
 ]
 prepend_previewers = [
-  { url = "*.csv",                run = "rich-preview" }, # for csv files
-  { url = "*.md",                 run = 'piper -- glow -w=$w -s="$XDG_CONFIG_HOME/glow/darkvoid.json" "$1"' }, # for markdown (.md) files
-  { url = "*.rst",                run = "rich-preview" }, # for restructured text (.rst) files
-  { url = "*.ipynb",              run = "rich-preview" }, # for jupyter notebooks (.ipynb)
-  { url = "*.json",               run = "rich-preview" }, # for json (.json) files
-  { url = "*.toml",               run = "rich-preview" }, # for toml (.toml) files
-  { url = "*.{yml,yaml}",         run = "rich-preview" },
-  { mime = "{audio,video,image}/*", run = "mediainfo --no-metadata"},
-  { mime = "text/*", run = 'piper -- cat --theme=darkvoid --number --color=always "$1"' },
+  # Glow is the dedicated Markdown renderer; `-w 0` preserves source line boundaries.
+  { url = "*.{md,markdown,mdx}", run = 'piper -- glow -n -w 0 -s="$XDG_CONFIG_HOME/glow/darkvoid.glow.json" "$1"' },
+  # Rich handles every other text preview with the Darkvoid palette and line numbers.
+  { url = "*.{csv,rst,ipynb,json,jsonc,toml,yml,yaml,xml,svg}", run = "rich-darkvoid" },
+  { mime = "text/*", run = "rich-darkvoid" },
+  { mime = "{audio,video,image}/*", run = "mediainfo --no-metadata" },
 ]
 prepend_preloaders = [
   { mime = "{audio,video,image}/*", run = "mediainfo" },
