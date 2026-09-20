@@ -3,3 +3,11 @@
 [flavor]
 dark = "darkvoid"
 light = "darkvoid"
+
+# git.yazi >= 26.9 reads status signs from the theme.
+[git]
+ignored_sign = "I"
+untracked_sign = "U"
+unstaged_sign = "M"
+staged_sign = "M"
+deleted_sign = "D"

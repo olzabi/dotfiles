@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "0.85.1",
+  "lastChangelogVersion": "0.86.1",
   "collapseChangelog": true,
   "autoUpdate": true,
   "quietStartup": true,
@@ -18,8 +18,7 @@
   "enabledModels": [
     "openai-codex/gpt-5.6-luna",
     "openai-codex/gpt-5.6-sol",
-    "openai-codex/gpt-5.6-terra",
-    "openai-codex/gpt-5.4-mini"
+    "openai-codex/gpt-5.6-terra"
   ],
   "packages": [
     "npm:pi-mcp-adapter",

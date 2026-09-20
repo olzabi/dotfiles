@@ -5,7 +5,10 @@
   "scripts": {
     "symlinks": "bin/symlinks.sh",
     "submodule:init": "git submodule update --init --recursive --jobs 8",
-    "submodules:update": "git submodule update --remote --merge --jobs 8"
+    "submodules:update": "git submodule update --remote --merge --jobs 8",
+    "rustup:install": "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh",
+    "rustup:update": "rustup update",
+    "yazi-cli:update": "ya pkg upgrade"
   },
   "keywords": [
     "dotfiles"

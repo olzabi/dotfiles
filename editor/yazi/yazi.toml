@@ -29,10 +29,10 @@ suppress_preload = false
 
 [plugin]
 prepend_fetchers = [
-  { id = "git", url= "*", run = "git", group="git" },
-  { id = "git", url= "*/", run = "git", group="git" },
-
+  { url = "*",  run = "git", group = "git" },
+  { url = "*/", run = "git", group = "git" },
 ]
+
 prepend_previewers = [
   # Glow is the dedicated Markdown renderer; `-w 0` preserves source line boundaries.
   { url = "*.{md,markdown,mdx}", run = 'piper -- glow -n -w 0 -s="$XDG_CONFIG_HOME/glow/darkvoid.glow.json" "$1"' },

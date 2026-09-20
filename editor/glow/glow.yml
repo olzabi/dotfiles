@@ -1,8 +1,8 @@
 # style name or JSON path (default "auto")
-style: "$HOME/.config/glow/darkvoid.json"
+style: "/home/evernight/.config/glow/darkvoid.glow.json"
 # mouse support (TUI-mode only)
 mouse: false
-pager: false
-width: 120
-all: true
+pager: true
+width: 150
+all: false
 showLineNumbers: true
