@@ -18,8 +18,8 @@ export YAZI_CONFIG_HOME="$DOTFILES_EDITOR/yazi"
 export BAT_CONFIG_DIR="$DOTFILES_EDITOR/bat"
 export STARSHIP_CONFIG="$DOTFILES/zsh/starship.toml"
 
-_prepend_path() { case ":$PATH:" in *":$1:"*) ;; *) export PATH="$1:$PATH" ;; esac }
-_append_path()  { case ":$PATH:" in *":$1:"*) ;; *) export PATH="$PATH:$1" ;; esac }
+_prepend_path() { path=("$1" ${path:#$1}) }
+_append_path()  { path=(${path:#$1} "$1") }
 
 _append_path "/opt/nvim-linux-x86_64/bin"
 _prepend_path "$XDG_LOCAL_HOME/bin"

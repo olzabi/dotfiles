@@ -150,6 +150,3 @@ export NVM_DIR="$DOTFILES_TOOLS/nvm"
 # PATH dedup
 PATH=$(printf %s "$PATH" | awk -v RS=: -v ORS=: '!seen[$0]++' | sed 's/:$//')
 
-
-# Load Angular CLI autocompletion.
-source <(ng completion script)

@@ -9,7 +9,7 @@ osc52 = "CopyPaste"
 
 [terminal.shell]
 program = "wsl.exe"
-args = [ "~", "-e", "tmux", "new", "-A", "-s", "main" ]
+args = [ "--cd", "~", "--exec", "/home/evernight/.local/bin/tmux", "new-session", "-A", "-s", "main" ]
 # args = ["~"]
 
 [font]
@@ -52,6 +52,11 @@ y = 2
 
 [mouse]
 hide_when_typing = true
+
+[[keyboard.bindings]]
+key = "Enter"
+mods = "Shift"
+chars = "\u001b[13;2u"
 
 [window.dimensions]
 columns = 220
