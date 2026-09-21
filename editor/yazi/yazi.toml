@@ -33,11 +33,12 @@ prepend_fetchers = [
   { url = "*/", run = "git", group = "git" },
 ]
 prepend_previewers = [
-  # Glow is the dedicated Markdown renderer; `-w 0` preserves source line boundaries.
-  { url = "*.{md,mdx}", run = 'piper -- CLICOLOR=1 glow "$1"' },
-  # Rich handles every other text preview with the Darkvoid palette and line numbers.
-  { url = "*.{csv,rst,ipynb,json,jsonc,toml,yml,yaml,xml,svg}", run = "rich-darkvoid" },
+  # { url = "*.md", run = 'piper -- glow --style "$HOME/.config/glow/darkvoid.glow.json" -w=$w  "$1"' },
+  { url = "*.md", run = 'rich-darkvoid' },
   { mime = "text/*", run = "rich-darkvoid" },
+  { mime = "application/json", run = "rich-darkvoid" },
+  { mime = "application/*+json", run = "rich-darkvoid" },
+  { mime = "application/{javascript,x-javascript,toml,yaml,x-yaml,x-ndjson}", run = "rich-darkvoid" },
   { mime = "{audio,video,image}/*", run = "mediainfo --no-metadata" },
 ]
 prepend_preloaders = [
