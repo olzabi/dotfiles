@@ -1,32 +1,38 @@
----@diagnostic disable: undefined-global
+--@diagnostic disable: undefined-global
 local M = {}
-local ansi = string.char(27)
-local reset = ansi .. "[0m"
-local glyphs = { ["+"] = "▎", ["~"] = "┆", ["-"] = "╴" }
+local ESC = string.char(27)
+local RESET = ESC .. "[0m"
+local SIGNS = {
+	["+"] = { glyph = "▎", color = "#baffc9" }, -- added
+	["~"] = { glyph = "┆", color = "#ffffba" }, -- modified
+	["-"] = { glyph = "╴", color = "#ffb3ba" }, -- deleted
+}
 
-local function trim(value)
-	value = value:gsub("^%s+", "")
-	return value:gsub("%s+$", "")
+local function ansi_fg(hex)
+	local r, g, b = hex:match("^#(%x%x)(%x%x)(%x%x)$")
+	if not r then
+		return ""
+	end
+	return string.format("%s[38;2;%d;%d;%dm", ESC, tonumber(r, 16), tonumber(g, 16), tonumber(b, 16))
 end
 
-local function run_command(command, args)
-	local child = Command(command):arg(args):stdout(Command.PIPED):stderr(Command.PIPED):spawn()
-	if not child then
-		return nil, true
+for _, def in pairs(SIGNS) do
+	def.marker = ansi_fg(def.color) .. def.glyph .. RESET
+end
+
+local function trim(value)
+	return (value:gsub("^%s+", ""):gsub("%s+$", ""))
+end
+
+local function count_lines(content)
+	if content == "" then
+		return 0
 	end
-	local output, errors = {}, 0
-	repeat
-		local line, event = child:read_line()
-		if event == 0 then
-			output[#output + 1] = line
-		elseif event == 1 then
-			errors = errors + 1
-		else
-			break
-		end
-	until false
-	child:start_kill()
-	return table.concat(output), errors > 0
+	local n = select(2, content:gsub("\n", "\n"))
+	if content:sub(-1) ~= "\n" then
+		n = n + 1
+	end
+	return n
 end
 
 local function parse_range(range)
@@ -34,29 +40,61 @@ local function parse_range(range)
 	return start and tonumber(start) or tonumber(range), start and tonumber(count) or 1
 end
 
-local function signs_for_file(path)
+local function run_command(command, args)
+	local output = Command(command):arg(args):output()
+	if not output then
+		return nil, true
+	end
+
+	return output.stdout, not output.status.success
+end
+
+local function compute_signs(path)
 	local source = io.open(path, "rb")
-	if not source then return nil end
+	if not source then
+		return nil
+	end
 	local content = source:read("*a")
 	source:close()
-	if content:find("\0", 1, true) then return nil end
-	local lines = 0
-	for _ in (content .. "\n"):gmatch(".-\n") do lines = lines + 1 end
-
+	if content:find("\0", 1, true) then
+		return nil -- binary file, nothing to mark up
+	end
+	local lines = count_lines(content)
 	local directory = path:match("^(.*)/[^/]+$") or "."
-	local root, failed = run_command("git", { "-C", directory, "rev-parse", "--show-toplevel" })
-	if failed or not root then return nil end
+	local root, root_failed = run_command("git", { "-C", directory, "rev-parse", "--show-toplevel" })
+	if root_failed or not root then
+		return nil -- not inside a git repo
+	end
+
 	root = trim(root)
-	local relative = path:sub(1, #root + 1) == root .. "/" and path:sub(#root + 2) or path
+
 	local diff, diff_failed = run_command("git", {
-		"-C", root, "diff", "--no-ext-diff", "--no-color", "--unified=0", "HEAD", "--", relative,
+		"-C",
+		root,
+		"diff",
+		"--no-ext-diff",
+		"--no-color",
+		"--unified=0",
+		"HEAD",
+		"--",
+		path,
 	})
 	if diff_failed then
 		diff, diff_failed = run_command("git", {
-			"-C", root, "diff", "--no-ext-diff", "--no-color", "--unified=0", "--", relative,
+			"-C",
+			root,
+			"diff",
+			"--no-ext-diff",
+			"--no-color",
+			"--unified=0",
+			"--",
+			path,
 		})
 	end
-	if diff_failed or not diff then return nil end
+	if diff_failed or not diff then
+		return nil
+	end
+
 	local signs = {}
 	for header in diff:gmatch("[^\n]+") do
 		local old_range, new_range = header:match("@@ %-([^ ]+) %+([^ ]+) @@")
@@ -67,62 +105,81 @@ local function signs_for_file(path)
 				signs[math.max(1, math.min(new_start, lines))] = "-"
 			else
 				local sign = old_count > 0 and "~" or "+"
-				for line = new_start, math.min(lines, new_start + new_count - 1) do signs[line] = sign end
+				for line = new_start, math.min(lines, new_start + new_count - 1) do
+					signs[line] = sign
+				end
 			end
 		end
 	end
+
 	if diff == "" then
 		local untracked, untracked_failed = run_command("git", {
-			"-C", root, "ls-files", "--others", "--exclude-standard", "--", relative,
+			"-C",
+			root,
+			"ls-files",
+			"--others",
+			"--exclude-standard",
+			"--",
+			path,
 		})
 		if not untracked_failed and untracked and trim(untracked) ~= "" then
-			for line = 1, lines do signs[line] = "+" end
+			for line = 1, lines do
+				signs[line] = "+"
+			end
 		end
 	end
+
 	return signs
 end
 
-local function ansi_fg(hex)
-	local r, g, b = hex:match("^#(%x%x)(%x%x)(%x%x)$")
-	return r and string.format("%s[38;2;%d;%d;%dm", ansi, tonumber(r, 16), tonumber(g, 16), tonumber(b, 16)) or ""
+local last = {}
+local function signs_for_file(file)
+	local path = tostring(file.url.path)
+	local cha = file.cha
+	if last.path == path and last.mtime == cha.mtime and last.size == cha.len then
+		return last.signs
+	end
+	local signs = compute_signs(path)
+	last = { path = path, mtime = cha.mtime, size = cha.len, signs = signs }
+	return signs
 end
 
 local function add_git_markers(text, signs)
-	if not signs then return text end
-	local colors = { ["+"] = "#baffc9", ["~"] = "#ffffba", ["-"] = "#ffb3ba" }
+	if not signs then
+		return text
+	end
 	local rendered = {}
 	for line in (text .. "\n"):gmatch("(.-)\n") do
-		local plain = line:gsub(ansi .. "%[[%d;]*m", "")
+		local plain = line:gsub(ESC .. "%[[%d;]*m", "")
 		local line_number = tonumber(plain:match("^%s*(%d+)%s"))
 		local sign = line_number and signs[line_number]
-		local rendered_line = line
 		if sign and line:sub(1, 1) == " " then
-			rendered_line = ansi_fg(colors[sign]) .. glyphs[sign] .. reset .. line:sub(2)
+			rendered[#rendered + 1] = SIGNS[sign].marker .. line:sub(2)
+		else
+			rendered[#rendered + 1] = line
 		end
-		rendered[#rendered + 1] = rendered_line
 	end
 	return table.concat(rendered, "\n")
 end
 
-local function rich_theme_path()
+local function rich_pythonpath()
 	local config_home = os.getenv("XDG_CONFIG_HOME") or ((os.getenv("HOME") or "") .. "/.config")
-	return config_home .. "/dotfiles/tools/rich"
+	local theme_path = config_home .. "/dotfiles/tools/rich"
+	local current = os.getenv("PYTHONPATH")
+	return current and theme_path .. ":" .. current or theme_path
 end
 
-local function rich_pythonpath()
-	local path = rich_theme_path()
-	local current = os.getenv("PYTHONPATH")
-	return current and path .. ":" .. current or path
-end
+local RICH_PYTHONPATH = rich_pythonpath()
 
 function M:peek(job)
 	local path = tostring(job.file.url.path)
-	local signs = signs_for_file(path)
+	local signs = signs_for_file(job.file)
 	local width = tostring(rt.preview.max_width)
+
 	local child = Command("rich")
 		:env("COLUMNS", width)
 		:env("COLORTERM", "truecolor")
-		:env("PYTHONPATH", rich_pythonpath())
+		:env("PYTHONPATH", RICH_PYTHONPATH)
 		:arg({
 			"--syntax",
 			"--left",
@@ -159,6 +216,7 @@ function M:peek(job)
 		else
 			break
 		end
+
 	until i >= job.skip + limit
 	child:start_kill()
 
