@@ -1,0 +1,16 @@
+[Unit]
+Description=Local SearXNG metasearch service
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/.local/share/searxng/source
+Environment=SEARXNG_SETTINGS_PATH=%h/.config/dotfiles/tools/searxng/config/settings.yml
+EnvironmentFile=%h/.config/dotfiles/tools/searxng/.env
+ExecStart=%h/.local/share/searxng/venv/bin/python -m searx.webapp
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

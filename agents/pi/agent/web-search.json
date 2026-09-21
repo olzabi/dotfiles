@@ -1,0 +1,16 @@
+{
+  "provider": "searxng",
+  "searxngBaseUrl": "http://127.0.0.1:8888",
+  "summaryModel": "ollama/qwen3.5:latest",
+  "workflow": "auto-summary",
+  "webSearch": {
+    "allowedProviders": [
+      "searxng"
+    ]
+  },
+  "ssrf": {
+    "allowRanges": [
+      "127.0.0.1/32"
+    ]
+  }
+}

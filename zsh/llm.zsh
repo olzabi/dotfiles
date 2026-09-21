@@ -17,5 +17,5 @@ export OLLAMA_KEEP_ALIVE=10m
 # export ANTHROPIC_BASE_URL="${LOCAL_HOST}"
 
 _prepend_path "$OPENCODE_CONFIG_DIR/bin"
-_prepend_path /usr/bin:$PATH
+_append_path /usr/bin
 _prepend_path $DEV/llama.cpp/build/bin

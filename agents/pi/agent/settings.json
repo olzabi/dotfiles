@@ -3,8 +3,14 @@
   "collapseChangelog": true,
   "autoUpdate": true,
   "quietStartup": true,
+  "defaultProvider": "openai-codex",
   "defaultModel": "gpt-5.6-luna",
   "defaultThinkingLevel": "xhigh",
+  "modelThinkingLevels": {
+    "openai-codex/gpt-5.6-luna": "xhigh",
+    "openai-codex/gpt-5.6-terra": "medium",
+    "openai-codex/gpt-5.6-sol": "medium"
+  },
   "theme": "darkvoid",
   "markdown": {
     "mermaid": "final"
@@ -16,6 +22,7 @@
   },
   "hideThinkingBlock": true,
   "enabledModels": [
+    "ollama/qwen3.5:latest",
     "openai-codex/gpt-5.6-luna",
     "openai-codex/gpt-5.6-sol",
     "openai-codex/gpt-5.6-terra"
@@ -29,7 +36,6 @@
     "npm:pi-memory",
     "npm:pi-tool-display",
     "npm:pi-context-prune",
-    "npm:pi-headroom",
     "npm:pi-context",
     "npm:pi-rtk-optimizer",
     "npm:pi-web-access",
@@ -80,3 +86,4 @@
   "treeFilterMode": "default",
   "fullscreenExitOutput": "transcript"
 }
+
