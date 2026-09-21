@@ -32,10 +32,9 @@ prepend_fetchers = [
   { url = "*",  run = "git", group = "git" },
   { url = "*/", run = "git", group = "git" },
 ]
-
 prepend_previewers = [
   # Glow is the dedicated Markdown renderer; `-w 0` preserves source line boundaries.
-  { url = "*.{md,markdown,mdx}", run = 'piper -- glow -n -w 0 -s="$XDG_CONFIG_HOME/glow/darkvoid.glow.json" "$1"' },
+  { url = "*.{md,mdx}", run = 'piper -- CLICOLOR=1 glow "$1"' },
   # Rich handles every other text preview with the Darkvoid palette and line numbers.
   { url = "*.{csv,rst,ipynb,json,jsonc,toml,yml,yaml,xml,svg}", run = "rich-darkvoid" },
   { mime = "text/*", run = "rich-darkvoid" },
@@ -47,21 +46,21 @@ prepend_preloaders = [
 
 [opener]
 edit = [
-  { run = '$EDITOR "$@"', desc = "$EDITOR", block = true, for = "linux" },
+  { run = '$EDITOR %s',    block = true, desc = "$EDITOR", for = "linux" },
+  { run = 'hunk diff %s1', block = true, desc = "Review diff in Hunk" },
 ]
 edit_php = [
-  { run = 'phpstorm64.exe "$@"',   desc = "Open in PhpStorm",  orphan = true, for = "unix" },
-  { run = 'nvim "$@"',             desc = "Edit in Neovim",    block = true,  for = "unix" },
+  { run = 'phpstorm64.exe %s',  desc = "Open in PhpStorm",  orphan = true, for = "unix" },
+  { run = 'nvim %s',            desc = "Edit in Neovim",    block = true,  for = "unix" },
 ]
 reveal = [
-  { run = 'wslview "$1"',      desc = "Open in Windows (wslview)", orphan = true, for = "linux" },
-  { run = 'explorer.exe "$(wslpath -w "$1")"', orphan = true, desc = "Reveal in Explorer", for = "linux" },
+  { run = 'wslview %s1',                      orphan = true, desc = "Open in Windows (wslview)", for = "linux" },
+  { run = 'explorer.exe "$(wslpath -w %s1)"', orphan = true, desc = "Reveal in Explorer", for = "linux" },
 ]
 audio = [
-  { run = '''mediainfo "$1"; echo "Press enter to exit"; read''', block = true, desc = "Show media info" },
-  { run = 'mpv --no-video "$@"', block = true },
+  { run = '''mediainfo %s1; echo "Press enter to exit"; read''', block = true, desc = "Show media info" },
+  { run = 'mpv --no-video %s', block = true },
 ]
-
 
 [open]
 prepend_rules = [
@@ -73,6 +72,7 @@ prepend_rules = [
   { mime = "text/*",                                         use = [ "edit",  "reveal"] },
   { mime = "*",                                              use = [ "edit",  "reveal"] },
 ]
+
 [input]
 cursor_blink = false
 

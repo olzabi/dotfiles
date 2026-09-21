@@ -36,7 +36,7 @@
     "npm:@ff-labs/pi-fff",
     "npm:@aliou/pi-guardrails",
     "npm:@tintinweb/pi-subagents",
-    "npm:pi-chatgpt-limit",
+    "npm:@narumitw/pi-usage",
   ],
   "observational-memory": {
     "observeAfterTokens": 10000,
