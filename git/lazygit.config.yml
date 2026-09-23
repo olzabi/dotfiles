@@ -4,7 +4,6 @@ git:
       pager: hunk pager --mode split
     - colorArg: always
       pager: hunk pager --mode stack
-    - pager: delta --paging=never --features=darkvoid
   autoFetch: true
   autoRefresh: false
   disableForcePushing: true

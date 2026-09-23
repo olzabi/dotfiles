@@ -1,25 +1,16 @@
-local original_sign_handler = vim.diagnostic.handlers.signs
-vim.diagnostic.handlers.signs = {
-  show = function(ns, bufnr, diagnostics, opts)
-    if diagnostics then
-      local new_diagnostics = {}
-      for _, diagnostic in ipairs(diagnostics) do
-        if diagnostic.message:match "Unexpected statement, found '<<'" then
-          if diagnostic.severity == vim.diagnostic.severity.ERROR then
-            diagnostic.message = "Git conflict detected."
-            table.insert(new_diagnostics, diagnostic)
-          end
-          -- WARN variant is silently dropped
-        else
-          table.insert(new_diagnostics, diagnostic)
-        end
-      end
-      diagnostics = new_diagnostics
-    end
-    original_sign_handler.show(ns, bufnr, diagnostics, opts)
-  end,
-  hide = original_sign_handler.hide,
+local map = vim.keymap.set
+local sev = vim.diagnostic.severity
+
+local palette = {
+  err = "#51202A",
+  warn = "#3B3B1B",
+  info = "#1F3342",
+  hint = "#1E2E1E",
 }
+vim.api.nvim_set_hl(0, "DiagnosticErrorLine", { bg = palette.err, blend = 20 })
+vim.api.nvim_set_hl(0, "DiagnosticWarnLine", { bg = palette.warn, blend = 15 })
+vim.api.nvim_set_hl(0, "DiagnosticInfoLine", { bg = palette.info, blend = 10 })
+vim.api.nvim_set_hl(0, "DiagnosticHintLine", { bg = palette.hint, blend = 10 })
 
 local symbols = {
   [vim.diagnostic.severity.ERROR] = "✘",
@@ -35,9 +26,7 @@ local float = {
   style = "minimal",
   prefix = "",
   format = function(d)
-    local msg = d.message
-    local sym = symbols[d.severity] or ""
-    return string.format("%s\n%s", sym, msg)
+    return string.format("%s", d.message)
   end,
 }
 
@@ -49,8 +38,24 @@ vim.diagnostic.config {
   severity_sort = true,
   float = float,
   signs = { text = symbols },
+  linehl = {
+    [sev.ERROR] = "DiagnosticErrorLine",
+    [sev.WARN] = "DiagnosticWarnLine",
+    [sev.INFO] = "DiagnosticInfoLine",
+    [sev.HINT] = "DiagnosticHintLine",
+  },
 }
 
-local map = vim.keymap.set
-map("n", "[e", vim.diagnostic.goto_prev, { desc = "Prev diagnostic" })
-map("n", "]e", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
+local diagnostic_goto = function(next, severity)
+  severity = severity and vim.diagnostic.severity[severity] or nil
+  return function()
+    vim.diagnostic.jump({ count = next and 1 or -1, float = true, severity = severity })
+  end
+end
+
+map("n", "]d", diagnostic_goto(true), { desc = "Next Diagnostic" })
+map("n", "[d", diagnostic_goto(false), { desc = "Prev Diagnostic" })
+map("n", "]e", diagnostic_goto(true, "ERROR"), { desc = "Next Error" })
+map("n", "[e", diagnostic_goto(false, "ERROR"), { desc = "Prev Error" })
+map("n", "]w", diagnostic_goto(true, "WARN"), { desc = "Next Warning" })
+map("n", "[w", diagnostic_goto(false, "WARN"), { desc = "Prev Warning" })

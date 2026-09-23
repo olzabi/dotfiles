@@ -58,5 +58,15 @@ use = "yazi-rs/plugins:piper"
 rev = "5d5c480"
 hash = "384464b6df8cb807425c521f8cd790f3"
 
+[[plugin.deps]]
+use = "Rolv-Apneseth/starship"
+rev = "ea92cf4"
+hash = "9776f378459072b6c2875eae5addc49d"
+
+[[plugin.deps]]
+use = "yazi-rs/plugins:types"
+rev = "f703392"
+hash = "d368d5a6a72657e1c0e7ee7340dcea8c"
+
 [flavor]
 deps = []

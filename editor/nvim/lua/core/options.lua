@@ -4,79 +4,106 @@ local g = vim.g
 g.mapleader = " "
 g.maplocalleader = "\\"
 
-g.autoformat = true
-g.snacks_animate = true
-g.ai_cmp = true
+-- general
+opt.number = true
+opt.relativenumber = true
+opt.cursorline = true
+opt.wrap = false
+opt.scrolloff = 16
+opt.sidescrolloff = 8
+
+-- Indentation
+opt.tabstop = 2
+opt.shiftwidth = 2
+opt.softtabstop = 2
+opt.expandtab = true
+opt.smartindent = true
+opt.autoindent = true
+opt.shiftround = true
+
+-- Search
+opt.ignorecase = true
+opt.smartcase = true
+opt.incsearch = true
+
+-- Visual settings
+opt.termguicolors = true
+opt.signcolumn = "yes"
+opt.showmatch = true
+opt.matchtime = 2
+opt.cmdheight = 1
+opt.showmode = false
+opt.pumheight = 10
+opt.pumblend = 10
+opt.winblend = 0
+opt.completeopt = "menu,menuone,noselect"
+opt.conceallevel = 2
+opt.confirm = true
+opt.concealcursor = ""
+opt.synmaxcol = 300
+opt.ruler = false
+opt.virtualedit = "block"
+opt.winminwidth = 5
+
+-- File handling
+opt.backup = false
+opt.writebackup = false
+opt.swapfile = false
+opt.undodir = vim.fn.stdpath("data") .. "/undo//"
+opt.undolevels = 10000
+opt.undofile = true
+opt.updatetime = 200
+opt.timeoutlen = vim.g.vscode and 1000 or 300
+opt.ttimeoutlen = 0
+opt.autoread = true
+
+-- Behavior settings
+opt.hidden = true
+opt.errorbells = false
+opt.backspace = "indent,eol,start"
+opt.autochdir = false
+opt.iskeyword:append("-")
+opt.path:append("**")
+opt.selection = "exclusive"
+opt.mouse = "a"
+opt.clipboard = vim.env.SSH_TTY and "" or "unnamedplus"
+opt.modifiable = true
+opt.encoding = "UTF-8"
+
+-- Folding settings
+opt.smoothscroll = true
+vim.wo.foldmethod = "expr"
+opt.foldlevel = 99
+opt.formatoptions = "jcroqlnt" -- tcqj
+-- opt.formatoptions = "jqlnt"
+opt.grepformat = "%f:%l:%c:%m"
+opt.grepprg = "rg --vimgrep"
+
+-- Split behavior
+opt.splitbelow = true
+opt.splitright = true
+opt.splitkeep = "screen"
+
+-- Command-line completion
+opt.wildmenu = true
+opt.wildmode = "longest:full,full"
+opt.wildignore:append({ "*.o", "*.obj", "*.pyc", "*.class", "*.jar", "/node_modules/" })
+
+-- Better diff options
+opt.diffopt:append("linematch:60")
+
+-- Performance improvements
+opt.redrawtime = 10000
+opt.maxmempattern = 20000
+
 g.lazyvim_picker = "auto"
 g.lazyvim_cmp = "auto"
 g.root_spec = { "lsp", { ".git", "lua" }, "cwd" }
-g.root_lsp_ignore = { "copilot" }
 g.deprecation_warnings = false
 g.trouble_lualine = true
 g.markdown_recommended_style = 0
-g.loaded_perl_provider  = 0
-g.loaded_ruby_provider  = 0
 
-opt.swapfile = false -- no swap files
-opt.backup = true
-opt.backupdir = vim.fn.stdpath("data") .. "/backup//"
-opt.backupskip = { "/tmp/*" }
-opt.writebackup = true
-opt.undofile = true
-opt.undodir = vim.fn.stdpath("data") .. "/undo//"
-opt.undolevels = 10000
-
-opt.clipboard = vim.env.SSH_TTY and "" or "unnamedplus"
-
-opt.expandtab = true -- spaces instead of tabs
-opt.shiftwidth = 2
-opt.tabstop = 2
-opt.shiftround = true -- round indent to shiftwidth
-opt.smartindent = true -- better autoindent for code
-
-opt.formatoptions = "jqlnt"
-opt.virtualedit = "block" -- free cursor in visual block mode          [IDEA]
-
-opt.ignorecase = true
-opt.smartcase = true
-opt.inccommand = "nosplit" -- live preview for :s and similar
-opt.grepprg = "rg --vimgrep"
-opt.grepformat = "%f:%l:%c:%m"
-
-opt.title = true
-opt.number = true -- [IDEA]
-opt.relativenumber = true -- [IDEA]
-opt.cursorline = true
-opt.signcolumn = "yes" -- always show; prevents layout shift
-opt.showmode = false -- statusline shows mode
-opt.ruler = false -- statusline covers this
-opt.list = true -- show invisible chars
-opt.linebreak = true -- wrap at word boundaries
-opt.wrap = false -- no soft-wrap by default                      [IDEA]
-opt.scrolloff = 16
-opt.sidescrolloff = 8
-opt.pumheight = 10
-opt.pumblend = 10
-opt.termguicolors = true
-opt.laststatus = 3 -- single global statusline
-opt.conceallevel = 2 -- hide * markup for bold/italic
-
-opt.splitbelow = true
-opt.splitright = true
-opt.splitkeep = "cursor"
-opt.winminwidth = 5
-
-opt.completeopt = "menu,menuone,noselect"
-
-opt.confirm = true -- ask instead of error on unsaved changes
-opt.autowrite = true -- write before :make, :next, etc.
-opt.updatetime = 200 -- faster CursorHold, faster sign updates
-opt.timeoutlen = vim.g.vscode and 1000 or 300 -- which-key trigger speed
-opt.jumpoptions = "view"
 opt.spelllang = { "en" }
 opt.sessionoptions = { "buffers", "curdir", "tabpages", "winsize", "winpos", "help", "globals", "skiprtp", "folds" }
-opt.shortmess:append({ W = true, I = true, c = true, C = true })
-opt.wildmode = "longest:full,full"
 opt.shell = "zsh"
-opt.path:append({ "**" })
-opt.wildignore:append({ "/node_modules/" })
+

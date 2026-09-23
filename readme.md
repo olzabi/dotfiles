@@ -1,6 +1,5 @@
 # Dotfiles
 
-
 ```bash
 sudo apt update && sudo apt-get install \
   build-essential libreadline-dev unzip liblua5.4-dev lua5.4 \
@@ -12,9 +11,6 @@ sudo apt update && sudo apt-get install \
   libevent-dev libncurses-dev \
   clangd-15
 ```
-
-
-
 
 ## Installation
 

@@ -1,6 +1,6 @@
 require("motions"):setup({
-  show_numbers = "relative",
-  show_motion = true,
+	show_numbers = "relative",
+	show_motion = true,
 })
 
 require("projects"):setup({
@@ -35,4 +35,12 @@ require("bookmarks"):setup({
 			delete_all = "Deleted all bookmarks",
 		},
 	},
+})
+
+require("starship"):setup({
+	hide_flags = true,
+	flags_after_prompt = true,
+	show_right_prompt = false,
+	hide_count = false,
+	count_separator = " ",
 })

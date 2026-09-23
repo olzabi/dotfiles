@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "0.86.1",
+  "lastChangelogVersion": "0.87.1",
   "collapseChangelog": true,
   "autoUpdate": true,
   "quietStartup": true,
@@ -43,6 +43,7 @@
     "npm:@aliou/pi-guardrails",
     "npm:@tintinweb/pi-subagents",
     "npm:@narumitw/pi-usage",
+    "npm:@narumitw/pi-stamp",
   ],
   "observational-memory": {
     "observeAfterTokens": 10000,

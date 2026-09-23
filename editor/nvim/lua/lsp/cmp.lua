@@ -97,6 +97,7 @@ return {
           },
         },
       },
+      signature = { window = { border = "rounded" } },
       sources = {
         default = { "lsp", "snippets", "path", "buffer", "lazydev" },
         per_filetype = {
