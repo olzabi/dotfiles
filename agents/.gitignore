@@ -1,13 +1,6 @@
 *
-!.gitignore
-!docs/
-!docs/**
 
-!pi/
-pi/*
-!pi/agent/
-pi/agent/*
-!pi/agent/mcp.json
-!pi/agent/settings.json
-!web-search.json
-!models.json
+!/pi/
+!/pi/agent/
+!/pi/agent/.gitignore
+

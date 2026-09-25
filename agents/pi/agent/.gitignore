@@ -1,0 +1,10 @@
+# core
+!settings.json
+!AGENTS.md
+
+# plugins
+!web-search.json
+!subagents.json
+!pi-starship.toml
+!pi-stamp.json
+!model.json
