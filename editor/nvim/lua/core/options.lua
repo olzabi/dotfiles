@@ -64,7 +64,7 @@ opt.backspace = "indent,eol,start"
 opt.autochdir = false
 opt.iskeyword:append("-")
 opt.path:append("**")
-opt.selection = "exclusive"
+opt.selection = "inclusive"
 opt.mouse = "a"
 opt.clipboard = vim.env.SSH_TTY and "" or "unnamedplus"
 opt.modifiable = true
@@ -74,8 +74,8 @@ opt.encoding = "UTF-8"
 opt.smoothscroll = true
 vim.wo.foldmethod = "expr"
 opt.foldlevel = 99
-opt.formatoptions = "jcroqlnt" -- tcqj
--- opt.formatoptions = "jqlnt"
+-- opt.formatoptions = "jcroqlnt" -- tcqj
+opt.formatoptions = "jqlnt"
 opt.grepformat = "%f:%l:%c:%m"
 opt.grepprg = "rg --vimgrep"
 
