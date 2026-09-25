@@ -37,7 +37,6 @@
     "npm:pi-memory",
     "npm:pi-tool-display",
     "npm:pi-context-prune",
-    "npm:pi-context",
     "npm:pi-rtk-optimizer",
     "npm:pi-web-access",
     "npm:@ff-labs/pi-fff",
@@ -45,7 +44,8 @@
     "npm:@tintinweb/pi-subagents",
     "npm:@narumitw/pi-usage",
     "npm:@narumitw/pi-stamp",
-    "npm:@narumitw/pi-starship"
+    "npm:@narumitw/pi-starship",
+    "npm:pi-markdown-preview"
   ],
   "observational-memory": {
     "observeAfterTokens": 10000,

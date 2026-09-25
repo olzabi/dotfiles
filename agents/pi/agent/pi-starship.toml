@@ -1,0 +1,43 @@
+# Compact two-line footer: identity and usage above, activity and resource metrics below.
+format = """
+$model$git_branch$fill$extension_status
+$directory$activity$fill$context$tokens
+"""
+
+[model]
+format = "[$model]($style) "
+symbol = ""
+style = "bold blue"
+
+[directory]
+format = "[$path]($style) "
+symbol = ""
+style = "cyan bold"
+
+[git_branch]
+format = "[branch: $branch]($style) "
+symbol = ""
+style = "bold purple"
+
+[activity]
+format = "[$text]($style)"
+symbol = "*"
+style = "bold yellow"
+
+[context]
+format = "[ctx:$percentage]($style) "
+symbol = ""
+
+[tokens]
+format = "[↑$input ↓$output]($style)"
+symbol = ""
+style = "dimmed cyan"
+
+[extension_status]
+format = "[ $statuses]($style)"
+separator = " • "
+max_statuses = 10
+style = "dimmed yellow"
+
+[extension_status.icons]
+usage = ""

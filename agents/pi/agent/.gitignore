@@ -3,6 +3,7 @@
 !AGENTS.md
 
 # plugins
+!context-prune/
 !web-search.json
 !subagents.json
 !pi-starship.toml
