@@ -6,6 +6,10 @@ export XDG_BIN_HOME="$XDG_LOCAL_HOME/bin"
 export XDG_DATA_HOME="$XDG_LOCAL_HOME/share"
 export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/run/user/$(id -u)}
 
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
+
 export DOTFILES="$XDG_CONFIG_HOME/dotfiles"
 export DOTFILES_GIT="$DOTFILES/git"
 export DOTFILES_EDITOR="$DOTFILES/editor"

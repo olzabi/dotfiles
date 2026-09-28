@@ -9,6 +9,8 @@ alias ls='eza --color=always --icons --group-directories-first'
 # alias rm='trash'
 alias y='yy'
 alias n='nvim'
+alias t='tmux'
+alias tt='tt new-session -A -s main'
 alias td='sesh connect default'
 alias monkey='smassh' # inspired by monkeytype
 alias cal="calcurse"
@@ -35,3 +37,6 @@ alias serve="artisan serve"
 alias tinker="artisan tinker"
 alias cu='composer update'
 alias ci='composer install'
+
+#---
+alias win_ssh='/mnt/c/Windows/System32/OpenSSH/ssh.exe'
