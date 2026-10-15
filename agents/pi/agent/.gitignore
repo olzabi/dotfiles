@@ -2,6 +2,14 @@
 !settings.json
 !AGENTS.md
 
+!/**/config.json
+
+!extensions/
+!extensions/**
+
+!npm/
+!npm/package.json
+
 # plugins
 !context-prune/
 !web-search.json
