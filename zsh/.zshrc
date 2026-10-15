@@ -120,6 +120,9 @@ export RUSTFLAGS="-C opt-level=3 -C target-cpu=native" # Rust app build optimiza
 export RUST_SRC_PATH="${RUST_SRC_PATH:-$(rustc --print sysroot 2>/dev/null)/lib/rustlib/src/rust/src}"
 # ---------
 
+ZSH_TMUX_AUTOSTART=true
+ZSH_TMUX_DEFAULT_SESSION_NAME=main
+
 . "$ZSH/oh-my-zsh.sh"
 . "$ZSH/../aliases.zsh"
 . "$ZSH/../functions.zsh"
