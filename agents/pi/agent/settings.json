@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "1.2.0",
+  "lastChangelogVersion": "1.3.0",
   "collapseChangelog": true,
   "autoUpdate": true,
   "quietStartup": true,
@@ -37,31 +37,10 @@
     "npm:pi-web-access",
     "npm:pi-cache-optimizer",
     "npm:pi-minimalist",
-    "npm:pi-atelier"
+    "npm:pi-vim",
+    "./extensions/.packages/pi-atelier-local",
+    "npm:@juicesharp/rpiv-ask-user-question"
   ],
-  "observational-memory": {
-    "observeAfterTokens": 15000,
-    "reflectAfterTokens": 30000,
-    "compactAfterTokens": 100000,
-    "compactAfterTokensMode": "callibrated",
-    "compactAfterTokensRatio": 0.68,
-    "observationsPoolMaxTokens": 20000,
-    "agentMaxTurns": 16,
-    "models": {
-      "consolidator": {
-        "provider": "openai-codex",
-        "id": "gpt-6-luna",
-        "thinking": "high"
-      },
-      "observer": {
-        "provider": "openai-codex",
-        "id": "gpt-6-luna",
-        "thinking": "high"
-      }
-    },
-    "passive": false,
-    "debugLog": false
-  },
   "tuiMode": "regular",
   "outputPad": 1,
   "images": {
@@ -97,6 +76,53 @@
     "glyphStyle": "unicode",
     "excludeTools": [],
     "keepActiveThinkingExpanded": false
+  },
+  "piVim": {
+    "clipboardMirror": "all",
+    "exCommand": {
+      "piDispatch": true,
+      "copyInputToClipboard": false
+    },
+    "modeColors": {
+      "insert": "borderMuted",
+      "normal": "borderAccent",
+      "visual": "customMessageLabel",
+      "ex": "warning"
+    },
+    "borderSync": {
+      "insert": "host",
+      "normal": "host",
+      "visual": "host",
+      "ex": "host"
+    },
+    "labelSync": {
+      "insert": "mode",
+      "normal": "mode",
+      "visual": "mode",
+      "ex": "mode"
+    }
+  },
+  "observational-memory": {
+    "observeAfterTokens": 15000,
+    "reflectAfterTokens": 30000,
+    "compactAfterTokens": 100000,
+    "compactAfterTokensMode": "callibrated",
+    "compactAfterTokensRatio": 0.68,
+    "observationsPoolMaxTokens": 20000,
+    "agentMaxTurns": 16,
+    "models": {
+      "consolidator": {
+        "provider": "openai-codex",
+        "id": "gpt-6-luna",
+        "thinking": "high"
+      },
+      "observer": {
+        "provider": "openai-codex",
+        "id": "gpt-6-luna",
+        "thinking": "high"
+      }
+    },
+    "passive": false,
+    "debugLog": false
   }
 }
-
