@@ -146,3 +146,6 @@ _prepend_path "$RBENV_ROOT/bin"
 # export AWS_HOME="$DOTFILES/aws"
 # export AWS_CONFIG_FILE="$AWS_HOME/config"
 # export AWS_SHARED_CREDENTIALS_FILE="$AWS_HOME/credentials"
+
+# Vite+ bin (https://viteplus.dev)
+. "$XDG_CONFIG_HOME/vite-plus/env"

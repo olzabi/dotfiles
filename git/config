@@ -26,8 +26,8 @@
   conflictStyle = zdiff3
 
 [rebase]
-	authstash = true
-	autosquash = true
+	authStash = true
+	autoSquash = true
 	updateRefs = true
 
 [credential]
