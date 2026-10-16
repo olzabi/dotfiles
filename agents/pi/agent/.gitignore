@@ -3,10 +3,10 @@
 !AGENTS.md
 
 !/**/config.json
-
+!agents/
+!agents/**
 !extensions/
 !extensions/**
-
 !npm/
 !npm/package.json
 
@@ -17,3 +17,5 @@
 !pi-starship.toml
 !pi-stamp.json
 !model.json
+!tasks-config.json
+!pi-atelier.json

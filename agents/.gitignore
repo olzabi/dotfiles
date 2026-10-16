@@ -1,6 +1,9 @@
 *
 
 !/pi/
+!/skills/
+!/skills/**
+
 !/pi/agent/
 !/pi/agent/.gitignore
 
