@@ -32,7 +32,7 @@ _prepend_path "/usr/lib/jvm/default-java/bin"
 _prepend_path "$DOTFILES_TOOLS/.fzf/bin"
 
 export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig
-export ZSH="$DOTFILES/zsh/.oh-my-zsh"
+export ZSH="$DOTFILES/zsh/ohmyzsh"
 export ZSH_CUSTOM="$DOTFILES/zsh/custom"
 export ZSH_COMPDUMP="$XDG_CACHE_HOME/zsh/.zcomdump-$HOST"
 _prepend_path "$ZSH_CUSTOM/plugins/git-fuzzy/bin"
@@ -149,3 +149,4 @@ _prepend_path "$RBENV_ROOT/bin"
 
 # Vite+ bin (https://viteplus.dev)
 . "$XDG_CONFIG_HOME/vite-plus/env"
+

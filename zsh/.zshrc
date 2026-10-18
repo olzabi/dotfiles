@@ -59,7 +59,6 @@ zstyle ':omz:plugins:nvm' silent-autoload yes
 
 plugins=(
   aws
-  artisan
   composer
   # colemak
   branch

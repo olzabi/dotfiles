@@ -1,0 +1,110 @@
+/* darkvoid for waybar */
+@define-color bg        #1c1c1c;
+@define-color fg        #c0c0c0;
+@define-color fg_bright #e1e1e1;
+@define-color fg_dim    #b1b1b1;
+@define-color comment   #858585;
+@define-color line_nr   #404040;
+@define-color visual    #303030;
+@define-color border    #585858;
+@define-color focus     #83b7ad;
+@define-color const     #b2d8d8;
+@define-color added     #baffc9;
+@define-color error     #ff7b72;
+@define-color warning   #f2c879;
+@define-color info      #66b2b2;
+
+* {
+  font-family: "JetBrainsMono Nerd Font", "Symbols Nerd Font Mono", monospace;
+  font-size: 16px;
+  border: none;
+  border-radius: 0;
+  min-height: 0;
+}
+
+window#waybar {
+  background: transparent;
+  color: @fg;
+}
+
+tooltip {
+  background: @bg;
+  color: @fg;
+  border: 2px solid @line_nr;
+  border-radius: 10px;
+}
+tooltip label { color: @fg; }
+
+/* shared pill look */
+#workspaces,
+#window,
+#clock,
+#tray,
+#pulseaudio,
+#network,
+#cpu,
+#memory,
+#battery {
+  background: @bg;
+  color: @fg_dim;
+  border: 2px solid @line_nr;
+  border-radius: 10px;
+  padding: 0 16px;
+  margin: 0;
+}
+
+/* workspaces */
+#workspaces { padding: 0 4px; }
+
+#workspaces button {
+  color: @comment;
+  background: transparent;
+  padding: 0 10px;
+  margin: 4px 3px;
+  border-radius: 7px;
+}
+#workspaces button:hover {
+  background: @visual;
+  color: @fg_bright;
+}
+#workspaces button.active {
+  background: @focus;
+  color: @bg;
+  font-weight: bold;
+}
+#workspaces button.urgent {
+  background: @error;
+  color: @bg;
+}
+
+/* window title */
+#window { color: @fg_bright; }
+window#waybar.empty #window {
+  background: transparent;
+  border-color: transparent;
+}
+
+/* center clock */
+#clock {
+  color: @fg_bright;
+  font-weight: bold;
+  border-color: @focus;
+}
+
+/* right modules */
+#pulseaudio       { color: @const; }
+#pulseaudio.muted { color: @comment; }
+
+#network              { color: @info; }
+#network.disconnected { color: @warning; }
+
+#cpu    { color: @fg_dim; }
+#memory { color: @fg_dim; }
+
+#battery          { color: @added; }
+#battery.charging { color: @focus; }
+#battery.warning:not(.charging) { color: @warning; }
+#battery.critical:not(.charging) {
+  color: @error;
+  border-color: @error;
+}

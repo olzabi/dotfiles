@@ -1,9 +1,9 @@
 git:
-  pagers:
+  diffRenderers:
     - colorArg: always
-      pager: hunk pager --mode split
+      command: hunk pager --mode split
     - colorArg: always
-      pager: hunk pager --mode stack
+      command: hunk pager --mode stack
   autoFetch: true
   autoRefresh: false
   disableForcePushing: true
