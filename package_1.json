@@ -1,0 +1,25 @@
+{
+  "name": "infra",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "up:postgres": "docker compose --profile postgres up -d",
+    "up:mysql":    "docker compose --profile mysql up -d",
+    "down:postgres": "docker compose stop postgres",
+    "down:mysql": "docker compose stop mysql",
+    "logs": "docker compose --profile all logs -f",
+    "logs:postgres": "docker compose logs -f postgres",
+    "logs:mysql": "docker compose logs -f mysql",
+    "status": "docker compose --profile all ps",
+    "health": "docker inspect --format '{{.Name}} → {{.State.Health.Status}}' $(docker compose --profile all ps -q) 2>/dev/null || echo 'No containers running'",
+    "shell:postgres": "docker exec -it postgres psql -U ${POSTGRES_USER:-admin} -d ${POSTGRES_DB:-devdb}",
+    "shell:mysql": "docker exec -it mysql mysql -u ${MYSQL_USER:-admin} -p${MYSQL_PASSWORD:-secret} ${MYSQL_DB:-devdb}",
+    "backup:postgres": "docker exec postgres pg_dump -U ${POSTGRES_USER:-admin} ${POSTGRES_DB:-devdb} > backups/postgres_$(date +%Y%m%d_%H%M%S).sql",
+    "backup:mysql": "docker exec mysql mysqldump -u root -p${MYSQL_ROOT_PASSWORD:-rootsecret} ${MYSQL_DB:-devdb} > backups/mysql_$(date +%Y%m%d_%H%M%S).sql",
+    "restore:postgres": "cat $FILE | docker exec -i postgres psql -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-dev}",
+    "restore:mysql": "cat $FILE | docker exec -i mysql mysql -u root -p${MYSQL_ROOT_PASSWORD:-rootsecret} ${MYSQL_DB:-dev}",
+    "volumes:list": "docker volume ls | grep infra",
+    "pull": "docker compose --profile all pull",
+    "update": "npm run pull && npm run up"
+  }
+}
