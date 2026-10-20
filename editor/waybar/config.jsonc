@@ -9,7 +9,7 @@
 
   "modules-left": ["hyprland/workspaces", "hyprland/window"],
   "modules-center": ["clock"],
-  "modules-right": ["tray", "pulseaudio", "network", "cpu", "memory", "battery"],
+  "modules-right": ["tray", "pulseaudio", "network", "cpu", "memory", "battery", "hyprland/language"],
 
   "hyprland/workspaces": {
     "format": "{id}",
@@ -21,6 +21,10 @@
     "format": "{title}",
     "max-length": 50,
     "separate-outputs": true
+  },
+
+  "hyprland/language": {
+    "format": "{short}"
   },
 
   "clock": {
