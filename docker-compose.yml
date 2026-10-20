@@ -43,13 +43,34 @@ services:
     networks:
       - db_mysql
     profiles: [mysql, sql, all]
+  searxng:
+    image: docker.io/searxng/searxng:${SEARXNG_VERSION:-latest}
+    container_name: searxng
+    restart: unless-stopped
+    env_file:
+      - ${SEARXNG_ENV_FILE:-./tools/searxng/.env}
+    environment:
+      SEARXNG_BASE_URL: http://127.0.0.1:${SEARXNG_PORT:-8888}/
+    ports:
+      - "127.0.0.1:${SEARXNG_PORT:-8888}:8080"
+    dns:
+      - 1.1.1.1
+      - 9.9.9.9
+    volumes:
+      - ./tools/searxng/config:/etc/searxng:ro,Z
+      - searxng_cache:/var/cache/searxng
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:8080/healthz || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    profiles: [searxng, llm, all]
 volumes:
   postgres_data:
   mysql_data:
-
+  searxng_cache:
 networks:
   db_psql:
     external: true
   db_mysql:
     external: true
-

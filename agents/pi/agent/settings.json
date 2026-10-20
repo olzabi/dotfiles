@@ -3,14 +3,13 @@
   "collapseChangelog": true,
   "autoUpdate": true,
   "quietStartup": true,
-  "defaultProvider": "openai-codex",
+  "defaultProvider": "openai",
   "defaultModel": "gpt-6-luna",
   "defaultThinkingLevel": "xhigh",
   "modelThinkingLevels": {
-    "openai-codex/gpt-6-luna": "xhigh",
-    "openai-codex/gpt-6-sol": "medium"
+    "openai/gpt-6-luna": "xhigh",
+    "openai/gpt-6.1-sol": "medium"
   },
-  "shellCommandPrefix": "shopt -s expand_aliases",
   "theme": "darkvoid",
   "markdown": {
     "mermaid": "streaming"
@@ -18,9 +17,9 @@
   "hideThinkingBlock": true,
   "enabledModels": [
     "ollama/qwen3.5:latest",
-    "openai-codex/gpt-6-luna",
-    "openai-codex/gpt-6-sol",
-    "openai-codex/gpt-6-astra"
+    "openai/gpt-6-luna",
+    "openai/gpt-6.1-sol",
+    "openai/gpt-6-astra"
   ],
   "packages": [
     "npm:@ff-labs/pi-fff",
@@ -112,12 +111,12 @@
     "agentMaxTurns": 16,
     "models": {
       "consolidator": {
-        "provider": "openai-codex",
+        "provider": "openai",
         "id": "gpt-6-luna",
         "thinking": "high"
       },
       "observer": {
-        "provider": "openai-codex",
+        "provider": "openai",
         "id": "gpt-6-luna",
         "thinking": "high"
       }

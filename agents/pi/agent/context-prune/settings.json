@@ -2,7 +2,7 @@
   "enabled": true,
   "showPruneStatusLine": true,
   "showStartupNotice": true,
-  "summarizerModel": "openai-codex/gpt-6-luna",
+  "summarizerModel": "openai/gpt-6-luna",
   "summarizerThinking": "high",
   "pruneOn": "agent-message",
   "remindUnprunedCount": true,

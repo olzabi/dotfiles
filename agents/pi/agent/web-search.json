@@ -3,6 +3,7 @@
   "searxngBaseUrl": "http://127.0.0.1:8888",
   "summaryModel": "ollama/qwen3.5:latest",
   "workflow": "auto-summary",
+  "toolActivation": "eager",
   "webSearch": {
     "allowedProviders": [
       "searxng"

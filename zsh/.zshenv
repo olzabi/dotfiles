@@ -6,6 +6,8 @@ export XDG_BIN_HOME="$XDG_LOCAL_HOME/bin"
 export XDG_DATA_HOME="$XDG_LOCAL_HOME/share"
 export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/run/user/$(id -u)}
 
+export KB_NAME="Blasphemy Slate"
+
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 
@@ -75,13 +77,12 @@ export CMAKE_CONFIG_DIR="$XDG_CONFIG_HOME/.cmake"
 #* docker & k8
 # ---------
 export DOCKER_CONFIG="$XDG_CONFIG_HOME/.docker"
-export DOCKER_HOST=unix:///var/run/docker.sock
 export MINIKUBE_HOME="$XDG_CONFIG_HOME/.minikube"
 export ANSIBLE_HOME="$XDG_CONFIG_HOME/.ansible"
 
 #* golang
 # ---------
-export GOROOT=/usr/local/go
+export GOROOT=/usr/lib/go
 export GOPATH="$XDG_CONFIG_HOME/go"
 export GOBIN="$GOPATH/bin"
 _append_path "$GOROOT/bin"
