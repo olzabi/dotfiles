@@ -33,16 +33,9 @@ bun.lock
 TODO.md
 TODO*
 
-tools/eza/eza*
 lazysql/config.toml
 editor/tmux/plugins/
-zsh/.oh-my-zsh/*
-!zsh/.oh-my-zsh/.git
-
-# Submodule contents (track refs only)
-!tools/.*/.git
-tools/.*
 
 user.gitconfig
-
 storage/
+packages/

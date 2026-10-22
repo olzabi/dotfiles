@@ -3,7 +3,7 @@ vim.filetype.add {
     [".*%.overlay"] = "c",
     [".*%.dts"] = "c",
     [".*%.dtsi"] = "devicetree",
-    [".*%.keymap"] = "devicetree"
+    [".*%.keymap"] = "devicetree",
   },
 }
 
@@ -24,6 +24,10 @@ vim.filetype.add {
     [".env.*"] = "sh",
   },
 }
+vim.filetype.add({
+  filename = { [".zshrc"] = "zsh", [".zshenv"] = "zsh", [".zprofile"] = "zsh" },
+  extension = { zsh = "zsh" },
+})
 
 vim.filetype.add {
   filename = {

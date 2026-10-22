@@ -29,7 +29,7 @@ return {
         python = { "ruff", "pylint" },
         sh = { "shellcheck" },
         bash = { "shellcheck" },
-        zsh = { "zsh" },
+        zsh = {},
       }
 
       lint.linters.eslint_d.args = {

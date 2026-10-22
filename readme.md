@@ -16,6 +16,13 @@ sudo apt update && sudo apt-get install \
 
 ### bat
 
-```
+```sh
 bat cache --build
+```
+
+```sh
+curl https://mise.run | sh
+ln -s ~/.config/dotfiles/mise/config.toml ~/.config/mise/config.toml
+mise install
+mise run symlinks:create
 ```
