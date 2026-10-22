@@ -1,5 +1,11 @@
 # Dotfiles
 
+```sh
+git clone https://github.com/olzabi/dotifles ~/Dotfiles
+gh repo clone olzabi/dotifles ~/Dotfiles
+
+```
+
 ```bash
 sudo apt update && sudo apt-get install \
   build-essential libreadline-dev unzip liblua5.4-dev lua5.4 \

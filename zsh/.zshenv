@@ -10,39 +10,33 @@ export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/run/user/$(id -u)}
 
 export SSH_AUTH_SOCK=${SSH_AUTH_SOCK:-$XDG_RUNTIME_DIR/ssh-agent.socket}
 
-export KB_NAME="Blasphemy Slate"
 
-export LANG=en_US.UTF-8
-export LC_ALL=en_US.UTF-8
-
-
-export DOTFILES="$XDG_CONFIG_HOME/dotfiles"
+export DOTFILES="$HOME/Dotfiles"
 export DOTFILES_GIT="$DOTFILES/git"
 export DOTFILES_EDITOR="$DOTFILES/editor"
 export DOTFILES_TOOLS="$DOTFILES/tools"
 export DOTFILES_THEMES="$DOTFILES/themes"
 export DOTFILES_AI="$DOTFILES/agents"
 
+export KB_NAME="Blasphemy Slate"
+
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
+
 export DEV="$HOME/dev"
 export YAZI_CONFIG_HOME="$DOTFILES_EDITOR/yazi"
 export BAT_CONFIG_DIR="$DOTFILES_EDITOR/bat"
-export STARSHIP_CONFIG="$DOTFILES/zsh/starship.toml"
+export STARSHIP_CONFIG="$DOTFILES/starship.toml"
 
 _prepend_path() { path=("$1" ${path:#$1}); }
 _append_path()  { path=(${path:#$1} "$1"); }
 
-_append_path "/opt/nvim-linux-x86_64/bin"
 _prepend_path "$XDG_LOCAL_HOME/bin"
 
 [[ -d /opt/cuda/bin ]] && { _prepend_path /opt/cuda/bin; export CUDA_PATH=/opt/cuda; }
 
-_prepend_path "/usr/lib/jvm/default-java/bin"
-
-export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig
-export ZSH="$DOTFILES/zsh/ohmyzsh"
-export ZSH_CUSTOM="$DOTFILES/zsh/custom"
 export ZSH_COMPDUMP="$XDG_CACHE_HOME/zsh/.zcomdump-$HOST"
-_prepend_path "$ZSH_CUSTOM/plugins/git-fuzzy/bin"
 
 if [[ -n $SSH_CONNECTION ]]; then
   export EDITOR='vim'
@@ -67,7 +61,7 @@ export MYSQL_HISTFILE="$HIST_DIR/.mysql_history"
 export PYTHON_HISTORY="$HIST_DIR/.python_history"
 export PSYSH_CONFIG="$HIST_DIR/psysh_history"
 
-export EZA_CONFIG_DIR="$DOTFILES_TOOLS/eza"
+export EZA_CONFIG_DIR="$DOTFILES_THEMES/eza"
 export EZA_COLORS="di=1;34:ln=36:ex=1;32"
 _prepend_path "$DOTFILES_TOOLS/eza/completions/zsh"
 

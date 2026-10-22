@@ -163,8 +163,9 @@ local function add_git_markers(text, signs)
 end
 
 local function rich_pythonpath()
-	local config_home = os.getenv("XDG_CONFIG_HOME") or ((os.getenv("HOME") or "") .. "/.config")
-	local theme_path = config_home .. "/dotfiles/tools/rich"
+	-- local config_home = os.getenv("XDG_CONFIG_HOME") or ((os.getenv("HOME") or "") .. "/.config")
+  local config_home = os.getenv("HOME") .. "/Dotfiles"
+	local theme_path = config_home .. "/editor/yazi/rich"
 	local current = os.getenv("PYTHONPATH")
 	return current and theme_path .. ":" .. current or theme_path
 end
