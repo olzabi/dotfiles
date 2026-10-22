@@ -7,9 +7,11 @@ else
   alias l='ls -la'
 fi
 
+
 alias sudo='sudo '
 alias view="xdg-open"
 # alias rm='trash'
+alias rmrf="rm -rf"
 alias y='yy'
 alias n='nvim'
 alias tt='tmux new-session -A -s main'
@@ -18,14 +20,28 @@ alias oc="opencode"
 alias history='fc -fl 1'
 alias hs='history | grep'
 
-alias gf='git fuzzy'
-alias gc='git commit -m'
-alias gco="git checkout"
-alias gs='git status'
-alias gc='git commit -m'
-alias gca='git commit -am'
-alias ga='git add'
-alias gaa='git add .'
+if (( $+commands[git] )); then
+	alias ga="git add"
+	alias gb="git branch"
+	alias gc="git clone"
+	alias gcm="git commit -m"
+	alias gco="git checkout"
+	alias gcob="git checkout -b"
+	alias gcs="git commit -S -m"
+	alias gd="git difftool"
+	alias gdc="git difftool --cached"
+	alias gf="git fetch"
+	alias gg="git graph"
+	alias ggg="git graphgpg"
+	alias gm="git merge"
+	alias gp="git push"
+	alias gpr="gh pr create"
+	alias gr="git rebase -i"
+	alias gs="git status -sb"
+	alias gt="git tag"
+	alias gu="git reset @ --" #think git unstage
+	alias gx="git reset --hard @"
+fi
 
 alias ld="lazydocker"
 alias lg='lazygit'
