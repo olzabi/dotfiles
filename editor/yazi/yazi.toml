@@ -50,25 +50,34 @@ edit = [
   { run = '$EDITOR %s',    block = true, desc = "$EDITOR", for = "linux" },
   { run = 'hunk diff %s1', block = true, desc = "Review diff in Hunk" },
 ]
-edit_php = [
-  { run = 'phpstorm64.exe %s',  desc = "Open in PhpStorm",  orphan = true, for = "unix" },
+open = [
   { run = 'nvim %s',            desc = "Edit in Neovim",    block = true,  for = "unix" },
+  { run = 'xdg-open %s', orphan = true, desc = "Open with default app", for = "linux" },
 ]
 reveal = [
-  { run = 'wslview %s1',                      orphan = true, desc = "Open in Windows (wslview)", for = "linux" },
-  { run = 'explorer.exe "$(wslpath -w %s1)"', orphan = true, desc = "Reveal in Explorer", for = "linux" },
+  { run = 'xdg-open "$(dirname -- %s1)"', orphan = true, desc = "Open containing folder", for = "linux" },
 ]
 audio = [
-  { run = '''mediainfo %s1; echo "Press enter to exit"; read''', block = true, desc = "Show media info" },
-  { run = 'mpv --no-video %s', block = true },
+  { run = 'xdg-open %s', orphan = true, desc = "Open with default app", for = "linux" },
+  { run = '''mediainfo %s1; echo "Press enter to exit"; read''', block = true, desc = "Show media info", for = "linux" },
+]
+video = [
+  { run = 'xdg-open %s', orphan = true, desc = "Open with default app", for = "linux" },
+  { run = '''mediainfo %s1; echo "Press enter to exit"; read''', block = true, desc = "Show media info", for = "linux" },
+]
+image = [
+  { run = 'imv %s', orphan = true, desc = "Open image in imv", for = "linux" },
+  { run = 'xdg-open %s', orphan = true, desc = "Open with default app", for = "linux" },
 ]
 
 [open]
 prepend_rules = [
   { mime = "application/*zip",                               use = [ "extract", "reveal", ] },
 	{ mime = "application/x-{tar,bzip*,7z-compressed,xz,rar}", use = [ "extract", "reveal", ] },
-  { url = "*.blade.php",                                     use = "edit_php" },
-  { url = "*.php",                                           use = "edit_php" },
+  { url = "*.blade.php",                                     use = "edit" },
+  { url = "*.php",                                           use = "edit" },
+  { mime = "image/*",                                        use = "image" },
+  { mime = "video/*",                                        use = "video" },
   { mime = "audio/*",                                        use = "audio" },
   { mime = "text/*",                                         use = [ "edit",  "reveal"] },
   { mime = "*",                                              use = [ "edit",  "reveal"] },

@@ -1,0 +1,52 @@
+[settings]
+idiomatic_version_file_enable_tools = ["node", "python", "ruby", "php"]
+
+[tools]
+node = "lts"
+go = "latest"
+uv = "latest"
+fd = "latest"
+jq = "latest"
+yq = "latest"
+gh = "latest"
+act = "latest"
+bat = "latest"
+eza = "latest"
+fzf = "latest"
+glow = "latest"
+tmux = "latest"       # may compile from source, check with `mise install -v tmux`
+yazi = "latest"
+hunk = "latest"
+rust = "stable"
+delta = "latest"
+neovim = "latest"
+zoxide = "latest"
+direnv = "latest"
+ripgrep = "latest"
+lazygit = "latest"
+starship = "latest"
+lazydocker = "latest"
+
+"github:nnnkkk7/lazyactions" = "latest"
+"github:tmuxpack/tpack" = "latest"
+"github:jorgerojas26/lazysql" = "latest"
+
+
+[tasks."symlinks:create"]
+run = "bin/symlinks.sh --create"
+
+[tasks."yazi-cli:update"]
+description = "Upgrade yazi packages/plugins"
+run = "ya pkg upgrade"
+
+[tasks."pi:update"]
+run = "pi update --extensions"
+
+[tasks."bat:build"]
+description = "Rebuild the bat theme/syntax cache"
+run = "bat cache --build"
+
+[tasks.update]
+description = "Run mise up plus every *:update task"
+run = "mise up"
+depends = ["*:update"]

@@ -1,0 +1,10 @@
+{
+  "custom/gpu": {
+    "class": "accent-focus",
+    "exec": "~/.config/waybar/scripts/gpu.sh",
+    "return-type": "json",
+    "interval": 5,
+    "hide-empty-text": true,
+    "max-length": 18
+  }
+}

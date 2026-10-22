@@ -1,0 +1,13 @@
+{
+  "custom/bluetooth": {
+    "class": "accent-info",
+    "exec": "~/.config/waybar/scripts/bt.sh",
+    "return-type": "json",
+    "interval": 5,
+    "signal": 8,
+    "hide-empty-text": true,
+    "max-length": 18,
+    "on-click": "~/.config/waybar/scripts/bt-menu.sh",
+    "on-click-right": "~/.config/waybar/scripts/bt-menu.sh toggle"
+  }
+}

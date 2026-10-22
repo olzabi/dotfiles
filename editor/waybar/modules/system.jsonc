@@ -1,0 +1,8 @@
+{
+  // no accent: uses the default dim foreground
+  "custom/system": {
+    "exec": "~/.config/waybar/scripts/system.sh",
+    "return-type": "json",
+    "interval": 5
+  }
+}

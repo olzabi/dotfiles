@@ -1,0 +1,38 @@
+{
+  "include": [
+    "~/.config/waybar/common.jsonc",
+
+    "~/.config/waybar/modules/notifications.jsonc",
+    "~/.config/waybar/modules/bluetooth.jsonc",
+    "~/.config/waybar/modules/hyprwhspr.jsonc",
+    "~/.config/waybar/modules/splitkb.jsonc",
+    "~/.config/waybar/modules/system.jsonc",
+    "~/.config/waybar/modules/gpu.jsonc"
+  ],
+
+  "modules-left": ["niri/workspaces", "niri/window"],
+  "modules-right": [
+    "tray",
+    "custom/notifications",
+    "custom/bluetooth",
+    "custom/hyprwhspr",
+    "custom/splitkb",
+    "custom/system",
+    "custom/gpu",
+    "pulseaudio",
+    "network",
+    "battery"
+  ],
+  "modules-center": [ "clock", "niri/language" ],
+
+  "niri/workspaces": { "format": "{value}" },
+  "niri/window": {
+    "format": "{title}",
+    "max-length": 36,
+    "separate-outputs": true
+  },
+  "niri/language": {
+    "class": "accent-focus",
+    "format": "{short}"
+  }
+}

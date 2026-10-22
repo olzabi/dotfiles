@@ -1,15 +1,30 @@
 {
-  "layer": "top",
-  "position": "top",
-  "height": 42,
-  "margin-top": 8,
-  "margin-left": 20,
-  "margin-right": 20,
-  "spacing": 8,
+  // Hyprland bar
+  "include": [
+    "~/.config/waybar/common.jsonc",
+    "~/.config/waybar/modules/hyprwhspr.jsonc",
+    "~/.config/waybar/modules/notifications.jsonc",
+    "~/.config/waybar/modules/bluetooth.jsonc",
+    "~/.config/waybar/modules/splitkb.jsonc",
+    "~/.config/waybar/modules/system.jsonc",
+    "~/.config/waybar/modules/gpu.jsonc"
+  ],
 
-  "modules-left": ["hyprland/workspaces", "hyprland/window"],
   "modules-center": ["clock"],
-  "modules-right": ["tray", "pulseaudio", "network", "cpu", "memory", "battery", "hyprland/language"],
+  "modules-left": ["hyprland/workspaces", "hyprland/window"],
+  "modules-right": [
+    "tray",
+    "custom/notifications",
+    "custom/hyprwhspr",
+    "custom/bluetooth",
+    "custom/splitkb",
+    "custom/system",
+    "custom/gpu",
+    "pulseaudio",
+    "network",
+    "hyprland/language",
+    "battery"
+  ],
 
   "hyprland/workspaces": {
     "format": "{id}",
@@ -19,60 +34,12 @@
 
   "hyprland/window": {
     "format": "{title}",
-    "max-length": 50,
+    "max-length": 36,
     "separate-outputs": true
   },
 
   "hyprland/language": {
+    "class": "accent-focus",
     "format": "{short}"
-  },
-
-  "clock": {
-    "format": " {:%H:%M}",
-    "format-alt": " {:%a %d %b %Y}",
-    "tooltip-format": "<tt>{calendar}</tt>"
-  },
-
-  "tray": {
-    "icon-size": 20,
-    "spacing": 10
-  },
-
-  "pulseaudio": {
-    "format": "{icon} {volume}%",
-    "format-muted": " muted",
-    "format-icons": {
-      "headphone": "",
-      "default": ["", "", ""]
-    },
-    "scroll-step": 5,
-    "on-click": "pavucontrol"
-  },
-
-  "network": {
-    "format-wifi": " {essid}",
-    "format-ethernet": " {ipaddr}",
-    "format-disconnected": " offline",
-    "tooltip-format-wifi": "{essid} ({signalStrength}%)\n{ipaddr}",
-    "tooltip-format-ethernet": "{ifname}\n{ipaddr}"
-  },
-
-  "cpu": {
-    "format": " {usage}%",
-    "interval": 3
-  },
-
-  "memory": {
-    "format": " {percentage}%",
-    "interval": 5,
-    "tooltip-format": "{used:0.1f}G / {total:0.1f}G"
-  },
-
-  "battery": {
-    "states": { "warning": 25, "critical": 10 },
-    "format": "{icon} {capacity}%",
-    "format-charging": " {capacity}%",
-    "format-plugged": " {capacity}%",
-    "format-icons": ["", "", "", "", ""]
   }
 }

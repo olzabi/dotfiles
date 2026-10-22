@@ -1,0 +1,36 @@
+# Darkvoid notification styling
+font=JetBrainsMono Nerd Font 10
+background-color=#1c1c1c
+text-color=#c0c0c0
+border-color=#585858
+progress-color=over #1bfd9c
+
+width=380
+height=120
+outer-margin=8
+margin=6
+padding=12
+border-size=1
+border-radius=8
+anchor=top-right
+layer=top
+max-visible=4
+history=1
+format=<b>%s</b>\n%b
+
+[urgency=low]
+text-color=#b1b1b1
+border-color=#585858
+default-timeout=5000
+
+[urgency=normal]
+border-color=#1bfd9c
+default-timeout=7000
+
+[urgency=critical]
+text-color=#f1f1f1
+border-color=#dea6a0
+default-timeout=0
+
+[mode=do-not-disturb]
+invisible=1

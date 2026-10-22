@@ -1,0 +1,9 @@
+{
+  "custom/splitkb": {
+    "class": "accent-const",
+    "exec": "~/.config/waybar/scripts/splits.sh",
+    "return-type": "json",
+    "hide-empty-text": true,
+    "on-click": "~/.config/waybar/scripts/bt-menu.sh"
+  }
+}

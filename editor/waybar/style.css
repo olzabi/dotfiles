@@ -1,4 +1,20 @@
-/* darkvoid for waybar */
+/* ==================================================================
+   Waybar style: drop-in modules
+   ------------------------------------------------------------------
+   Waybar puts the class `.module` on every module, so the pill look
+   is defined ONCE below. A new module needs no CSS at all.
+
+   Accent colour (optional), set in the module's own .jsonc file:
+     "class": "accent-focus" | "accent-const" | "accent-info" | "accent-ok"
+
+   States (emitted by a script's JSON "class" or by native modules):
+     on  off  disabled  muted  connected  disconnected
+     warning  dnd  critical  error  low  charging  empty
+
+   Only add an #id rule for genuinely special layouts.
+   ================================================================== */
+
+/* darkvoid */
 @define-color bg        #1c1c1c;
 @define-color fg        #c0c0c0;
 @define-color fg_bright #e1e1e1;
@@ -16,7 +32,7 @@
 
 * {
   font-family: "JetBrainsMono Nerd Font", "Symbols Nerd Font Mono", monospace;
-  font-size: 16px;
+  font-size: 15px;
   border: none;
   border-radius: 0;
   min-height: 0;
@@ -30,38 +46,65 @@ window#waybar {
 tooltip {
   background: @bg;
   color: @fg;
-  border: 2px solid @line_nr;
-  border-radius: 10px;
+  border: 1px solid @line_nr;
+  border-radius: 7px;
 }
 tooltip label { color: @fg; }
 
-/* shared pill look */
-#workspaces,
-#window,
-#clock,
-#tray,
-#pulseaudio,
-#network,
-#cpu,
-#memory,
-#battery {
+/* ---------- base pill: every module, present and future ---------- */
+.module {
   background: @bg;
   color: @fg_dim;
-  border: 2px solid @line_nr;
-  border-radius: 10px;
-  padding: 0 16px;
-  margin: 0;
+  border: 1px solid @line_nr;
+  border-radius: 7px;
+  padding: 0 10px;
+  margin: 2px 0;
 }
 
-/* workspaces */
-#workspaces { padding: 0 4px; }
+/* ---------- accents (opt-in via "class" in the module config) ---------- */
+.module.accent-focus { color: @focus; }
+.module.accent-const { color: @const; }
+.module.accent-info  { color: @info; }
+.module.accent-ok    { color: @added; }
+
+/* ---------- states: later rules win, so order = severity ---------- */
+.module.on        { color: @fg_dim; }
+
+.module.off,
+.module.stopped,
+.module.unloaded,
+.module.disabled,
+.module.muted     { color: @comment; }
+
+.module.connected,
+.module.charging  { color: @focus; }
+
+.module.warning:not(.charging),
+.module.disconnected { color: @warning; }
+
+.module.dnd       { color: @warning; border-color: @warning; }
+
+.module.critical:not(.charging),
+.module.error,
+.module.low
+.module.recording { color: @error; border-color: @error; }
+
+/* script reported nothing: collapse the pill completely */
+.module.empty {
+  background: transparent;
+  border-color: transparent;
+  padding: 0;
+}
+
+/* ---------- special cases (ids beat classes, order doesn't matter) ---------- */
+#workspaces { padding: 0 3px; }
 
 #workspaces button {
   color: @comment;
   background: transparent;
-  padding: 0 10px;
-  margin: 4px 3px;
-  border-radius: 7px;
+  padding: 0 7px;
+  margin: 3px 1px;
+  border-radius: 5px;
 }
 #workspaces button:hover {
   background: @visual;
@@ -77,34 +120,14 @@ tooltip label { color: @fg; }
   color: @bg;
 }
 
-/* window title */
 #window { color: @fg_bright; }
 window#waybar.empty #window {
   background: transparent;
   border-color: transparent;
 }
 
-/* center clock */
 #clock {
   color: @fg_bright;
   font-weight: bold;
   border-color: @focus;
-}
-
-/* right modules */
-#pulseaudio       { color: @const; }
-#pulseaudio.muted { color: @comment; }
-
-#network              { color: @info; }
-#network.disconnected { color: @warning; }
-
-#cpu    { color: @fg_dim; }
-#memory { color: @fg_dim; }
-
-#battery          { color: @added; }
-#battery.charging { color: @focus; }
-#battery.warning:not(.charging) { color: @warning; }
-#battery.critical:not(.charging) {
-  color: @error;
-  border-color: @error;
 }

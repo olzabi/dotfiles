@@ -1,0 +1,54 @@
+{
+  // Bar geometry + native modules shared by every compositor.
+  // Custom modules live in ./modules/*.jsonc (one file each).
+  "layer": "top",
+  "position": "top",
+  "height": 44,
+  "margin-top": 4,
+  "margin-left": 12,
+  "margin-right": 12,
+  "spacing": 6,
+
+  "clock": {
+    "format": "{:%H:%M}",
+    "format-alt": "{:%a %d %b}",
+    "tooltip-format": "<tt>{calendar}</tt>"
+  },
+
+  "tray": {
+    "icon-size": 18,
+    "spacing": 5
+  },
+
+  "pulseaudio": {
+    "class": "accent-const",
+    "format": "{icon} {volume}%",
+    "format-muted": "\udb81\udf5f muted",
+    "format-icons": {
+      "headphone": "\uf025",
+      "default": ["\uf026", "\uf027", "\uf028"]
+    },
+    "scroll-step": 5,
+    "on-click": "pkill -x pavucontrol || pavucontrol"
+  },
+
+  "network": {
+    "class": "accent-info",
+    "format-wifi": "\uf1eb {signalStrength}%",
+    "format-ethernet": "\udb80\ude00",
+    "format-disconnected": "\udb81\uddaa",
+    "on-click": "~/.config/waybar/scripts/wifi-menu.sh",
+    "on-click-right": "kitty --class popup-nmtui -e nmtui",
+    "tooltip-format-wifi": "{essid} ({signalStrength}%)\n{ipaddr}",
+    "tooltip-format-ethernet": "{ifname}\n{ipaddr}"
+  },
+
+  "battery": {
+    "class": "accent-ok",
+    "states": { "warning": 25, "critical": 10 },
+    "format": "{icon} {capacity}%",
+    "format-charging": " {capacity}%",
+    "format-plugged": " {capacity}%",
+    "format-icons": ["", "", "", "", ""]
+  }
+}
