@@ -1,0 +1,3 @@
+Aloxaf/fzf-tab
+hlissner/zsh-autopair
+MichaelAquilina/zsh-you-should-use

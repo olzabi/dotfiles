@@ -1,10 +1,14 @@
-#!/usr/bin/env zsh
+#typeset -U path PATH
+
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_LOCAL_HOME="$HOME/.local"
-export XDG_BIN_HOME="$XDG_LOCAL_HOME/bin"
-export XDG_DATA_HOME="$XDG_LOCAL_HOME/share"
+export XDG_BIN_HOME="$HOME/.local/bin"
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_STATE_HOME="$HOME/.local/state"
 export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/run/user/$(id -u)}
+
+export SSH_AUTH_SOCK=${SSH_AUTH_SOCK:-$XDG_RUNTIME_DIR/ssh-agent.socket}
 
 export KB_NAME="Blasphemy Slate"
 
@@ -24,14 +28,15 @@ export YAZI_CONFIG_HOME="$DOTFILES_EDITOR/yazi"
 export BAT_CONFIG_DIR="$DOTFILES_EDITOR/bat"
 export STARSHIP_CONFIG="$DOTFILES/zsh/starship.toml"
 
-_prepend_path() { path=("$1" ${path:#$1}) }
-_append_path()  { path=(${path:#$1} "$1") }
+_prepend_path() { path=("$1" ${path:#$1}); }
+_append_path()  { path=(${path:#$1} "$1"); }
 
 _append_path "/opt/nvim-linux-x86_64/bin"
 _prepend_path "$XDG_LOCAL_HOME/bin"
-_prepend_path "/usr/local/cuda/bin"
+
+[[ -d /opt/cuda/bin ]] && { _prepend_path /opt/cuda/bin; export CUDA_PATH=/opt/cuda; }
+
 _prepend_path "/usr/lib/jvm/default-java/bin"
-_prepend_path "$DOTFILES_TOOLS/.fzf/bin"
 
 export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig
 export ZSH="$DOTFILES/zsh/ohmyzsh"
@@ -66,6 +71,9 @@ export EZA_CONFIG_DIR="$DOTFILES_TOOLS/eza"
 export EZA_COLORS="di=1;34:ln=36:ex=1;32"
 _prepend_path "$DOTFILES_TOOLS/eza/completions/zsh"
 
+export RIPGREP_CONFIG_PATH="$DOTFILES/.ripgreprc"
+export ZELLIJ_CONFIG_DIR="$DOTFILES_EDITOR/zellij"
+
 #* C++
 # ---------
 export CC="${commands[gcc]:-$CC}"
@@ -80,74 +88,46 @@ export DOCKER_CONFIG="$XDG_CONFIG_HOME/.docker"
 export MINIKUBE_HOME="$XDG_CONFIG_HOME/.minikube"
 export ANSIBLE_HOME="$XDG_CONFIG_HOME/.ansible"
 
+export DOCKER_HOST="unix://$XDG_RUNTIME_DIR/podman/podman.sock"
+
 #* golang
 # ---------
-export GOROOT=/usr/lib/go
 export GOPATH="$XDG_CONFIG_HOME/go"
 export GOBIN="$GOPATH/bin"
-_append_path "$GOROOT/bin"
 _append_path "$GOPATH/bin"
 
 #* rust
 # ---------
 export RUSTUP_HOME="$XDG_CONFIG_HOME/.rustup"
 export CARGO_HOME="$XDG_CONFIG_HOME/.cargo"
+
 _prepend_path "$CARGO_HOME/bin"
-[ -f "$CARGO_HOME/env" ] && source "$CARGO_HOME/env"
 
-#* python
-# ---------
-export PYENV_ROOT="$DOTFILES_TOOLS/.pyenv"
-if [ -d "$PYENV_ROOT/bin" ]; then
-  _prepend_path "$PYENV_ROOT/bin"
-fi
-
-if command -v pyenv >/dev/null; then
-  export PIPENV_PYTHON="$PYENV_ROOT/shims/python"
-  export PYENV_VIRTUALENV_DISABLE_PROMPT=1
-fi
-
-#* pnpm
 # ---------
 export PNPM_HOME="$XDG_DATA_HOME/pnpm"
-_prepend_path "$PNPM_HOME"
-
-# ---------
 export BUN_INSTALL="$XDG_CONFIG_HOME/.bun"
+export NVM_DIR="${NVM_DIR:-$XDG_CONFIG_HOME/.nvm}"
+[[ -s "$NVM_DIR/nvm.sh" ]] && . "$NVM_DIR/nvm.sh"
+[ -s "${BUN_INSTALL}/_bun" ] && . "${BUN_INSTALL}/_bun"
+
+_prepend_path "$PNPM_HOME"
 _prepend_path "$BUN_INSTALL/bin"
+_prepend_path "$XDG_CONFIG_HOME/.composer/vendor/bin"
 
 #* git
 # ---------
 export GH_DASH_CONFIG="$DOTFILES_GIT/gh-dash.config.yml"
 
-# php
-# ---------
-export PHPENV_ROOT="$DOTFILES_TOOLS/.phpenv"
-_prepend_path "$PHPENV_ROOT/bin"
-_prepend_path "$XDG_CONFIG_HOME/.composer/vendor/bin"
+
+export PI_CODING_AGENT_DIR="$DOTFILES_AI/pi/agent"
+export CLAUDE_CONFIG_DIR=$DOTFILES_AI/claude
+export OPENCODE_CONFIG_DIR=$DOTFILES_AI/opencode
+
+export OLLAMA_HOST="${OLLAMA_HOST:-127.0.0.1:11434}"
+export OLLAMA_KEEP_ALIVE=10m
+
+_prepend_path "$OPENCODE_CONFIG_DIR/bin"
+_append_path /usr/bin
 
 
-# Perl
-# ---------
-_prepend_path "$XDG_CONFIG_HOME/perl5/bin"
-export PERL5LIB="$XDG_CONFIG_HOME/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"
-export PERL_LOCAL_LIB_ROOT="$XDG_CONFIG_HOME/perl5${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"
-export PERL_MB_OPT="--install_base \"$XDG_CONFIG_HOME/perl5\""
-export PERL_MM_OPT="INSTALL_BASE=$XDG_CONFIG_HOME/perl5"
-
-export RIPGREP_CONFIG_PATH="$DOTFILES/.ripgreprc"
-
-export YAMLLINT_CONFIG_FILE="$DOTFILES_TOOLS/yamllint/.yamllint.yml"
-export ZELLIJ_CONFIG_DIR="$DOTFILES_EDITOR/zellij"
-export RBENV_ROOT="$DOTFILES_TOOLS/.rbenv"
-_prepend_path "$RBENV_ROOT/bin"
-
-# ---------
-
-# export AWS_HOME="$DOTFILES/aws"
-# export AWS_CONFIG_FILE="$AWS_HOME/config"
-# export AWS_SHARED_CREDENTIALS_FILE="$AWS_HOME/credentials"
-
-# Vite+ bin (https://viteplus.dev)
-. "$XDG_CONFIG_HOME/vite-plus/env"
 

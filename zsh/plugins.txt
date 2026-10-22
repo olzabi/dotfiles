@@ -1,0 +1,45 @@
+# ~/.config/zsh/plugins.txt  -- phase 1, loaded BEFORE compinit
+# `antidote load` turns this into plugins.zsh (a static file) and only rebuilds
+# it when this file changes. Add plugins.zsh to .gitignore.
+
+# Must be first: sets $ZSH/$ZSH_CACHE_DIR, queues `compdef` until compinit runs
+getantidote/use-omz
+
+# --- system / shell helpers -------------------------------------------------
+ohmyzsh/ohmyzsh path:plugins/archlinux
+ohmyzsh/ohmyzsh path:plugins/eza
+ohmyzsh/ohmyzsh path:plugins/fancy-ctrl-z
+ohmyzsh/ohmyzsh path:plugins/jsontools
+ohmyzsh/ohmyzsh path:plugins/last-working-dir
+ohmyzsh/ohmyzsh path:plugins/man
+ohmyzsh/ohmyzsh path:plugins/nmap
+ohmyzsh/ohmyzsh path:plugins/sudo
+ohmyzsh/ohmyzsh path:plugins/tldr
+ohmyzsh/ohmyzsh path:plugins/tmux
+ohmyzsh/ohmyzsh path:plugins/tmuxinator
+
+# --- git --------------------------------------------------------------------
+ohmyzsh/ohmyzsh path:plugins/git-auto-fetch
+ohmyzsh/ohmyzsh path:plugins/git-escape-magic
+ohmyzsh/ohmyzsh path:plugins/gitignore
+# Only if `pacman -Ql git | grep site-functions/_git` shows nothing:
+# ohmyzsh/ohmyzsh path:plugins/gitfast
+# Only if `pacman -Ql git-extras | grep -i zsh` shows nothing:
+# ohmyzsh/ohmyzsh path:plugins/git-extras
+
+# --- containers / cloud -----------------------------------------------------
+ohmyzsh/ohmyzsh path:plugins/aws
+ohmyzsh/ohmyzsh path:plugins/docker-compose
+ohmyzsh/ohmyzsh path:plugins/kubectl
+ohmyzsh/ohmyzsh path:plugins/terraform
+ohmyzsh/ohmyzsh path:plugins/vault
+
+# --- languages --------------------------------------------------------------
+ohmyzsh/ohmyzsh path:plugins/golang
+ohmyzsh/ohmyzsh path:plugins/ng kind:fpath      # completion only, no plugin file
+ohmyzsh/ohmyzsh path:plugins/nestjs             # NOTE: aliases `ng` to `nest generate`
+ohmyzsh/ohmyzsh path:plugins/npm
+ohmyzsh/ohmyzsh path:plugins/pip
+ohmyzsh/ohmyzsh path:plugins/pipenv
+ohmyzsh/ohmyzsh path:plugins/python
+ohmyzsh/ohmyzsh path:plugins/uv
