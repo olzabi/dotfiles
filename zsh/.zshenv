@@ -7,9 +7,7 @@ export XDG_BIN_HOME="$HOME/.local/bin"
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
 export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/run/user/$(id -u)}
-
 export SSH_AUTH_SOCK=${SSH_AUTH_SOCK:-$XDG_RUNTIME_DIR/ssh-agent.socket}
-
 
 export DOTFILES="$HOME/Dotfiles"
 export DOTFILES_GIT="$DOTFILES/git"
@@ -23,8 +21,6 @@ export KB_NAME="Blasphemy Slate"
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 
-
-export DEV="$HOME/dev"
 export YAZI_CONFIG_HOME="$DOTFILES_EDITOR/yazi"
 export BAT_CONFIG_DIR="$DOTFILES_EDITOR/bat"
 export STARSHIP_CONFIG="$DOTFILES/starship.toml"
@@ -63,7 +59,6 @@ export PSYSH_CONFIG="$HIST_DIR/psysh_history"
 
 export EZA_CONFIG_DIR="$DOTFILES_THEMES/eza"
 export EZA_COLORS="di=1;34:ln=36:ex=1;32"
-_prepend_path "$DOTFILES_TOOLS/eza/completions/zsh"
 
 export RIPGREP_CONFIG_PATH="$DOTFILES/.ripgreprc"
 export ZELLIJ_CONFIG_DIR="$DOTFILES_EDITOR/zellij"

@@ -1,3 +1,7 @@
+if command -v bat >/dev/null; then
+    alias cat='bat --paging=never'
+fi
+
 if command -v eza >/dev/null 2>&1; then
   alias ls='eza --group-directories-first --color=auto'
   alias ll='eza -lah --group-directories-first --color=auto'

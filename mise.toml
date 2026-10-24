@@ -1,0 +1,19 @@
+
+[tasks."symlinks:create"]
+run = "bin/symlinks.sh --create"
+
+[tasks."yazi-cli:update"]
+description = "Upgrade yazi packages/plugins"
+run = "ya pkg upgrade"
+
+[tasks."pi:update"]
+run = "pi update --extensions"
+
+[tasks."bat:build"]
+description = "Rebuild the bat theme/syntax cache"
+run = "bat cache --build"
+
+[tasks.update]
+description = "Run mise up plus every *:update task"
+run = "mise up"
+depends = ["*:update"]

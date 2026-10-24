@@ -1,0 +1,52 @@
+environment {
+    XDG_CURRENT_DESKTOP "niri"
+    XDG_SESSION_DESKTOP "niri"
+    XDG_SESSION_TYPE "wayland"
+    XDG_DATA_DIRS "/usr/local/share:/usr/share"
+    MOZ_ENABLE_WAYLAND "1"
+    ELECTRON_OZONE_PLATFORM_HINT "auto"      // Electron apps (Discord, VS Code, etc.) run native Wayland, no blurry scaling
+    GDK_BACKEND "wayland,x11,*"
+    QT_QPA_PLATFORM "wayland;xcb"            // Qt apps prefer Wayland, fall back to X11
+    QT_QPA_PLATFORMTHEME "gtk3"
+    QT_WAYLAND_DISABLE_WINDOWDECORATION "1"  // avoids Qt drawing its own title bars
+}
+input {
+    keyboard {
+        xkb {
+            layout "us,ua"
+            options "grp:win_space_toggle"
+        }
+        numlock
+    }
+    touchpad {
+        tap
+        natural-scroll
+    }
+    mouse {
+        accel-speed 0.0
+        accel-profile "adaptive"
+    }
+    focus-follows-mouse max-scroll-amount="0%"
+    workspace-auto-back-and-forth
+}
+output "HDMI-A-2" {
+    mode "3840x2160@60.00"
+    position x=0 y=0
+    scale 1.1
+    focus-at-startup
+}
+output "HDMI-A-1" {
+    mode "1920x1080@60.00"
+    position x=-1920 y=442
+    scale 1
+}
+recent-windows {
+    debounce-ms 750
+    open-delay-ms 150
+}
+hotkey-overlay {
+    skip-at-startup
+}
+screenshot-path "~/Pictures/Screenshots/%Y-%m-%d %H-%M-%S.png"
+prefer-no-csd
+

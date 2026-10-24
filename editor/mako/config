@@ -1,31 +1,43 @@
-# Darkvoid notification styling
-font=JetBrainsMono Nerd Font 10
 background-color=#1c1c1c
 text-color=#c0c0c0
-border-color=#585858
+border-color=#83b7ad
 progress-color=over #1bfd9c
 
-width=380
-height=120
+width=360
+height=130
+margin=4
+padding=9,9
 outer-margin=8
-margin=6
-padding=12
 border-size=1
 border-radius=8
-anchor=top-right
-layer=top
+
 max-visible=4
+layer=overlay
+anchor=top-right
+sort=-time
+
+font=JetBrainsMono Nerd Font 9
+
 history=1
+max-history=20
+
+max-icon-size=28
+icon-border-radius=4
 format=<b>%s</b>\n%b
+
+on-button-left=invoke-default-action
+on-button-middle=dismiss-all
+on-button-right=dismiss
 
 [urgency=low]
 text-color=#b1b1b1
-border-color=#585858
-default-timeout=5000
+default-timeout=4000
+on-notify=exec mpv /usr/share/sounds/freedesktop/stereo/audio-volume-change.oga
 
 [urgency=normal]
 border-color=#1bfd9c
-default-timeout=7000
+default-timeout=6000
+on-notify=exec mpv /usr/share/sounds/freedesktop/stereo/audio-volume-change.oga
 
 [urgency=critical]
 text-color=#f1f1f1
@@ -34,3 +46,7 @@ default-timeout=0
 
 [mode=do-not-disturb]
 invisible=1
+[mode=do-not-disturb urgency=critical]
+invisible=0
+[group-index=0]
+invisible=0

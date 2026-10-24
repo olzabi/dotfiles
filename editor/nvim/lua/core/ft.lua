@@ -61,3 +61,9 @@ vim.filetype.add {
     dtsi = "devicetree",
   },
 }
+vim.filetype.add({
+  extension = {
+    kdl = "kdl",
+  },
+})
+

@@ -1,5 +1,8 @@
+[env]
 [settings]
 idiomatic_version_file_enable_tools = ["node", "python", "ruby", "php"]
+fetch_remote_versions_timeout = "30s"
+raw = false
 
 [tools]
 node = "lts"
@@ -26,27 +29,16 @@ ripgrep = "latest"
 lazygit = "latest"
 starship = "latest"
 lazydocker = "latest"
+bun = "latest"
+yamllint = "latest"
+gemini = "latest"
+tree-sitter = "latest"
+shfmt = "latest"
+
 
 "github:nnnkkk7/lazyactions" = "latest"
 "github:tmuxpack/tpack" = "latest"
 "github:jorgerojas26/lazysql" = "latest"
+"github:yvgude/lean-ctx" = "3.11.4"
 
 
-[tasks."symlinks:create"]
-run = "bin/symlinks.sh --create"
-
-[tasks."yazi-cli:update"]
-description = "Upgrade yazi packages/plugins"
-run = "ya pkg upgrade"
-
-[tasks."pi:update"]
-run = "pi update --extensions"
-
-[tasks."bat:build"]
-description = "Rebuild the bat theme/syntax cache"
-run = "bat cache --build"
-
-[tasks.update]
-description = "Run mise up plus every *:update task"
-run = "mise up"
-depends = ["*:update"]

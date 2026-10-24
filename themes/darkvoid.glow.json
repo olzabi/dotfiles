@@ -79,7 +79,7 @@
     "unticked": "[ ] "
   },
   "link": {
-    "color": "#1bfd9c",
+    "color": "#83b7ad",
     "underline": true
   },
   "link_text": {
@@ -97,7 +97,7 @@
   "code": {
     "prefix": " ",
     "suffix": " ",
-    "color": "#1bfd9c",
+    "color": "#83b7ad",
     "background_color": "#303030"
   },
   "code_block": {
@@ -132,7 +132,7 @@
         "color": "#a1a1a1"
       },
       "operator": {
-        "color": "#1bfd9c"
+        "color": "#83b7ad"
       },
       "punctuation": {
         "color": "#e6e6e6"

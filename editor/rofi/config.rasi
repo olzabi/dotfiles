@@ -1,74 +1,17 @@
 configuration {
-    modi: "drun,run,window";
-    font: "JetBrainsMono Nerd Font 11";
-    show-icons: true;
-    drun-display-format: "{name}";
-    display-drun: "Apps";
-    display-run: "Run";
-    display-window: "Windows";
+  modi               : "run,drun,window,clipboard:~/.config/rofi/scripts/cliphist.sh";
+  disable-history    : false;
+  display-run        : "  run";
+  display-drun       : "  drun";
+  display-window     : "󰕰  win";
+  display-clipboard  : "  clip";
+  drun-display-format: "{icon} {name}";
+  clipboard-display-format: "{name}";
+  hide-scrollbar     : true;
+  location           : 0;
+  show-icons         : true;
+  sidebar-mode       : true;
+  terminal           : "kitty";
 }
 
-* {
-    background-color: #1c1c1c;
-    text-color: #c0c0c0;
-    border-color: #404040;
-}
-
-window {
-    width: 42%;
-    border: 1px;
-    border-radius: 10px;
-    padding: 18px;
-    background-color: #1c1c1c;
-    border-color: #404040;
-}
-
-mainbox {
-    children: [ inputbar, listview ];
-    spacing: 12px;
-}
-
-inputbar {
-    children: [ prompt, entry ];
-    background-color: #303030;
-    border-radius: 7px;
-    padding: 9px 12px;
-}
-
-prompt {
-    text-color: #83b7ad;
-    padding: 0 8px 0 0;
-}
-
-entry {
-    placeholder: "Search applications…";
-    placeholder-color: #858585;
-}
-
-listview {
-    columns: 1;
-    lines: 8;
-    fixed-height: false;
-    scrollbar: false;
-    spacing: 3px;
-}
-
-element {
-    children: [ element-icon, element-text ];
-    spacing: 10px;
-    padding: 7px 10px;
-    border-radius: 6px;
-}
-
-element selected {
-    background-color: #303030;
-    text-color: #83b7ad;
-}
-
-element-icon {
-    size: 24px;
-}
-
-element-text {
-    vertical-align: 0.5;
-}
+@theme "theme.rasi"

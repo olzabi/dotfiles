@@ -1,0 +1,39 @@
+layout {
+    gaps 8
+    center-focused-column "never"
+    default-column-width {
+        proportion 0.5
+    }
+    preset-column-widths {
+        proportion 0.33333
+        proportion 0.5
+        proportion 0.66667
+    }
+    focus-ring {
+        width 1.5
+        active-color "#83b7ad"
+        inactive-color "#585858"
+    }
+    shadow {
+        on
+        softness 30
+        spread 5
+        offset x=0 y=5
+        color "#0000009a"
+    }
+    struts {
+        left 12
+        top 4
+        bottom 12
+        right 12
+    }
+}
+overview {
+    zoom 0.55
+    workspace-shadow {
+        softness 40
+        spread 10
+        offset x=0 y=10
+        color "#1c1c1c"
+    }
+}

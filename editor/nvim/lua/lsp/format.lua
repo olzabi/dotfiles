@@ -201,6 +201,9 @@ return {
           args = { "--max-len=120", "--base-formatter=gofumpt" },
           stdin = true,
         },
+        kdlfmt = {
+          args = { "format", "--kdl-version", "v1", "-" },
+        },
       },
 
       formatters_by_ft = {
@@ -221,6 +224,7 @@ return {
         xml = { "xmlformatter" },
         toml = { "taplo" },
         lua = { "stylua" },
+        kdl = { "kdlfmt" },
         python = { "isort", "ruff_format" },
         php = { "pint" },
         sql = { "sqlfluff" },
