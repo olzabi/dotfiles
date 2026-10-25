@@ -26,10 +26,10 @@ setopt glob_dots
 setopt no_case_glob
 setopt numeric_glob_sort
 setopt rc_expand_param
-setopt correct_all
 
-# Things OMZ's lib/ used to turn on
-setopt pushd_ignore_dups interactive_comments auto_cd auto_pushd pushd_minus multios long_list_jobs prompt_subst
+setopt correct
+setopt auto_cd auto_pushd pushd_minus cdable_vars
+setopt pushd_ignore_dups interactive_comments  multios long_list_jobs prompt_subst
 setopt auto_menu complete_in_word always_to_end
 unsetopt menu_complete flow_control
 
