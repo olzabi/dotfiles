@@ -1,0 +1,107 @@
+setupVersion: 2
+autoUpdate: true
+quietStartup: header
+defaultProvider: openai-codex
+defaultModel: gpt-6-luna
+defaultThinkingLevel: high
+modelRoles:
+  default: openai-codex/gpt-6-luna
+  smol: openai-codex/gpt-6-luna
+  commit: openai-codex/gpt-6-luna:low
+  image: openai-codex/gpt-image-2
+markdown:
+  mermaid: streaming
+packages:
+  - npm:@ff-labs/pi-fff
+  - npm:@tintinweb/pi-subagents
+  - npm:@tintinweb/pi-tasks
+  - npm:pi-lens
+  - npm:context-mode
+  - npm:pi-mcp-adapter
+  - npm:pi-web-access
+  - npm:pi-cache-optimizer
+  - npm:pi-minimalist
+  - npm:pi-vim
+  - ./extensions/.packages/pi-atelier-local
+  - npm:@juicesharp/rpiv-ask-user-question
+tuiMode: regular
+images:
+  blockImages: false
+enableSkillCommands: true
+editorPaddingX: 1
+outputPad: 1
+terminal:
+  clearOnShrink: false
+  showProgress: false
+steeringMode: all
+followUpMode: all
+transport: auto
+httpIdleTimeoutMs: 120000
+showCacheMissNotices: true
+showWorkerNotifications: true
+treeFilterMode: default
+fullscreenExitOutput: transcript
+minimalist:
+  preset: custom
+  compactToolRows: true
+  groupToolRuns: false
+  foldIntermediateActivity: true
+  thinkingAsToolCall: true
+  activitySummary: elapsed
+  gutter: true
+  timer: true
+  keepActiveToolsExpanded: false
+  glyphStyle: unicode
+  excludeTools: []
+  keepActiveThinkingExpanded: false
+piVim:
+  clipboardMirror: all
+  exCommand:
+    piDispatch: true
+    copyInputToClipboard: false
+  modeColors:
+    insert: borderMuted
+    normal: borderAccent
+    visual: customMessageLabel
+    ex: warning
+  borderSync:
+    insert: host
+    normal: host
+    visual: host
+    ex: host
+  labelSync:
+    insert: mode
+    normal: mode
+    visual: mode
+    ex: mode
+enableInstallTelemetry: false
+startup:
+  changelogMode: summary
+memory:
+  backend: mnemopi
+autolearn:
+  enabled: true
+personality: pragmatic
+proseOnlyThinking: false
+hideThinkingBlock: true
+readLineNumbers: true
+symbolPreset: nerd
+theme:
+  dark: darkvoid
+composer:
+  shape: box
+  tokenRate: true
+statusLine:
+  preset: compact
+  separator: powerline
+  contextLine: embedded
+  sessionAccent: true
+  transparent: true
+  compactThinkingLevel: true
+  showHookStatus: true
+edit:
+  mode: hashline
+tui:
+  textSizing: true
+  autoGraph: smart
+  titleSpinner: pulse

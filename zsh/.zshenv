@@ -113,7 +113,7 @@ _prepend_path "$XDG_CONFIG_HOME/.composer/vendor/bin"
 export GH_DASH_CONFIG="$DOTFILES_GIT/gh-dash.config.yml"
 
 
-export PI_CODING_AGENT_DIR="$DOTFILES_AI/pi/agent"
+# export PI_CODING_AGENT_DIR="$DOTFILES_AI/pi/agent"
 export CLAUDE_CONFIG_DIR=$DOTFILES_AI/claude
 export OPENCODE_CONFIG_DIR=$DOTFILES_AI/opencode
 

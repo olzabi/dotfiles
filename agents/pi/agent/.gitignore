@@ -2,7 +2,6 @@
 !settings.json
 !AGENTS.md
 
-!/**/config.json
 !agents/
 !agents/**
 !extensions/
@@ -10,12 +9,17 @@
 !npm/
 !npm/package.json
 
+!/**/config.json
+!models.json
+
+!/**/config.yml
+!models.yml
+
 # plugins
 !context-prune/
 !web-search.json
 !subagents.json
 !pi-starship.toml
 !pi-stamp.json
-!model.json
 !tasks-config.json
 !pi-atelier.json

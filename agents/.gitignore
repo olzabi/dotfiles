@@ -7,3 +7,7 @@
 !/pi/agent/
 !/pi/agent/.gitignore
 
+!/omp/
+!/omp/agent/
+!/omp/agent/.gitignore
+
