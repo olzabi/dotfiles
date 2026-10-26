@@ -1,17 +1,13 @@
 configuration {
-  modi               : "run,drun,window,clipboard:~/.config/rofi/scripts/cliphist.sh";
-  disable-history    : false;
-  display-run        : "  run";
-  display-drun       : "  drun";
+  display-run        : "  run";
+  display-drun       : "  drun";
   display-window     : "󰕰  win";
-  display-clipboard  : "  clip";
   drun-display-format: "{icon} {name}";
-  clipboard-display-format: "{name}";
   hide-scrollbar     : true;
-  location           : 0;
   show-icons         : true;
   sidebar-mode       : true;
   terminal           : "kitty";
 }
+
 
 @theme "theme.rasi"

@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# ~/.local/bin/rofi-menu   (usage: rofi-menu [mode] [extra rofi args])
+ROFI_DIR="${ROFI_DIR:-$HOME/.config/rofi}"
+
+modi="drun,run,window"
+extra=()
+for f in "$ROFI_DIR"/modes/*.sh; do
+  [[ -x $f ]] || continue
+  base=$(basename "$f" .sh)
+  name=${base#[0-9][0-9]-}                      # allows 10-foo.sh for ordering
+  label=$(sed -n 's/^# label: *//p' "$f" | head -n1)
+  modi+=",$name:$f"
+  [[ -n $label ]] && extra+=(-"display-$name" "$label")
+done
+
+exec rofi -modi "$modi" "${extra[@]}" -show "${1:-drun}" "${@:2}"

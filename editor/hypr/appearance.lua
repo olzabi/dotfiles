@@ -14,7 +14,13 @@ hl.config({
 		},
 		resize_on_border = true,
 		allow_tearing = false,
-		layout = "dwindle",
+		layout = "scrolling",
+	},
+
+	scrolling = {
+		direction = "right",
+		column_width = 0.5,
+		follow_focus = true,
 	},
 
 	group = {

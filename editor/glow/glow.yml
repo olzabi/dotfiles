@@ -1,5 +1,5 @@
 # style name or JSON path (default "auto")
-style: "/home/evernight/.config/glow/darkvoid.glow.json"
+style: "/home/chronica/.config/glow/darkvoid.json"
 # mouse support (TUI-mode only)
 mouse: false
 pager: true

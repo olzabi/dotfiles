@@ -28,6 +28,7 @@ layout {
         right 12
     }
 }
+
 overview {
     zoom 0.55
     workspace-shadow {

@@ -1,5 +1,8 @@
 #typeset -U path PATH
 
+_prepend_path() { path=("$1" ${path:#$1}); }
+_append_path()  { path=(${path:#$1} "$1"); }
+
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_LOCAL_HOME="$HOME/.local"
@@ -25,12 +28,14 @@ export YAZI_CONFIG_HOME="$DOTFILES_EDITOR/yazi"
 export BAT_CONFIG_DIR="$DOTFILES_EDITOR/bat"
 export STARSHIP_CONFIG="$DOTFILES/starship.toml"
 
-_prepend_path() { path=("$1" ${path:#$1}); }
-_append_path()  { path=(${path:#$1} "$1"); }
-
 _prepend_path "$XDG_LOCAL_HOME/bin"
+_prepend_path "$DOTFILES/bin"
 
-[[ -d /opt/cuda/bin ]] && { _prepend_path /opt/cuda/bin; export CUDA_PATH=/opt/cuda; }
+[[ -d /opt/cuda/bin ]] && {
+  _prepend_path /opt/cuda/bin
+  _prepend_path /opt/cuda/lib64
+  export CUDA_PATH=/opt/cuda
+}
 
 export ZSH_COMPDUMP="$XDG_CACHE_HOME/zsh/.zcomdump-$HOST"
 

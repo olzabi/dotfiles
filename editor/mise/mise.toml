@@ -40,5 +40,7 @@ shfmt = "latest"
 "github:tmuxpack/tpack" = "latest"
 "github:jorgerojas26/lazysql" = "latest"
 "github:yvgude/lean-ctx" = "3.11.4"
+"llama.cpp" = { version = "latest", prerelease = true, version_prefix = "b" }
+"github:can1357/oh-my-pi" = "latest"
 
 

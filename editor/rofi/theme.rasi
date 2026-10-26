@@ -187,6 +187,34 @@ element-text {
 }
 
 /*****----- Message -----*****/
+message {
+    padding:          8px 15px;
+    background-color: @surface-alt;
+    border:           0px 0px 1px 0px;
+    border-color:     @line-nr;
+}
+
+mode-switcher {
+    spacing:          0px;
+    border:           1px 0px 0px 0px;
+    border-color:     @line-nr;
+    background-color: @surface-alt;
+    border-radius:    0px 0px 12px 12px;
+}
+
+button {
+    padding:          10px;
+    background-color: transparent;
+    text-color:       @comment;
+    horizontal-align: 0.5;
+    cursor:           pointer;
+}
+
+button selected {
+    background-color: @visual;
+    text-color:       @focus;
+}
+
 error-message {
     padding:          15px;
     border:           1px solid;

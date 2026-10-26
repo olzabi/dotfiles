@@ -1,43 +1,41 @@
+font=Iosevka Nerd Font 12
 background-color=#1c1c1c
+progress-color=over #1bfd9c
 text-color=#c0c0c0
 border-color=#83b7ad
-progress-color=over #1bfd9c
-
-width=360
-height=130
+border-size=2
+border-radius=12
+outer-margin=10
+padding=14,14
 margin=4
-padding=9,9
-outer-margin=8
-border-size=1
-border-radius=8
+width=480
+height=120
 
-max-visible=4
+max-visible=2
 layer=overlay
-anchor=top-right
+anchor=top-center
 sort=-time
-
-font=JetBrainsMono Nerd Font 9
+default-timeout=2500
 
 history=1
 max-history=20
 
-max-icon-size=28
-icon-border-radius=4
+max-icon-size=48
+icon-border-radius=6
 format=<b>%s</b>\n%b
 
 on-button-left=invoke-default-action
 on-button-middle=dismiss-all
 on-button-right=dismiss
+on-touch=dismiss
 
 [urgency=low]
 text-color=#b1b1b1
-default-timeout=4000
-on-notify=exec mpv /usr/share/sounds/freedesktop/stereo/audio-volume-change.oga
+default-timeout=1500
+on-notify=exec mpv /usr/share/sounds/freedesktop/stereo/message.oga
 
 [urgency=normal]
-border-color=#1bfd9c
-default-timeout=6000
-on-notify=exec mpv /usr/share/sounds/freedesktop/stereo/audio-volume-change.oga
+on-notify=exec mpv /usr/share/sounds/freedesktop/stereo/message.oga
 
 [urgency=critical]
 text-color=#f1f1f1
@@ -46,7 +44,11 @@ default-timeout=0
 
 [mode=do-not-disturb]
 invisible=1
+
 [mode=do-not-disturb urgency=critical]
 invisible=0
+
+[grouped]
+format=(%g) <b>%s</b>\n%b
 [group-index=0]
 invisible=0

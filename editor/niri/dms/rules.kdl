@@ -1,0 +1,86 @@
+window-rule {
+    match is-floating=true
+    tiled-state false
+    geometry-corner-radius 10
+    clip-to-geometry true
+    border {
+        on
+        width 1
+        active-color "#343438"
+        inactive-color "#28282C"
+        urgent-color "#ffb86b"
+    }
+    shadow {
+        on
+        softness 10
+        spread 6
+        offset x=1 y=1
+        color "rgba(14,14,14,0.6)"
+    }
+}
+window-rule {
+    tiled-state true
+    clip-to-geometry true
+    geometry-corner-radius 10
+    draw-border-with-background false
+}
+window-rule {
+    match is-floating=false
+    tiled-state true
+    geometry-corner-radius 10
+}
+
+window-rule {
+    match app-id="^popup-"
+    open-floating true
+    default-column-width {
+
+
+        fixed 1600
+    }
+    default-window-height {
+        fixed 900
+    }
+}
+window-rule {
+    match app-id="^org\\.pulseaudio\\.pavucontrol$"
+    match app-id="^pavucontrol$"
+    open-floating true
+    open-focused true
+    default-column-width {
+        fixed 600
+    }
+    default-window-height {
+        fixed 600
+    }
+    // optional: open under the bar at the top right instead of centered
+    default-floating-position x=16 y=48 relative-to="top-right"
+}
+
+
+window-rule {
+    match app-id="steam" title="^Friends List$"
+    open-floating true
+    default-floating-position x=16 y=48 relative-to="top-right"
+    default-column-width { fixed 350; }
+    default-window-height { fixed 700; }
+}
+
+window-rule {
+    match app-id="^chromium$"
+    open-maximized false
+    open-floating  true
+    match title="Picture in picture"
+        default-column-width {
+        fixed 600
+    }
+    default-window-height {
+        fixed 400
+    }
+    default-floating-position x=16 y=48 relative-to="top-right"
+}
+
+window-rule {
+    match app-id=r#"^org\.telegram\.desktop$"# title="^Media viewer$"
+    open-fullscreen false
+}

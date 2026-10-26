@@ -23,6 +23,7 @@ prepend_keymap = [
     # Goto
     { on = ["g", "h"], run = "cd ~",                                                              desc = "Go to the Home directory" },
     { on = ["g", "d"], run = "cd $DOTFILES",                                                      desc = "Go to the Dotfiles" },
+    { on = ["g", "p"], run = "cd ~/Projects",                                                    desc = "Go to the Projects" },
     { on = ["g", "<Space>"], run = "cd --interactive",                                            desc = "Go to a directory interactively" },
     { on = ["g", "r"], run  = 'shell --orphan -- ya emit cd "$(git rev-parse --show-toplevel)"',  desc = "Go to the repository root" },
 
