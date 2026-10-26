@@ -1,4 +1,8 @@
-use_default_settings: true
+use_default_settings:
+  engines:
+    remove:
+      - ahmia
+      - torch
 general:
   instance_name: Local SearXNG
 search:
@@ -14,12 +18,9 @@ server:
   image_proxy: false
   method: GET
 outgoing:
-  request_timeout: 3.0
+  request_timeout: 5.0
+  max_request_timeout: 10.0
 engines:
-  - name: ahmia
-    disabled: true
-  - name: torch
-    disabled: true
   - name: duckduckgo
     disabled: true
   - name: brave
