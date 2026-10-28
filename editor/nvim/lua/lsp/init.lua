@@ -1,66 +1,82 @@
-local function init_servers()
-  -- WARN: tmp, but crucial fix;
-  -- (?) client.is_closing() is broken in nvim0.12, thus some lsp doesn't work at all.
-  vim.lsp.start = (function(original)
-    return function(config, opts)
-      local ok, err = pcall(original, config, opts)
-      if not ok then
-        vim.notify(err, vim.log.levels.WARN)
-      end
+local function find_fn(t, path, server, seen)
+  seen = seen or {}
+  if seen[t] then
+    return
+  end
+  seen[t] = true
+  for k, v in pairs(t) do
+    local p = path .. "." .. tostring(k)
+    if type(v) == "function" then
+      vim.notify(("LSP %s: function in %s"):format(server, p), vim.log.levels.ERROR)
+    elseif type(v) == "table" then
+      find_fn(v, p, server, seen)
     end
-  end)(vim.lsp.start)
-  --
-
-  local capabilities = require("blink.cmp").get_lsp_capabilities()
-  local srv_path = vim.api.nvim_get_runtime_file("lua/lsp/servers", false)[1]
-
-  for name, type in vim.fs.dir(srv_path) do
-    if type ~= "file" or not name:match("%.lua$") then
-      goto continue
-    end
-    local ok, servers = pcall(require, "lsp.servers." .. name:gsub("%.lua$", ""))
-    if ok then
-      for server, cfg in pairs(servers) do
-        cfg.capabilities = vim.tbl_deep_extend("force", cfg.capabilities or {}, capabilities)
-        vim.lsp.config(server, cfg)
-        vim.lsp.enable(server)
-      end
-    end
-    ::continue::
   end
 end
 
-local function cursor_highlight(buf)
-  local highlight_augroup = vim.api.nvim_create_augroup("lsp-highlight", { clear = false })
-  vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
-    buffer = buf,
-    group = highlight_augroup,
-    callback = vim.lsp.buf.document_highlight,
+local function init_servers()
+  -- "*" is merged under every server config (blink caps no longer override per-server caps)
+  vim.lsp.config("*", {
+    capabilities = vim.tbl_deep_extend("force", vim.lsp.protocol.make_client_capabilities(), require("blink.cmp").get_lsp_capabilities()),
   })
-  vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
-    buffer = buf,
-    group = highlight_augroup,
-    callback = vim.lsp.buf.clear_references,
-  })
-  -- LspReference specifically for darkvoid.nvim
+  local srv_path = vim.api.nvim_get_runtime_file("lua/lsp/servers", false)[1]
+  if not srv_path then
+    return
+  end
+
+  local enabled = {}
+  for name, type in vim.fs.dir(srv_path) do
+    if type == "file" and name:match "%.lua$" then
+      local mod = "lsp.servers." .. name:gsub("%.lua$", "")
+      local ok, servers = pcall(require, mod)
+      if ok then
+        for server, cfg in pairs(servers) do
+          vim.lsp.config(server, cfg)
+          find_fn(cfg.settings or {}, "settings", server)
+          enabled[#enabled + 1] = server
+        end
+      else
+        vim.notify(mod .. ": " .. tostring(servers), vim.log.levels.ERROR)
+      end
+    end
+  end
+  vim.lsp.enable(enabled)
+end
+
+local function set_ref_hl()
+  -- LspReference* specifically for darkvoid.nvim; re-applied on ColorScheme
   vim.api.nvim_set_hl(0, "LspReferenceText", { bg = "#1c1c1c", underline = true })
   vim.api.nvim_set_hl(0, "LspReferenceRead", { bg = "#1c1c1c", sp = "#707070", underline = true })
   vim.api.nvim_set_hl(0, "LspReferenceWrite", { bg = "#1c1c1c", sp = "#aaaaaa", undercurl = true })
 end
 
+local function cursor_highlight(buf)
+  -- clear = true => a second client attaching doesn't duplicate autocmds
+  local g = vim.api.nvim_create_augroup("lsp-highlight-" .. buf, { clear = true })
+  vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
+    buffer = buf,
+    group = g,
+    callback = vim.lsp.buf.document_highlight,
+  })
+  vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
+    buffer = buf,
+    group = g,
+    callback = vim.lsp.buf.clear_references,
+  })
+end
+
 local function lsp_keymaps(buf)
   local function map(mode, lhs, rhs, desc)
-    vim.keymap.set(mode, lhs, rhs, { noremap = true, silent = true, buffer = buf, desc = desc })
+    vim.keymap.set(mode, lhs, rhs, { silent = true, buffer = buf, desc = desc })
   end
 
+  -- Already built in on 0.11+: K (hover), gO (symbols), grn (rename), gra (code action),
+  -- grr (references), gri (implementation), grt (type def), <C-S> (insert signature help)
   map("n", "gd", vim.lsp.buf.definition, "Go to definition")
   map("n", "gD", vim.lsp.buf.declaration, "Go to declaration")
   map("n", "gi", vim.lsp.buf.implementation, "Go to implementation")
   map("n", "gt", vim.lsp.buf.type_definition, "Go to type definition")
   map("n", "gR", vim.lsp.buf.references, "References")
-  map("n", "gO", vim.lsp.buf.document_symbol, "Document symbols")
-  map("n", "K", vim.lsp.buf.hover, "Hover docs")
-  map({ "n", "i" }, "<C-h>", vim.lsp.buf.signature_help, "Signature help")
   map({ "n", "v" }, "g..", vim.lsp.buf.code_action, "Code action")
   map("n", "<leader>ws", vim.lsp.buf.workspace_symbol, "Workspace symbols")
 end
@@ -70,6 +86,16 @@ return {
     "LSP",
     virtual = true,
     config = function()
+      vim.o.winborder = "rounded"
+      vim.diagnostic.config { severity_sort = true, float = { source = true } }
+      vim.lsp.log.set_level "warn"
+
+      set_ref_hl()
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        group = vim.api.nvim_create_augroup("lsp_ref_hl", { clear = true }),
+        callback = set_ref_hl,
+      })
+
       init_servers()
 
       vim.api.nvim_create_autocmd("LspAttach", {
@@ -81,47 +107,31 @@ return {
             return
           end
 
-          if c:supports_method "textDocument/inlayHint" then
+          if c:supports_method("textDocument/inlayHint", buf) then
             vim.lsp.inlay_hint.enable(true, { bufnr = buf })
           end
-          if c:supports_method "textDocument/documentHighlight" then
+          if c:supports_method("textDocument/documentHighlight", buf) then
             cursor_highlight(buf)
           end
 
           lsp_keymaps(buf)
+        end,
+      })
 
-          vim.api.nvim_create_autocmd("LspDetach", {
-            group = vim.api.nvim_create_augroup("lsp-detach-" .. buf, { clear = true }),
-            buffer = buf,
-            callback = function(cb_e)
-              vim.lsp.buf.clear_references()
-              vim.api.nvim_clear_autocmds { group = "lsp-highlight", buffer = cb_e.buf }
-            end,
-          })
+      -- One global detach handler; only tears down highlight when no other
+      -- client on the buffer still provides it.
+      vim.api.nvim_create_autocmd("LspDetach", {
+        group = vim.api.nvim_create_augroup("lsp_global_detach", { clear = true }),
+        callback = function(e)
+          local left = vim.tbl_filter(function(c)
+            return c.id ~= e.data.client_id and c:supports_method("textDocument/documentHighlight", e.buf)
+          end, vim.lsp.get_clients { bufnr = e.buf })
+          if #left == 0 and vim.api.nvim_buf_is_valid(e.buf) then
+            vim.api.nvim_buf_call(e.buf, vim.lsp.buf.clear_references)
+            pcall(vim.api.nvim_del_augroup_by_name, "lsp-highlight-" .. e.buf)
+          end
         end,
       })
     end,
-  },
-
-  "b0o/SchemaStore.nvim",
-  {
-    "folke/lazydev.nvim",
-    cmd = "LazyDev",
-    lazy = false,
-    dependencies = {
-      {
-        "justinsgithub/wezterm-types",
-        enabled = false,
-      },
-    },
-    opts = {
-      library = {
-        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
-        { path = "snacks.nvim", words = { "Snacks" } },
-        { path = "lazy.nvim", words = { "LazyVim" } },
-        { path = "wezterm-types", modes = { "wezterm" } },
-        "neotest",
-      },
-    },
   },
 }

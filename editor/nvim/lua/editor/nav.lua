@@ -24,10 +24,11 @@ return {
         customPatterns = {},
       })
 
-      vim.keymap.set({ "w", "<cmd>lua require('spider').motion('w')<CR>", mode = { "n", "o", "x" } })
-      vim.keymap.set({ "e", "<cmd>lua require('spider').motion('e')<CR>", mode = { "n", "o", "x" } })
-      vim.keymap.set({ "b", "<cmd>lua require('spider').motion('b')<CR>", mode = { "n", "o", "x" } })
-      vim.keymap.set({ "ge", "<cmd>lua require('spider').motion('ge')<CR>", mode = { "n", "o", "x" } })
+      for _, key in ipairs { "w", "e", "b", "ge" } do
+        vim.keymap.set({ "n", "o", "x" }, key, function()
+          require("spider").motion(key)
+        end, { desc = "Spider-" .. key })
+      end
     end,
   },
 }

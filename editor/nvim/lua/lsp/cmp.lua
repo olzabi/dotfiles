@@ -13,6 +13,17 @@ local get_bufnrs = function()
 end
 
 return {
+  -- autopairs as its own spec (was a blink dependency)
+  {
+    "windwp/nvim-autopairs",
+    event = "InsertEnter",
+    opts = {
+      check_ts = true,
+      enable_check_bracket_line = true,
+      ts_config = { javascript = { "string", "template_string" } },
+    },
+  },
+
   {
     "saghen/blink.cmp",
     version = "1.*",
@@ -20,44 +31,24 @@ return {
     dependencies = {
       "rafamadriz/friendly-snippets",
       "Kaiser-Yang/blink-cmp-dictionary",
-      {
-        "windwp/nvim-autopairs",
-        event = "InsertEnter",
-        opts = {
-          check_ts = true,
-          enable_check_bracket_line = true,
-          ts_config = {
-            javascript = { "string", "template_string" },
-          },
-        },
-      },
-      {
-        "saghen/blink.compat",
-        version = "2.*",
-        lazy = true,
-        opts = {},
-      },
+      { "saghen/blink.compat", version = "2.*", lazy = true, opts = {} },
       {
         "petertriho/cmp-git",
-        ft = { "gitcommit", "gitrebase" },
-        opts = { filetypes = { "gitcommit", "octo", "markdown" } },
+        dependencies = { "nvim-lua/plenary.nvim" },
+        opts = { filetypes = { "gitcommit", "gitrebase" } },
       },
       {
         "L3MON4D3/LuaSnip",
         build = "make install_jsregexp",
         config = function()
           local luasnip = require "luasnip"
-
-          -- Loads all the snippets installed by extensions in vscode.
-          -- require('luasnip.loaders.from_vscode').lazy_load()
-          require("luasnip.loaders.from_vscode").load { paths = "~/.config/nvim/snippets" }
-
           luasnip.config.set_config {
             region_check_events = "InsertEnter",
             delete_check_events = "InsertLeave",
           }
-
-          luasnip.config.setup {}
+          -- With snippets.preset = "luasnip", blink does NOT load friendly-snippets for you.
+          require("luasnip.loaders.from_vscode").lazy_load()
+          require("luasnip.loaders.from_vscode").lazy_load { paths = { vim.fn.stdpath "config" .. "/snippets" } }
         end,
       },
     },
@@ -68,6 +59,9 @@ return {
       completion = {
         ghost_text = { enabled = true },
         documentation = { auto_show = true, window = { border = "rounded" } },
+        -- If <CR> inserting a completion when you wanted a newline annoys you:
+        -- list = { selection = { preselect = false, auto_insert = false } },
+        -- (ghost text then only shows after you pick an item with <C-j>/<C-k>)
         list = { selection = { auto_insert = false } },
         accept = { auto_brackets = { enabled = true } },
         menu = {
@@ -80,12 +74,10 @@ return {
               { "kind", gap = 2 },
             },
             components = {
+              -- no custom `highlight`: the default keeps per-kind / devicon colours
               kind_icon = {
                 text = function(ctx)
                   return " " .. ctx.kind_icon .. " "
-                end,
-                highlight = function(ctx)
-                  return "BlinkCmpKindIcon" .. ctx.kind
                 end,
               },
               kind = {
@@ -97,10 +89,16 @@ return {
           },
         },
       },
-      signature = { window = { border = "rounded" } },
+
+      -- signature help now actually enabled (shows on "(" and ","); the old `K` mapping is gone
+      signature = { enabled = true, window = { border = "rounded" } },
+
       sources = {
-        default = { "lsp", "snippets", "path", "buffer", "lazydev" },
+        -- lazydev removed from default; scoped to lua below.
+        -- (requires folke/lazydev.nvim to be installed in your config)
+        default = { "lsp", "snippets", "path", "buffer" },
         per_filetype = {
+          lua = { inherit_defaults = true, "lazydev" },
           sql = { "buffer" },
           markdown = { "lsp", "snippets", "path", "buffer", "dictionary" },
           gitcommit = { "git", "buffer", "dictionary" },
@@ -114,10 +112,17 @@ return {
           git = {
             name = "git",
             module = "blink.compat.source",
-            opts = { filetypes = { "gitcommit", "octo", "markdown", "gitrebase" } },
+            opts = { filetypes = { "gitcommit", "gitrebase" } },
           },
           buffer = { min_keyword_length = 3, max_items = 4, opts = { get_bufnrs = get_bufnrs } },
-          dictionary = { module = "blink-cmp-dictionary", min_keyword_length = 3 },
+          dictionary = {
+            name = "Dict",
+            module = "blink-cmp-dictionary",
+            min_keyword_length = 3,
+            -- Without a word list this provider returns nothing.
+            -- Point it at a real file (check the plugin README for current option names / deps).
+            opts = { dictionary_files = { "/usr/share/dict/words" } },
+          },
         },
       },
       snippets = { preset = "luasnip" },
@@ -126,14 +131,13 @@ return {
       keymap = {
         -- stylua: ignore start
         preset = "default",
-        ["<C-Space>"] = { "show", "hide" },
+        ["<C-CR>"] = { "show", "hide" },
         ["<C-s>"] = { "snippet_forward", "fallback" },
         ["<CR>"] = { "accept", "fallback" },
         ["<C-j>"] = { "select_next", "fallback" },
         ["<C-k>"] = { "select_prev", "fallback" },
         ["<C-p>"] = { function(cmp) cmp.show { providers = { "path", "buffer" } } end, },
-        ["<C-d>"] = { function(cmp) cmp.show { providers = { "dictionary"     } } end, },
-        ["K"] = { "show_signature", "fallback" },
+        ["<C-d>"] = { function(cmp) cmp.show { providers = { "dictionary" } } end, },
         --stylua: ignore end
       },
     },

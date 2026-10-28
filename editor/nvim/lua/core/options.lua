@@ -52,7 +52,7 @@ opt.swapfile = false
 opt.undodir = vim.fn.stdpath("data") .. "/undo//"
 opt.undolevels = 10000
 opt.undofile = true
-opt.updatetime = 200
+opt.updatetime = 250
 opt.timeoutlen = vim.g.vscode and 1000 or 300
 opt.ttimeoutlen = 0
 opt.autoread = true
@@ -73,7 +73,13 @@ opt.encoding = "UTF-8"
 -- Folding settings
 opt.smoothscroll = true
 vim.wo.foldmethod = "expr"
+opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+opt.foldmethod = "expr"
+opt.foldtext = "" -- folded line keeps its syntax highlighting
+opt.foldcolumn = "1"
 opt.foldlevel = 99
+vim.o.foldcolumn = "1" -- '0' is not bad
+vim.o.foldlevelstart = 99
 -- opt.formatoptions = "jcroqlnt" -- tcqj
 opt.formatoptions = "jqlnt"
 opt.grepformat = "%f:%l:%c:%m"
@@ -106,4 +112,8 @@ g.markdown_recommended_style = 0
 opt.spelllang = { "en" }
 opt.sessionoptions = { "buffers", "curdir", "tabpages", "winsize", "winpos", "help", "globals", "skiprtp", "folds" }
 opt.shell = "zsh"
+
+opt.inccommand = "split"
+
+g.loaded_perl_provider = 0
 

@@ -9,24 +9,12 @@ return {
     },
     keys = {
       -- stylua: ignore start
-      { ";qs", function()
-        require("persistence").load()
-      end, desc = "Restore Session" },
-      { ";qS", function()
-        require("persistence").select()
-      end, desc = "Select Session" },
-      { ";ql", function()
-        require("persistence").load({ last = true })
-      end, desc = "Restore Last Session" },
-      { ";qw", function()
-        require("persistence").save()
-      end, desc = "Save Session" },
-      { ";qr", function()
-        require("persistence").start()
-      end, desc = "Resume Session Saving" },
-      { ";qd", function()
-        require("persistence").stop()
-      end, desc = "Stop Session Saving" },
+      { ";qs", function() require("persistence").load() end, desc = "Restore Session" },
+      { ";qS", function() require("persistence").select() end, desc = "Select Session" },
+      { ";ql", function() require("persistence").load({ last = true }) end, desc = "Restore Last Session" },
+      { ";qw", function() require("persistence").save() end, desc = "Save Session" },
+      { ";qr", function() require("persistence").start() end, desc = "Resume Session Saving" },
+      { ";qd", function() require("persistence").stop() end, desc = "Stop Session Saving" },
       { ";qx", function()
         local dir = vim.fn.stdpath("state") .. "/sessions/"
         local files = vim.fn.glob(dir .. "*.vim", false, true)
@@ -87,7 +75,7 @@ return {
 
   {
     "gbprod/yanky.nvim",
-    enabled = false,
+    enabled = true,
     opts = {},
     dependencies = "folke/snacks.nvim",
     keys = {
