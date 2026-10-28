@@ -2,11 +2,13 @@
 
 ## Nested Skill Map
 
-Each Angular skill is a leaf directory directly under `angular/`. Resolve a skill ID to its source as `angular/<skill-id>/SKILL.md`; links below are relative to this index. A matched skill's `references/` links are relative to that leaf directory. Use file names as hints only—current Angular projects do not have to use type suffixes such as `.component.ts`.
+The focused skills listed below are the router's normal destinations. `angular-new-app` is the entry for creating an application; `angular-developer` is the broad fallback for cross-domain or otherwise uncovered Angular questions. Prefer focused skills for a matching domain, and follow them over overlapping fallback guidance. Links below are relative to this index. A matched skill's `references/` links are relative to that leaf directory. Use file names as hints only—current Angular projects do not have to use type suffixes such as `.component.ts`.
 
 | Skill ID | Source | Route here for |
 | --- | --- | --- |
 | `angular-architecture` | [SKILL.md](angular-architecture/SKILL.md) | Feature boundaries, standalone-first structure, NgModule interop, lazy-loading decisions, and project folders. |
+| `angular-new-app` | [SKILL.md](angular-new-app/SKILL.md) | Creating a new Angular application. |
+| `angular-developer` | [SKILL.md](angular-developer/SKILL.md) | Broad Angular guidance when a task spans domains or no focused skill applies. |
 | `angular-components` | [SKILL.md](angular-components/SKILL.md) | Components, templates, signal inputs/outputs, change detection, and built-in control flow. |
 | `angular-dependency-injection` | [SKILL.md](angular-dependency-injection/SKILL.md) | `inject()`, providers, injection tokens, and application initializers. |
 | `angular-directives-pipes` | [SKILL.md](angular-directives-pipes/SKILL.md) | Attribute directives, host directives, and pure pipes. |

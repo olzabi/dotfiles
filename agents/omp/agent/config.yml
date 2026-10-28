@@ -1,5 +1,5 @@
 setupVersion: 2
-autoUpdate: true
+autoUpdate: false
 quietStartup: header
 defaultProvider: openai-codex
 defaultModel: gpt-6-luna
@@ -11,28 +11,13 @@ modelRoles:
   image: openai-codex/gpt-image-2
 markdown:
   mermaid: streaming
-packages:
-  - npm:@ff-labs/pi-fff
-  - npm:@tintinweb/pi-subagents
-  - npm:@tintinweb/pi-tasks
-  - npm:pi-lens
-  - npm:context-mode
-  - npm:pi-mcp-adapter
-  - npm:pi-web-access
-  - npm:pi-cache-optimizer
-  - npm:pi-minimalist
-  - npm:pi-vim
-  - ./extensions/.packages/pi-atelier-local
-  - npm:@juicesharp/rpiv-ask-user-question
-tuiMode: regular
-images:
-  blockImages: false
 enableSkillCommands: true
 editorPaddingX: 1
 outputPad: 1
 terminal:
   clearOnShrink: false
-  showProgress: false
+  showProgress: true
+  programStatus: true
 steeringMode: all
 followUpMode: all
 transport: auto
@@ -41,39 +26,6 @@ showCacheMissNotices: true
 showWorkerNotifications: true
 treeFilterMode: default
 fullscreenExitOutput: transcript
-minimalist:
-  preset: custom
-  compactToolRows: true
-  groupToolRuns: false
-  foldIntermediateActivity: true
-  thinkingAsToolCall: true
-  activitySummary: elapsed
-  gutter: true
-  timer: true
-  keepActiveToolsExpanded: false
-  glyphStyle: unicode
-  excludeTools: []
-  keepActiveThinkingExpanded: false
-piVim:
-  clipboardMirror: all
-  exCommand:
-    piDispatch: true
-    copyInputToClipboard: false
-  modeColors:
-    insert: borderMuted
-    normal: borderAccent
-    visual: customMessageLabel
-    ex: warning
-  borderSync:
-    insert: host
-    normal: host
-    visual: host
-    ex: host
-  labelSync:
-    insert: mode
-    normal: mode
-    visual: mode
-    ex: mode
 enableInstallTelemetry: false
 startup:
   changelogMode: summary
@@ -92,16 +44,40 @@ composer:
   shape: box
   tokenRate: true
 statusLine:
-  preset: compact
-  separator: powerline
+  preset: custom
+  separator: powerline-thin
   contextLine: embedded
-  sessionAccent: true
-  transparent: true
+  sessionAccent: false
+  transparent: false
   compactThinkingLevel: true
   showHookStatus: true
+display:
+  showTurnTime: false
+  showTokenUsage: false
+  cacheMissMarker: true
+  collapseCompacted: true
+  hideToolActivity: false
+  smoothStreaming: true
+  subagentLivePreview: true
+  pinnedAgents: collapsed
+  shimmer: classic
 edit:
   mode: hashline
+tuiMode: regular
 tui:
+  vimMode: true
   textSizing: true
   autoGraph: smart
-  titleSpinner: pulse
+  titleSpinner: braille
+  tight: false
+  imeSafeCursor: true
+title:
+  icons: nf+emoji
+task:
+  showResolvedModelBadge: false
+showHardwareCursor: true
+colorBlindMode: false
+omitThinking: false
+externalThinking: false
+codexResets:
+  autoRedeem: "no"

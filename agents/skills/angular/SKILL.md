@@ -5,11 +5,14 @@ description: Entry point for Angular implementation, debugging, review, architec
 
 # Angular Skill Router
 
-Use this skill as the entry point, then load the focused leaf skill or skills for the task. This file is a dispatcher, not a replacement for the detailed Angular guidance.
+Use this skill as the entry point, then load only the focused skill or skills needed for the task.
 
-1. Read [`INDEX.md`](INDEX.md) in this directory to map the task and relevant files to nested skills.
-2. Read the selected leaf skill file(s), such as `angular-routing/SKILL.md`, before making changes. Usually one skill is enough; load additional skills for cross-cutting work.
-3. Do not load every Angular skill by default. If the task spans domains, combine only the relevant guidance—for example, routing plus security for access control, or SSR plus HTTP for transfer caching.
-4. Follow the target project's Angular version and existing conventions when guidance is version-specific or the project differs from an example.
+1. Read [`INDEX.md`](INDEX.md) and select the relevant skill(s) before acting.
+2. For a request to create a new Angular application, load `angular-new-app/SKILL.md` first. Add `angular-tooling/SKILL.md` only for separate CLI, workspace, or build-configuration work.
+3. For work in an existing Angular application, prefer the focused domain skill(s) mapped in the index. Usually one is enough; add another only for a real cross-cutting concern.
+4. Use `angular-developer/SKILL.md` as the broad fallback for Angular questions that span several domains or do not fit a focused skill. Do not load it alongside a focused skill for the same topic; where guidance overlaps, the focused skill and the target project's conventions take precedence.
+5. Follow the target project's Angular version and existing conventions when guidance is version-specific or the project differs from an example.
 
-If the task is Angular-related but no leaf skill clearly matches, use the closest domain skill and inspect the relevant references it links to.
+Treat Angular application TypeScript as Angular/bundler-managed code. Load the general Node skill only for a concrete Node.js runtime concern, such as a standalone Node script or custom Node server code; Angular CLI use or SSR alone is not a reason to apply Node type-stripping guidance.
+
+If the task is Angular-related but no skill clearly matches, use `angular-developer` as the fallback and inspect the relevant references it links to.
