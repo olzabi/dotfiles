@@ -1,11 +1,35 @@
 [env]
+HK_MISE = 1
+_.python.venv = { path = ".vnenv", create = true, uv_create_args = ["--seed"] }
+
 [settings]
 idiomatic_version_file_enable_tools = ["node", "python", "ruby", "php"]
 fetch_remote_versions_timeout = "30s"
+http_timeout = "30s"
+auto_update = true
+verbose = false
 raw = false
+jobs = 4
+pipx.uvx = true
+
+[settings.skills]
+dir = "agents/skills"
+auto_sync = true
+prune = true
+
+[settings.python]
+uv_venv_auto = true
+uv_venv_create_args = ["--seed"]
+
 
 [tools]
-node = "lts"
+"github:nnnkkk7/lazyactions" = "latest"
+"github:tmuxpack/tpack" = "latest"
+"github:jorgerojas26/lazysql" = "latest"
+"github:yvgude/lean-ctx" = "3.11.4"
+"llama.cpp" = { version = "latest", prerelease = true, version_prefix = "b" }
+"github:can1357/oh-my-pi" = "latest"
+node = "latest"
 go = "latest"
 uv = "latest"
 fd = "latest"
@@ -17,7 +41,7 @@ bat = "latest"
 eza = "latest"
 fzf = "latest"
 glow = "latest"
-tmux = "latest"       # may compile from source, check with `mise install -v tmux`
+tmux = "latest"                                                               # may compile from source, check with `mise install -v tmux`
 yazi = "latest"
 hunk = "latest"
 rust = "stable"
@@ -34,13 +58,13 @@ yamllint = "latest"
 gemini = "latest"
 tree-sitter = "latest"
 shfmt = "latest"
-
-
-"github:nnnkkk7/lazyactions" = "latest"
-"github:tmuxpack/tpack" = "latest"
-"github:jorgerojas26/lazysql" = "latest"
-"github:yvgude/lean-ctx" = "3.11.4"
-"llama.cpp" = { version = "latest", prerelease = true, version_prefix = "b" }
-"github:can1357/oh-my-pi" = "latest"
-
-
+oxfmt = "latest"
+pkl = "latest"
+hk = { version = "latest", workflow = "release.yml" }
+"npm:@oh-my-pi/pi-coding-agent" = "latest"
+agent-browser = "latest"
+prettier = "latest"
+pint = "latest"
+"go:github.com/sqls-server/sqls" = "latest"
+"npm:graphql-language-service-cli" = "latest"
+"npm:@angular/language-service" = "latest"
