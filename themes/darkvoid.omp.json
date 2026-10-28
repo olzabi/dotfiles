@@ -3,7 +3,8 @@
   "vars": {
     "bg": "#1c1c1c",
     "fg": "#c0c0c0",
-    "cursor": "#83b7ad",
+    "focus": "#83b7ad",
+    "cursor": "focus",
     "lineNr": "#404040",
     "visual": "#303030",
     "comment": "#858585",
@@ -13,18 +14,24 @@
     "identifier": "#b1b1b1",
     "type": "#a1a1a1",
     "typeBuiltin": "#c5c5c5",
-    "bracket": "#e6e6e6",
-    "operator": "#83b7ad",
     "constant": "#b2d8d8",
+    "operator": "focus",
+    "bracket": "#e6e6e6",
     "eob": "#3c3c3c",
     "border": "#585858",
+    "title": "cursor",
     "added": "#baffc9",
     "changed": "#ffffba",
     "removed": "#ffb3ba",
     "error": "#ff7b72",
     "warning": "#f2c879",
-    "hint": "#83b7ad",
-    "info": "#66b2b2"
+    "hint": "cursor",
+    "info": "#66b2b2",
+    "surface": "bg",
+    "surfaceAlt": "visual",
+    "successBg": "#1f2a24",
+    "errorBg": "#2a2020",
+    "pendingBg": "#202020"
   },
   "colors": {
     "accent": "cursor",
@@ -40,11 +47,11 @@
     "thinkingText": "comment",
 
     "selectedBg": "visual",
-    "userMessageBg": "visual",
-    "customMessageBg": "bg",
-    "toolPendingBg": "#202020",
-    "toolSuccessBg": "#1f2a24",
-    "toolErrorBg": "#2a2020",
+    "userMessageBg": "surfaceAlt",
+    "customMessageBg": "surface",
+    "toolPendingBg": "pendingBg",
+    "toolSuccessBg": "successBg",
+    "toolErrorBg": "errorBg",
     "statusLineBg": "bg",
 
     "userMessageText": "fg",
@@ -53,7 +60,7 @@
     "toolTitle": "func",
     "toolOutput": "identifier",
 
-    "mdHeading": "cursor",
+    "mdHeading": "title",
     "mdLink": "operator",
     "mdLinkUrl": "comment",
     "mdCode": "string",
@@ -83,6 +90,7 @@
     "thinkingMedium": "fg",
     "thinkingHigh": "func",
     "thinkingXhigh": "cursor",
+    "thinkingMax": "operator",
     "bashMode": "operator",
     "pythonMode": "info",
 
@@ -102,7 +110,7 @@
   },
   "export": {
     "pageBg": "bg",
-    "cardBg": "bg",
+    "cardBg": "surface",
     "infoBg": "visual"
   },
   "symbols": {
