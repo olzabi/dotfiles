@@ -52,22 +52,22 @@ edit = [
 ]
 open = [
   { run = 'nvim %s',            desc = "Edit in Neovim",    block = true,  for = "unix" },
-  { run = 'xdg-open %s', orphan = true, desc = "Open with default app", for = "linux" },
+  { run = 'xdg-open %s1', orphan = true, desc = "Open with default app", for = "linux" },
 ]
 reveal = [
   { run = 'xdg-open "$(dirname -- %s1)"', orphan = true, desc = "Open containing folder", for = "linux" },
 ]
 audio = [
-  { run = 'xdg-open %s', orphan = true, desc = "Open with default app", for = "linux" },
-  { run = '''mediainfo %s1; echo "Press enter to exit"; read''', block = true, desc = "Show media info", for = "linux" },
+  { run = 'xdg-open %s1', orphan = true, desc = "Open with default app", for = "linux" },
+  { run = '''mediainfo %s1; echo "Press enter to exit"; read _''', block = true, desc = "Show media info", for = "linux" },
 ]
 video = [
-  { run = 'xdg-open %s', orphan = true, desc = "Open with default app", for = "linux" },
-  { run = '''mediainfo %s1; echo "Press enter to exit"; read''', block = true, desc = "Show media info", for = "linux" },
+  { run = 'xdg-open %s1', orphan = true, desc = "Open with default app", for = "linux" },
+  { run = '''mediainfo %s1; echo "Press enter to exit"; read _''', block = true, desc = "Show media info", for = "linux" },
 ]
 image = [
+  { run = 'xdg-open %s1', orphan = true, desc = "Open with default app", for = "linux" },
   { run = 'imv %s', orphan = true, desc = "Open image in imv", for = "linux" },
-  { run = 'xdg-open %s', orphan = true, desc = "Open with default app", for = "linux" },
 ]
 
 [open]
@@ -80,7 +80,9 @@ prepend_rules = [
   { mime = "video/*",                                        use = "video" },
   { mime = "audio/*",                                        use = "audio" },
   { mime = "text/*",                                         use = [ "edit",  "reveal"] },
-  { mime = "*",                                              use = [ "edit",  "reveal"] },
+]
+append_rules = [
+  { url = "*", use = [ "edit", "reveal" ] },
 ]
 
 [input]

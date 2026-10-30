@@ -1,6 +1,6 @@
 [env]
 HK_MISE = 1
-_.python.venv = { path = ".vnenv", create = true, uv_create_args = ["--seed"] }
+_.python.venv = { path = ".venv", create = true, uv_create_args = ["--seed"] }
 
 [settings]
 idiomatic_version_file_enable_tools = ["node", "python", "ruby", "php"]
@@ -27,9 +27,9 @@ uv_venv_create_args = ["--seed"]
 "github:tmuxpack/tpack" = "latest"
 "github:jorgerojas26/lazysql" = "latest"
 "github:yvgude/lean-ctx" = "3.11.4"
-"llama.cpp" = { version = "latest", prerelease = true, version_prefix = "b" }
+"llama.cpp" = { version = "cuda", prerelease = true, version_prefix = "b" } # version changed to locally build output through `mise link llama.cpp@cuda /path/to`
 "github:can1357/oh-my-pi" = "latest"
-node = "latest"
+node = "24.22.1"
 go = "latest"
 uv = "latest"
 fd = "latest"
@@ -68,3 +68,7 @@ pint = "latest"
 "go:github.com/sqls-server/sqls" = "latest"
 "npm:graphql-language-service-cli" = "latest"
 "npm:@angular/language-service" = "latest"
+herdr = "latest"
+"pypi:rich-cli" = "latest"
+"pypi:trash-cli" = "latest"
+"conda:mediainfo" = "latest"

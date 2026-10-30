@@ -6,6 +6,7 @@ binds {
     Mod+X repeat=false { close-window; }
     Mod+C { center-column; }
     Mod+Q { spawn "kitty" "-e" "tmux" "new-session" "-A" "-s" "main"; }
+    Mod+Shift+Q { spawn "kitty" "--class" "herdr" "-e" "herdr"; }
     Mod+D repeat=false { toggle-overview; }
     Mod+B { spawn "~/.config/waybar/scripts/bt-menu.sh"; }
     Mod+S { spawn "~/.config/niri/scratchpad-toggle.sh"; }

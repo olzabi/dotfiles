@@ -89,7 +89,12 @@ M.angularls = {
       mise_ls_dir(root),
       vim.fn.stdpath "data" .. "/mason/packages/angular-language-server/node_modules",
     }
-    local probe = table.concat(vim.tbl_filter(function(p) return p end, paths), ",")
+    local probe = table.concat(
+      vim.tbl_filter(function(p)
+        return p
+      end, paths),
+      ","
+    )
     return vim.lsp.rpc.start(
       { "ngserver", "--stdio", "--tsProbeLocations", probe, "--ngProbeLocations", probe },
       dispatchers,
@@ -262,6 +267,12 @@ M.cssls = {
     less = { validate = true, lint = { unknownAtRules = "ignore" } },
     scss = { validate = true, lint = { unknownAtRules = "ignore" } },
   },
+  on_attach = function(client, bufnr)
+    local name = vim.api.nvim_buf_get_name(bufnr)
+    if name:match("/waybar/") or name:match("/swaync/") then
+      vim.diagnostic.enable(false, { bufnr = bufnr })
+    end
+  end,
 }
 
 M.graphql = {

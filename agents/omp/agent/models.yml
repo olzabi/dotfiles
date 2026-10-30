@@ -8,7 +8,7 @@ providers:
       supportsReasoningEffort: true
     models:
       - id: qwen3.5:latest
-        name: Qwen 3.5 9.7B (Local)
+        name: Qwen 3.5
         reasoning: false
         input:
           - text

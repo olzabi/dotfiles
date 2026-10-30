@@ -32,15 +32,35 @@
     "on-click": "pkill -x pavucontrol || pavucontrol"
   },
 
-  "network": {
+  "network#wifi": {
     "class": "accent-info",
+    "interface": "wl*",
     "format-wifi": "\uf1eb {signalStrength}%",
-    "format-ethernet": "\udb80\ude00",
     "format-disconnected": "\udb81\uddaa",
     "on-click": "~/.config/waybar/scripts/wifi-menu.sh",
     "on-click-right": "kitty --class popup-nmtui -e nmtui",
-    "tooltip-format-wifi": "{essid} ({signalStrength}%)\n{ipaddr}",
+    "tooltip-format-wifi": "{essid} ({signalStrength}%)\n{ipaddr}"
+  },
+
+  // Wired: only visible while a cable is connected.
+  "network#eth": {
+    "class": "accent-info",
+    "interface": "en*",
+    "format-ethernet": "\udb80\ude00",
+    "format-disconnected": "",
     "tooltip-format-ethernet": "{ifname}\n{ipaddr}"
+  },
+
+  "network#vpn": {
+  "exec": "~/.config/waybar/scripts/vpn-status.sh",
+  "return-type": "json",
+  "on-click": "~/.config/waybar/scripts/vpn-popup.sh",
+  "on-click-right": "pkill -x nm-connection-editor || nm-connection-editor"
+  },
+
+  "group/net": {
+    "orientation": "inherit",
+    "modules": ["network#wifi", "network#eth", "network#vpn"]
   },
 
   "battery": {

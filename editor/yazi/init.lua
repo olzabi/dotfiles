@@ -3,17 +3,19 @@ require("motions"):setup({
 	show_motion = true,
 })
 
+local top_level = os.getenv("YAZI_RESTORE_PROJECT") == "1"
+	and os.getenv("NVIM") == nil
+	and (tonumber(os.getenv("YAZI_LEVEL")) or 1) <= 1
+
 require("projects"):setup({
-	save = { method = "yazi" },
+	save = { method = "lua" },
 	last = {
 		update_after_save = true,
-		update_after_load = true,
-		update_before_quit = true,
-		load_after_start = true,
+		update_after_load = top_level,
+		update_before_quit = top_level,
+		load_after_start = top_level,
 	},
-	notify = {
-		enable = true,
-	},
+	notify = { enable = true },
 })
 
 require("git"):setup({

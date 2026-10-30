@@ -48,46 +48,37 @@ export FZF_ALT_C_OPTS="
 
 rg-fzf() {
   local RG_PREFIX="rg --column --line-number --no-heading --color=always --smart-case"
-  local INITIAL_QUERY="${*:-}"
-  fzf --ansi --disabled --query "$INITIAL_QUERY" \
+  fzf --ansi --disabled --query "${*:-}" \
     --bind "start:reload:$RG_PREFIX {q}" \
     --bind "change:reload:sleep 0.1; $RG_PREFIX {q} || true" \
     --bind "ctrl-f:unbind(change,ctrl-f)+change-prompt(fzf ❯ )+enable-search+clear-query" \
+    --bind "enter:become(nvim {1} +{2})" \
     --color "hl:#1bfd9c:underline,hl+:#bdfe58:underline:reverse" \
     --prompt 'rg ❯ ' \
     --delimiter : \
-    --preview 'cat --color=always {1} --highlight-line {2} --style=numbers,changes' \
+    --preview 'bat --color=always {1} --highlight-line {2} --style=numbers,changes' \
     --preview-window 'right:55%:border-left:+{2}+3/3:wrap' \
-    --header 'ctrl-f: switch to fzf mode' \
-    | awk -F: '{print $1" +"$2}' \
-    | xargs -r nvim
+    --header 'ctrl-f: switch to fzf mode'
 }
 
 bindkey -s '^G' 'rg-fzf\n'
 
 fcd() {
   local dir
-  dir=$(zoxide query --list --score | awk '{print $2}' | \
-    fzf --height=40% --layout=reverse \
-        --preview='eza --tree --level=2 --color=always {}' \
-        --preview-window='right:40%:border-left' \
-        --scheme=history)
-  if [[ -n "$dir" ]]; then
-    cd "$dir"
-    zle reset-prompt
-  fi
-  zle redisplay
+  dir=$(zoxide query --list | fzf --height=40% --layout=reverse \
+    --preview='eza --tree --level=2 --color=always {}' \
+    --preview-window='right:40%:border-left' --scheme=history)
+  [[ -n $dir ]] && cd "$dir"
+  zle reset-prompt
 }
 zle -N fcd
 bindkey '^F' fcd
 
 ts() {
   local session
-  session=$(tmux list-sessions -F '#{session_name}' 2>/dev/null | \
-    fzf --layout=reverse --height=30% \
-        --preview='tmux list-windows -t {} 2>/dev/null' \
-        --preview-window='right:40%:border-left') && \
-  tmux switch-client -t "$session" 2>/dev/null || tmux attach -t "$session"
+  session=$(tmux list-sessions -F '#{session_name}' 2>/dev/null | fzf --layout=reverse --height=30% \
+    --preview='tmux list-windows -t {} 2>/dev/null' --preview-window='right:40%:border-left') || return
+  if [[ -n $TMUX ]]; then tmux switch-client -t "$session"; else tmux attach -t "$session"; fi
 }
 
 

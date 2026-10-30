@@ -23,6 +23,15 @@ return {
       ts_config = { javascript = { "string", "template_string" } },
     },
   },
+  {
+    "folke/lazydev.nvim",
+    ft = "lua",
+    opts = {
+      library = {
+        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+      },
+    },
+  },
 
   {
     "saghen/blink.cmp",
@@ -96,7 +105,7 @@ return {
       sources = {
         -- lazydev removed from default; scoped to lua below.
         -- (requires folke/lazydev.nvim to be installed in your config)
-        default = { "lsp", "snippets", "path", "buffer" },
+        default = { "lsp", "snippets", "path", "buffer", "lazydev" },
         per_filetype = {
           lua = { inherit_defaults = true, "lazydev" },
           sql = { "buffer" },

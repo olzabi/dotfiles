@@ -10,7 +10,9 @@
     "~/.config/waybar/modules/gpu.jsonc"
   ],
 
+
   "modules-left": ["niri/workspaces", "niri/window"],
+  "modules-center": ["niri/language", "clock", "pulseaudio"],
   "modules-right": [
     "tray",
     "custom/notifications",
@@ -19,11 +21,9 @@
     "custom/splitkb",
     "custom/system",
     "custom/gpu",
-    "pulseaudio",
-    "network",
+    "group/net",
     "battery"
   ],
-  "modules-center": [ "clock", "niri/language" ],
 
   "niri/workspaces": { "format": "{value}" },
   "niri/window": {

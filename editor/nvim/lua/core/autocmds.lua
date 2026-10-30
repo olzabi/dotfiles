@@ -83,3 +83,15 @@ vim.api.nvim_create_autocmd("BufReadPost", {
     end
   end,
 })
+
+vim.api.nvim_create_autocmd("BufEnter", {
+  callback = function(ev)
+    if vim.bo[ev.buf].buftype ~= "" or vim.api.nvim_buf_get_name(ev.buf) == "" then return end
+    local root = vim.fs.root(ev.buf, { ".git" }) or vim.fs.dirname(vim.api.nvim_buf_get_name(ev.buf))
+    if root and root ~= vim.uv.cwd() then
+      vim.cmd.cd(vim.fn.fnameescape(root))
+      local ok, fff = pcall(require, "fff")
+      if ok and fff.change_indexing_directory then pcall(fff.change_indexing_directory, root) end
+    end
+  end,
+})

@@ -163,9 +163,9 @@ local function add_git_markers(text, signs)
 end
 
 local function rich_pythonpath()
-	-- local config_home = os.getenv("XDG_CONFIG_HOME") or ((os.getenv("HOME") or "") .. "/.config")
-  local config_home = os.getenv("HOME") .. "/Dotfiles"
-	local theme_path = config_home .. "/editor/yazi/rich"
+	local config_home = os.getenv("YAZI_CONFIG_HOME")
+		or ((os.getenv("XDG_CONFIG_HOME") or (os.getenv("HOME") .. "/.config")) .. "/yazi")
+	local theme_path = config_home .. "/rich"
 	local current = os.getenv("PYTHONPATH")
 	return current and theme_path .. ":" .. current or theme_path
 end
@@ -175,7 +175,7 @@ local RICH_PYTHONPATH = rich_pythonpath()
 function M:peek(job)
 	local path = tostring(job.file.url.path)
 	local signs = signs_for_file(job.file)
-	local width = tostring(rt.preview.max_width)
+	local width = tostring(job.area.w)
 
 	local child = Command("rich")
 		:env("COLUMNS", width)

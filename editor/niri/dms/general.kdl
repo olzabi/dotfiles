@@ -8,6 +8,7 @@ environment {
     GDK_BACKEND "wayland,x11,*"
     QT_QPA_PLATFORM "wayland;xcb"            // Qt apps prefer Wayland, fall back to X11
     QT_QPA_PLATFORMTHEME "gtk3"
+    QT_QPA_PLATFORMTHEME "qt6ct"
     QT_WAYLAND_DISABLE_WINDOWDECORATION "1"  // avoids Qt drawing its own title bars
 }
 input {

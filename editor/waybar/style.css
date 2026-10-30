@@ -49,7 +49,9 @@ tooltip {
   border: 1px solid @line_nr;
   border-radius: 7px;
 }
-tooltip label { color: @fg; }
+tooltip label {
+  color: @fg;
+}
 
 /* ---------- base pill: every module, present and future ---------- */
 .module {
@@ -62,32 +64,53 @@ tooltip label { color: @fg; }
 }
 
 /* ---------- accents (opt-in via "class" in the module config) ---------- */
-.module.accent-focus { color: @focus; }
-.module.accent-const { color: @const; }
-.module.accent-info  { color: @info; }
-.module.accent-ok    { color: @added; }
+.module.accent-focus {
+  color: @focus;
+}
+.module.accent-const {
+  color: @const;
+}
+.module.accent-info {
+  color: @info;
+}
+.module.accent-ok {
+  color: @added;
+}
 
 /* ---------- states: later rules win, so order = severity ---------- */
-.module.on        { color: @fg_dim; }
+.module.on {
+  color: @fg_dim;
+}
 
 .module.off,
 .module.stopped,
 .module.unloaded,
 .module.disabled,
-.module.muted     { color: @comment; }
+.module.muted {
+  color: @comment;
+}
 
 .module.connected,
-.module.charging  { color: @focus; }
+.module.charging {
+  color: @focus;
+}
 
 .module.warning:not(.charging),
-.module.disconnected { color: @warning; }
+.module.disconnected {
+  color: @warning;
+}
 
-.module.dnd       { color: @warning; border-color: @warning; }
+.module.dnd {
+  color: @warning;
+  border-color: @warning;
+}
 
 .module.critical:not(.charging),
 .module.error,
-.module.low
-.module.recording { color: @error; border-color: @error; }
+.module.low .module.recording {
+  color: @error;
+  border-color: @error;
+}
 
 /* script reported nothing: collapse the pill completely */
 .module.empty {
@@ -97,7 +120,9 @@ tooltip label { color: @fg; }
 }
 
 /* ---------- special cases (ids beat classes, order doesn't matter) ---------- */
-#workspaces { padding: 0 3px; }
+#workspaces {
+  padding: 0 3px;
+}
 
 #workspaces button {
   color: @comment;
@@ -120,7 +145,9 @@ tooltip label { color: @fg; }
   color: @bg;
 }
 
-#window { color: @fg_bright; }
+#window {
+  color: @fg_bright;
+}
 window#waybar.empty #window {
   background: transparent;
   border-color: transparent;
@@ -131,3 +158,24 @@ window#waybar.empty #window {
   font-weight: bold;
   border-color: @focus;
 }
+
+#network.wifi,
+#network.eth,
+#network.vpn {
+  padding: 0 6px;
+}
+
+#network.vpn {
+  color: #a6e3a1;
+}
+#network.wifi.disconnected {
+  opacity: 0.5;
+}
+#network.vpn.connected  { color: #a6e3a1; }
+#network.vpn.connecting { color: #f9e2af; }
+
+/* spacing between items inside the group */
+#net {
+  margin: 0;
+}
+

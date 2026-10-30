@@ -1,15 +1,16 @@
-agent_notes = true
-vcs = "git"
-mode = "auto"
-exclude_untracked = false
-line_numbers = true
-menu_bar = false
 transparent_background = true
-hunk_headers = false
-theme = "custom"
-wrap_lines = true
+line_numbers = true
+agent_notes = true
+menu_bar = true
+exclude_untracked = false
 copy_decorations = false
+hunk_headers = false
+wrap_lines = false
+
 cursor_line = "row"
+theme = "custom"
+mode = "auto"
+vcs = "git"
 
 [pager]
 theme = "custom"

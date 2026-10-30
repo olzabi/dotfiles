@@ -1,0 +1,95 @@
+* {
+    /* palette */
+    bg:          #1c1c1c;
+    bg-alpha:    #1c1c1ccc;
+    fg:          #c0c0c0;
+    func:        #e1e1e1;
+    kw:          #f1f1f1;
+    comment:     #585858;
+    visual:      #ffffff0d;
+    border:      #58585899;
+
+    /* warm mint accent (replaces #1bfd9c / #bdfe58) */
+    accent:      #98f0b0;
+    accent-dim:  #6fc58a;
+    glow:        #98f0b026;
+
+    background-color: transparent;
+    text-color:       @fg;
+    spacing:          0;
+}
+
+window {
+    location:         center;
+    anchor:           center;
+    y-offset:         -6%;
+    width:            560px;
+    background-color: @bg-alpha;
+    border:           1px;
+    border-color:     @border;      /* try @glow for a faint halo, or @accent-dim for a stronger one */
+    border-radius:    12px;
+}
+
+mainbox {
+    padding:  12px;
+    spacing:  8px;
+    children: [ inputbar, listview ];
+}
+
+inputbar {
+    padding:  10px 12px;
+    spacing:  12px;
+    children: [ prompt, entry ];
+}
+
+prompt {
+    str:              "";
+    text-color:       @func;
+    vertical-align:   0.5;
+}
+
+entry {
+    placeholder:       "Search...";
+    placeholder-color: @comment;
+    text-color:        @kw;
+    cursor-color:      @accent;     /* remove if your rofi version rejects it */
+    cursor-width:      2px;
+    vertical-align:    0.5;
+}
+
+listview {
+    lines:       5;
+    columns:     1;
+    scrollbar:   false;
+    fixed-height:false;
+    spacing:     2px;
+    cycle:       true;
+}
+
+element {
+    padding:       9px 12px;
+    spacing:       12px;
+    border-radius: 8px;
+    orientation:   horizontal;
+}
+
+element-icon {
+    size:           1.3em;
+    vertical-align: 0.5;
+}
+
+element-text {
+    markup:         true;
+    text-color:     inherit;
+    vertical-align: 0.5;
+}
+
+element normal.normal,
+element alternate.normal { text-color: @fg; }
+
+element selected.normal {
+    background-color: @visual;
+    text-color:       @kw;
+    border:           0 0 0 2px;     /* thin mint marker on the left; delete for pure subtle highlight */
+    border-color:     @accent-dim;
+}

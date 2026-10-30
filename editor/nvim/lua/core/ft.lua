@@ -67,3 +67,13 @@ vim.filetype.add({
   },
 })
 
+vim.filetype.add({
+  pattern = {
+    [".*/waybar/.*%.css"] = "gtkcss",
+    [".*/swaync/.*%.css"] = "gtkcss",
+    [".*/wofi/.*%.css"] = "gtkcss",
+    [".*/gtk%-[34]%.0/.*%.css"] = "gtkcss",
+  },
+})
+
+vim.treesitter.language.register("css", "gtkcss")

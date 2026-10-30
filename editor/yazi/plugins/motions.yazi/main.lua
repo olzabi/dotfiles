@@ -118,15 +118,15 @@ end)
 local render_numbers = ya.sync(function(_, mode)
 	trigger_render()
 
-	Entity.number = function(_, index, total, file, hovered)
+	Entity.number = function(_, index, total, offset, hovered)
 		local idx
 		if mode == SHOW_NUMBERS_RELATIVE then
 			idx = math.abs(hovered - index)
 		elseif mode == SHOW_NUMBERS_ABSOLUTE then
-			idx = file.idx
+			idx = offset + index
 		else -- SHOW_NUMBERS_RELATIVE_ABSOLUTE
 			if hovered == index then
-				idx = file.idx
+				idx = offset + index
 			else
 				idx = math.abs(hovered - index)
 			end
@@ -161,13 +161,17 @@ local render_numbers = ya.sync(function(_, mode)
 			linemodes[#linemodes + 1] = Linemode:new(f):redraw()
 
 			local entity = Entity:new(f)
-			entities[#entities + 1] = ui.Line({ Entity:number(i, #self._folder.files, f, hovered_index), entity:redraw() })
-				:style(entity:style())
+			local number = Entity:number(i, #self._folder.files, self._folder.offset, hovered_index)
+			local line = entity:redraw()
+			local max = math.max(0, self._area.w - linemodes[#linemodes]:width() - ui.width(number))
+			line:truncate { max = max, ellipsis = entity:ellipsis(max) }
+			entities[#entities + 1] = ui.Line({ number, line }):style(entity:style())
 		end
 
 		return {
 			ui.List(entities):area(self._area),
 			ui.Text(linemodes):area(self._area):align(ui.Align.RIGHT),
+			table.unpack(Dnd:new(self._area):redraw()),
 		}
 	end
 end)
@@ -226,15 +230,14 @@ local function get_cmd(first_char, keys)
 	-- command direction
 	local direction
 	if last_key == "g" or last_key == "v" or last_key == "d" or last_key == "y" or last_key == "x" then
-		DIRECTION_KEYS[#DIRECTION_KEYS + 1] = {
-			on = last_key,
-		}
-		local direction_key = ya.which { cands = DIRECTION_KEYS, silent = true }
+		local direction_keys = { table.unpack(DIRECTION_KEYS) }
+		direction_keys[#direction_keys + 1] = { on = last_key }
+		local direction_key = ya.which { cands = direction_keys, silent = true }
 		if not direction_key then
 			return nil, nil, nil
 		end
 		if type(direction_key) == "number" then
-			direction = DIRECTION_KEYS[direction_key].on
+			direction = direction_keys[direction_key].on
 		elseif type(direction_key) == "table" then
 			direction = direction_key.on or direction_key[1]
 		else
