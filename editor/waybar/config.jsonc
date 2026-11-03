@@ -20,7 +20,7 @@
     "custom/splitkb",
     "custom/system",
     "custom/gpu",
-    "pulseaudio",
+    "wireplumber",
     "network",
     "hyprland/language",
     "battery"

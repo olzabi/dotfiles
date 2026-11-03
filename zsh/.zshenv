@@ -110,7 +110,7 @@ _prepend_path "$XDG_CONFIG_HOME/.composer/vendor/bin"
 
 #* git
 # ---------
-export GH_DASH_CONFIG="$DOTFILES_GIT/gh-dash.config.yml"
+export GH_DASH_CONFIG="$XDG_CONFIG_HOME/gh-dash/config.yml"
 
 
 # export PI_CODING_AGENT_DIR="$DOTFILES_AI/pi/agent"
@@ -119,6 +119,7 @@ export OPENCODE_CONFIG_DIR=$DOTFILES_AI/opencode
 
 export OLLAMA_HOST="${OLLAMA_HOST:-127.0.0.1:11434}"
 export OLLAMA_KEEP_ALIVE=10m
+export CLAUDE_CODE_ENABLE_EXPERIMENTAL_ADVISOR_TOOL=1
 
 _prepend_path "$OPENCODE_CONFIG_DIR/bin"
 _append_path /usr/bin

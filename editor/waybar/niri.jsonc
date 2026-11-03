@@ -12,7 +12,7 @@
 
 
   "modules-left": ["niri/workspaces", "niri/window"],
-  "modules-center": ["niri/language", "clock", "pulseaudio"],
+  "modules-center": ["niri/language", "clock", "wireplumber"],
   "modules-right": [
     "tray",
     "custom/notifications",

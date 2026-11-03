@@ -22,8 +22,8 @@ next_tab = "prefix+n"
 new_tab = "ctrl+t"
 previous_workspace = "prefix+k"
 next_workspace = "prefix+j"
-previous_agent = "alt+j"
-next_agent     = "alt+k"
+previous_agent = "alt+k"
+next_agent     = "alt+j"
 switch_tab     = "prefix+1..9"
 rename_tab     = "prefix+,"
 
@@ -132,7 +132,7 @@ manage_ssh_config = true
 
 [experimental]
 kitty_graphics = true
-pane_history = false
+pane_history = true
 
 [theme]
 [theme.custom]

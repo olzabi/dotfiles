@@ -20,16 +20,19 @@
     "spacing": 5
   },
 
-  "pulseaudio": {
+  "wireplumber": {
     "class": "accent-const",
     "format": "{icon} {volume}%",
     "format-muted": "\udb81\udf5f muted",
+    "format-bluetooth": "{icon}\uf294 {volume}%",
     "format-icons": {
       "headphone": "\uf025",
       "default": ["\uf026", "\uf027", "\uf028"]
     },
     "scroll-step": 5,
-    "on-click": "pkill -x pavucontrol || pavucontrol"
+    "tooltip-format": "{desc}",
+    "on-click": "pkill -x pavucontrol || pavucontrol",
+    "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
   },
 
   "network#wifi": {

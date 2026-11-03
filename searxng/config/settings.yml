@@ -1,8 +1,11 @@
 use_default_settings:
   engines:
-    remove:
-      - ahmia
-      - torch
+    keep_only:
+      - duckduckgo
+      - startpage
+      - mojeek
+      - github
+      - brave
 general:
   instance_name: Local SearXNG
 search:
@@ -18,16 +21,5 @@ server:
   image_proxy: false
   method: GET
 outgoing:
-  request_timeout: 5.0
-  max_request_timeout: 10.0
-engines:
-  - name: duckduckgo
-    disabled: true
-  - name: brave
-    disabled: false
-  - name: startpage
-    disabled: false
-  - name: wikipedia
-    disabled: false
-  - name: github
-    disabled: false
+  request_timeout: 8.0
+  max_request_timeout: 12.0
