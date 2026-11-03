@@ -584,7 +584,7 @@ export const register: Register = on => {
     )
   })
 
-  // A typed prompt as a call row: `  USER  first line…`, the label in USER_COLOR; a click on the label unfolds the whole prompt under it, as a call's output.
+  // A typed prompt as a call row under a rule: `  USER  first line…`, the label in USER_COLOR; a click on the label unfolds the whole prompt under it, as a call's output.
   on('ui.render', { component: 'UserMessage' }, async ($, e, next) => {
     const p = e.props
     if (p.origin.kind !== 'composer') return next(e)
@@ -593,6 +593,8 @@ export const register: Register = on => {
     const isOpen = (await read($, expanded)).includes(id)
     return (
       <Box flexDirection="column">
+        {/* A rule parts the new prompt from the transcript above. */}
+        <Text dimColor wrap="truncate-end">{'─'.repeat(400)}</Text>
         <Box>
           <Text dimColor>{isOpen ? '▾ ' : '  '}</Text>
           <Button key={`row-${id}`} plain onPress={() => toggleOpen($, id, e.requestId)}>
