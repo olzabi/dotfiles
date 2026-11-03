@@ -20,6 +20,7 @@ services:
     networks:
       - db_psql
     profiles: [postgres, sql, all]
+    command: ["postgres", "-c", "shared_preload_libraries=pg_stat_statements"]
   mysql:
     image: mysql:${MYSQL_VERSION:-8.4}
     container_name: mysql
@@ -64,7 +65,41 @@ services:
       timeout: 5s
       retries: 3
     profiles: [searxng, llm, all]
+  dozzle:
+    container_name: dozzle
+    image: amir20/dozzle:latest
+    volumes:
+      - /run/user/1000/podman/podman.sock:/var/run/docker.sock:ro
+      - dozzle_data:/data
+    ports:
+      - 9999:8080
+    restart: unless-stopped
+  grafana:
+    image: docker.io/grafana/grafana-oss:latest
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+      # used by provisioning files
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-dev}
+      MYSQL_USER: ${MYSQL_USER:-admin}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-secret}
+      MYSQL_DB: ${MYSQL_DB:-devdb}
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./storage/grafana/provisioning:/etc/grafana/provisioning:Z
+    networks:
+      - db_psql
+      - db_mysql
 volumes:
+  dozzle_data:
+  grafana-data:
   postgres_data:
   mysql_data:
   searxng_cache:
