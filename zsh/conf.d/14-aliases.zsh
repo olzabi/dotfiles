@@ -78,3 +78,5 @@ alias -g ....='../../..'
 alias md='mkdir -p'
 
 alias dirty='watch -n1 "cat /proc/meminfo | grep Dirty"'
+
+alias uvpi="uv pip install"

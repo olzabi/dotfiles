@@ -48,6 +48,6 @@ recent-windows {
 hotkey-overlay {
     skip-at-startup
 }
-screenshot-path "~/Pictures/Screenshots/%Y-%m-%d %H-%M-%S.png"
+screenshot-path "~/Media/Screenshots/%Y-%m-%d %H-%M-%S.png"
 prefer-no-csd
 

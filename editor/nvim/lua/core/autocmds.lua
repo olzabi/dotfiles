@@ -95,3 +95,10 @@ vim.api.nvim_create_autocmd("BufEnter", {
     end
   end,
 })
+
+-- reload buffers changed on disk (e.g. by agents); autoread alone doesn't poll
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold" }, {
+  callback = function()
+    if vim.fn.getcmdwintype() == "" then vim.cmd.checktime() end
+  end,
+})
