@@ -1,5 +1,4 @@
 import { expect, test } from 'claude-code/testing'
-import { duration } from './register'
 
 const ROW = {
   plugin: 'hush',
@@ -235,14 +234,13 @@ test('a subagent row is labelled by its type', async $ => {
   await first.unmount()
 })
 
-test('the turn line draws nothing in the transcript; durations read as the engine writes them', async $ => {
+test('the turn line draws nothing in the transcript', async $ => {
   const ui = await $.ui.mount({
     plugin: 'hush', component: 'TurnDuration', requestId: 't1', surface: 'terminal',
     props: { word: 'Brewed', durationMs: 6000 },
   } as never)
   expect(await ui.find({ type: 'Text' })).toBeFalsy()
   await ui.unmount()
-  expect([duration(6000), duration(126000), duration(3840000)]).toEqual(['6s', '2m 6s', '1h 4m'])
 })
 
 test('the answer after a turn\'s tool calls gets a rule; a first answer does not', async ($, on) => {

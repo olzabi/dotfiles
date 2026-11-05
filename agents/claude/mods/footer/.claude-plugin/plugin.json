@@ -1,0 +1,1 @@
+{ "name": "footer", "version": "0.2.0", "description": "Footer under the prompt: vim mode badge, the engine's hint line, jumpers between typed prompts, model, effort and context fill.", "types": "./types/index.d.ts" }

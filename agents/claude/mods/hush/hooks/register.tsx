@@ -203,14 +203,6 @@ export function excerpt(text: string): string {
   return s.length <= 2 ? s.join(' ') : `${s[0]} ... ${s[s.length - 1]}`
 }
 
-// `6s`, `2m 6s`, `1h 4m`, as the engine's turn line writes a duration.
-export function duration(ms: number): string {
-  const s = Math.round(ms / 1000)
-  if (s < 60) return `${s}s`
-  if (s < 3600) return `${Math.floor(s / 60)}m ${s % 60}s`
-  return `${Math.floor(s / 3600)}h ${Math.floor((s % 3600) / 60)}m`
-}
-
 const fit = (s: string, cells: number) => (s.length > cells ? `${s.slice(0, Math.max(0, cells - 3))}...` : s)
 
 type Call = { tool: string; input: unknown; isRunning: boolean; isErrored: boolean }
@@ -660,23 +652,8 @@ export const register: Register = on => {
     )
   })
 
-  // The `✻ Brewed for 6s · done 5:49 AM` row moves to the status line under the prompt: the
-  // main loop's turn is timed here, and the transcript row draws nothing (ctrl+o keeps it;
-  // a row that waits on background agents keeps its text).
-  let turnStartedAt = 0
-  on('turn.start', async ($, e, next) => {
-    if (!e.agentId) turnStartedAt = Date.now()
-    return next(e)
-  })
-  on('turn.complete', async ($, e, next) => {
-    const r = await next(e)
-    if (!e.agentId && turnStartedAt) {
-      const done = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
-      $.ui.status(`✻ ${duration(Date.now() - turnStartedAt)} · done ${done}`)
-      turnStartedAt = 0
-    }
-    return r
-  })
+  // The `✻ Brewed for 6s` transcript row draws nothing (ctrl+o keeps it; a row that waits on
+  // background agents keeps its text): the footer mod shows the last turn's time under the prompt.
   on('ui.render', { component: 'TurnDuration' }, async ($, e, next) => {
     if (e.props.isExpanded || e.props.waitingFor) return next(e)
     const { Box } = $.ui.resolve(e)
