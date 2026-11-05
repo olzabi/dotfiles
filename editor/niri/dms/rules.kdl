@@ -29,13 +29,10 @@ window-rule {
     tiled-state true
     geometry-corner-radius 10
 }
-
 window-rule {
     match app-id="^popup-"
     open-floating true
     default-column-width {
-
-
         fixed 1600
     }
     default-window-height {
@@ -56,35 +53,28 @@ window-rule {
     // optional: open under the bar at the top right instead of centered
     default-floating-position x=16 y=48 relative-to="top-right"
 }
-
-
 window-rule {
     match app-id="steam" title="^Friends List$"
     open-floating true
     default-floating-position x=16 y=48 relative-to="top-right"
-    default-column-width { fixed 350; }
-    default-window-height { fixed 700; }
-}
-
-window-rule {
-    match app-id="^chromium$"
-    open-maximized false
-    open-floating  true
-    match title="Picture in picture"
-        default-column-width {
-        fixed 600
+    default-column-width {
+        fixed 350
     }
     default-window-height {
-        fixed 400
+        fixed 700
     }
+}
+window-rule {
+    match app-id="^chromium$" title="^Picture in picture$"
+    open-floating true
+    default-column-width { fixed 600; }
+    default-window-height { fixed 400; }
     default-floating-position x=16 y=48 relative-to="top-right"
 }
-
 window-rule {
-    match app-id=r#"^org\.telegram\.desktop$"# title="^Media viewer$"
+    match app-id="^org\\.telegram\\.desktop$" title="^Media viewer$"
     open-fullscreen false
 }
-
 window-rule {
     match app-id="org.remmina.Remmina"
     open-maximized true

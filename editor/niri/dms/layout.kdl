@@ -1,6 +1,8 @@
 layout {
     gaps 8
     center-focused-column "never"
+    always-center-single-column
+    empty-workspace-above-first
     default-column-width {
         proportion 0.5
     }
@@ -28,7 +30,6 @@ layout {
         right 12
     }
 }
-
 overview {
     zoom 0.55
     workspace-shadow {
