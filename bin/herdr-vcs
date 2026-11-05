@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# Report VCS info for the calling herdr pane/workspace as sidebar metadata:
+#   pane      $branch     current branch (git) or bookmark@change (jj)
+#   workspace $worktrees  other worktrees (git) / workspaces (jj) of the repo
+#   workspace $jj         bookmark@change (jj only; built-in `branch` is git-only)
+# Usage: herdr-vcs [dir]   (no-op outside herdr; called from agent hooks)
+[ "${HERDR_ENV:-}" = 1 ] && [ -n "${HERDR_PANE_ID:-}" ] || exit 0
+dir=${1:-$PWD}
+cd "$dir" 2>/dev/null || exit 0
+src=dotfiles:vcs
+
+if root=$(jj root --ignore-working-copy 2>/dev/null); then
+  # nearest bookmark on @ or its ancestors, plus @'s short change id
+  bm=$(jj log -r 'latest(::@ & bookmarks())' --no-graph --ignore-working-copy -T 'bookmarks.join(",")' 2>/dev/null)
+  ch=$(jj log -r @ --no-graph --ignore-working-copy -T 'change_id.shortest(4)' 2>/dev/null)
+  branch="jj ${bm:+$bm@}$ch"
+  self=$(jj workspace list --ignore-working-copy -T 'if(target.current_working_copy(), name ++ "\n")' 2>/dev/null)
+  wts=$(jj workspace list --ignore-working-copy -T 'name ++ "\n"' 2>/dev/null | grep -vxF -- "${self:-default}" | paste -sd' ')
+elif root=$(git rev-parse --show-toplevel 2>/dev/null); then
+  branch=$(git branch --show-current 2>/dev/null)
+  [ -n "$branch" ] || branch=$(git rev-parse --short HEAD 2>/dev/null)
+  # branches of every other non-prunable worktree; detached ones by dir name
+  wts=$(git worktree list --porcelain 2>/dev/null | awk -v self="$root" '
+    /^worktree /{p=substr($0,10); b=""; skip=(p==self)}
+    /^branch /{b=$2; sub("refs/heads/","",b)}
+    /^prunable/{skip=1}
+    /^$/{if(!skip){n=split(p,a,"/"); printf "%s ", (b!=""?b:a[n])} }
+  ' | sed 's/ $//')
+else
+  herdr pane report-metadata "$HERDR_PANE_ID" --source "$src" --clear-token branch >/dev/null 2>&1
+  exit 0
+fi
+
+herdr pane report-metadata "$HERDR_PANE_ID" --source "$src" --token "branch=$branch" >/dev/null 2>&1
+[ -n "${HERDR_WORKSPACE_ID:-}" ] || exit 0
+case $branch in
+  "jj "*) herdr workspace report-metadata "$HERDR_WORKSPACE_ID" --source "$src" --token "jj=${branch#jj }" >/dev/null 2>&1 ;;
+  *) herdr workspace report-metadata "$HERDR_WORKSPACE_ID" --source "$src" --clear-token jj >/dev/null 2>&1 ;;
+esac
+if [ -n "$wts" ]; then
+  herdr workspace report-metadata "$HERDR_WORKSPACE_ID" --source "$src" --token "worktrees=⑂ $wts" >/dev/null 2>&1
+else
+  herdr workspace report-metadata "$HERDR_WORKSPACE_ID" --source "$src" --clear-token worktrees >/dev/null 2>&1
+fi
+exit 0

@@ -29,7 +29,7 @@ uv_venv_create_args = ["--seed"]
 "github:yvgude/lean-ctx" = "3.11.4"
 "llama.cpp" = { version = "cuda", prerelease = true, version_prefix = "b" } # version changed to locally build output through `mise link llama.cpp@cuda /path/to`
 "github:can1357/oh-my-pi" = "latest"
-node = "24.22.1"
+node = "26.13.0"
 go = "latest"
 uv = "latest"
 fd = "latest"
@@ -74,3 +74,4 @@ herdr = "latest"
 "conda:mediainfo" = "latest"
 claude = "latest"
 "pipx:sqlit-tui" = "latest"
+jj = "latest"
