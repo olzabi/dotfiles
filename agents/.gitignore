@@ -3,11 +3,32 @@
 !/pi/
 !/skills/
 !/skills/**
+!/rules/
+!/rules/**
+# Linked by mise from its install dir (absolute paths, machine-local).
+/skills/.mise-skills.json
+/skills/hk-configure
+/skills/hk-debug
 
 !/pi/agent/
 !/pi/agent/.gitignore
 
 !/omp/
+!/omp/marketplaces.json
 !/omp/agent/
 !/omp/agent/.gitignore
+!/omp/agent/rules/
 
+
+!/claude/
+!/claude/settings.json
+!/claude/output-styles/
+!/claude/output-styles/**
+!/claude/hooks/
+!/claude/hooks/**
+!/claude/CLAUDE.md
+!/claude/mods/
+!/claude/mods/**
+
+# Anywhere above: installed packages.
+node_modules/

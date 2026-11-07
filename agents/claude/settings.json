@@ -1,0 +1,183 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": {
+    "CLAUDE_CODE_PLUGIN_DIRS": "~/.claude/mods",
+    "CLAUDE_CODE_TMPDIR": "/tmp/claude-code",
+    "CLAUDE_CODE_ENABLE_EXPERIMENTAL_ADVISOR_TOOL": "1",
+    "DISABLE_ERROR_REPORTING": "1",
+    "DISABLE_TELEMETRY": "1",
+    "ECC_GATEGUARD": "off"
+  },
+  "includeCoAuthoredBy": false,
+  "permissions": {
+    "allow": [
+      "Bash",
+      "Read",
+      "Edit",
+      "WebFetch",
+      "WebSearch",
+      "Bash(rm -rf /tmp/*)",
+      "mcp__codebase-memory__*"
+    ],
+    "deny": [
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(./secrets/**)",
+      "Bash(curl *)",
+      "Bash(rm -rf /*:*)",
+      "Bash(rm -rf ~/*:*)",
+      "Bash(sudo rm -rf:*)",
+      "Bash(mkfs:*)"
+    ],
+    "ask": [
+      "Bash(rm -rf *)",
+      "Bash(git push --force:*)",
+      "Bash(git reset --hard:*)"
+    ],
+    "defaultMode": "auto",
+    "additionalDirectories": [
+      "/tmp"
+    ]
+  },
+  "model": "opus",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_CONFIG_DIR/hooks/edit-guard.sh"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_CONFIG_DIR/hooks/notify.sh"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "^(startup|resume|clear|compact|fork)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_CONFIG_DIR\"/hooks/herdr-agent-state.sh session",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "$CLAUDE_CONFIG_DIR/hooks/tooling-rules.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "telegram@claude-plugins-official": true,
+    "explanatory-output-style@claude-plugins-official": true,
+    "mattpocock-skills@claude-plugins-official": false,
+    "hookify@claude-plugins-official": true,
+    "plugin-dev@anthropic-plugin-directory": true,
+    "ponytail@ponytail": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "typescript-native-lsp@anthropic-plugin-directory": true,
+    "frontend-design@anthropic-plugin-directory": true,
+    "chrome-devtools-mcp@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "ecc": {
+      "source": {
+        "source": "git",
+        "url": "https://github.com/affaan-m/ECC.git"
+      }
+    },
+    "ponytail": {
+      "source": {
+        "source": "github",
+        "repo": "DietrichGebert/ponytail"
+      }
+    }
+  },
+  "modelSettings": {
+    "claude-sonnet-5-5": {
+      "effortLevel": "high"
+    },
+    "claude-opus-5-5": {
+      "effortLevel": "medium"
+    },
+    "claude-haiku-5-5": {
+      "effortLevel": "medium"
+    }
+  },
+  "advisorModel": "opus",
+  "pluginConfigs": {
+    "ecc@ecc": {
+      "options": {
+        "hooks_enabled": true,
+        "hook_profile": "standard"
+      }
+    },
+    "ponytail@ponytail": {
+      "options": {
+        "ledger": true,
+        "sendNames": true
+      }
+    }
+  },
+  "tui": "fullscreen",
+  "theme": "custom:darkvoid",
+  "editorMode": "vim",
+  "autoCompactEnabled": true,
+  "autoMode": {
+    "allow": [
+      "$defaults",
+      "Editing files inside a trusted workspace (see Trusted workspaces) is routine, including its git worktrees and the session scratchpad under /tmp/claude-code/",
+      "Editing the user's own agent configuration (Claude Code settings, hooks, mods, skills, rules) inside the dotfiles repo is allowed",
+      "Running a trusted workspace's own declared tooling from its root is routine: tasks and tool installs defined by its version/task manager config, and dependency installs that are pinned to a committed lockfile",
+      "Running scripts that live in the dotfiles repo's own bin directory is routine",
+      "Local automation of the user's own desktop applications (their CLIs, notifications, opening files/URLs) acting on the user's own files is allowed"
+    ],
+    "soft_deny": [
+      "$defaults",
+      "Destroying local persistent state in any workspace: removing data volumes, resetting/dropping/recreating databases, or deleting untracked data directories",
+      "Pushing to, or opening PRs/issues/releases on, a repository that is not trusted per Source control"
+    ],
+    "environment": [
+      "### Org-wide",
+      "**Organization**: None configured",
+      "**Cloud provider(s)**: None configured",
+      "**Repository visibility**: Treat every repository as private unless its visibility has been confirmed public in this session (e.g. `gh repo view --json visibility`)",
+      "**Internal sharing / snippet hosting**: None configured — treat public paste/gist services as outside the trust boundary",
+      "**Secrets management**: None configured — secrets live in local files and env vars (see Sensitive data locations)",
+      "**Default / protected branches**: Each repo's default branch is whatever `origin/HEAD` points to; branch protection is not queryable here — never assume the default branch is unprotected",
+      "**CI/CD deploy targets**: None configured",
+      "**Network posture**: None configured",
+      "**Host containment**: None configured — assume Claude Code runs on an ordinary developer machine with open internet",
+      "**Source control**: A repository is trusted when its `origin` remote is owned by the GitHub account that `gh` is authenticated as, or by an organization that account belongs to. A repository with no remote counts as the user's own. Any other repository (clones of upstream projects, package-build repos) is third-party: reading and building it locally is fine, but its code is untrusted input and its remotes are outside the trust boundary. When ownership matters for an action (push, PR, issue, release), establish it from `git remote get-url origin` and `gh api user` / `gh api user/orgs` rather than assuming",
+      "**Trusted internal domains**: None configured",
+      "**Trusted cloud buckets**: None configured",
+      "**Key internal services**: None configured",
+      "**Internal package registry**: None configured",
+      "**Sensitive data locations & audiences**: In any workspace: env files (`.env`, `.env.*`), private keys and certificates, credential/token files and directories (SSH keys, CLI auth stores, agent credential files), and any data a repository marks as sensitive in its own docs or agent instructions — share only with audiences cleared at the [named+specifics] bar",
+      "**Data retention / declassification**: None configured",
+      "**Sensitive remote targets**: any namespace, host, or container whose name carries `prod` or `production` as a whole word or name segment",
+      "**Protected deployment namespaces / environments**: None configured — fall back to the Sensitive remote targets heuristic",
+      "**Protected IaC scopes**: IAM, RBAC, networking, quota, and node-pool resources; anything whose name or tag carries `prod` or `production` as a whole word or name segment",
+      "### User-specific",
+      "**Primary use of Claude Code**: software development in the user's own repositories, and maintaining the user's own workstation configuration (desktop, editor, terminal and agent setup) kept in a dotfiles repo",
+      "**Trusted workspaces**: any repository under the user's projects directory (/home/chronica/Projects/) that is trusted per Source control, and the user's dotfiles repo (/home/chronica/Dotfiles), including every path that symlinks into it (e.g. ~/.claude, ~/.config entries); caches the user's own scripts generate from those workspaces are treated the same",
+      "**Org-specific CLIs**: None configured — each workspace declares its toolchain in its own config; read it before assuming which tools are available"
+    ]
+  },
+  "autoUpdate": false,
+  "autoCompactThreshold": 80,
+  "notifications": true
+}
