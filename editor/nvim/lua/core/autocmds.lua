@@ -67,8 +67,9 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 
 vim.api.nvim_create_autocmd("FileType", {
   pattern = { "text", "markdown", "gitcommit" },
-  callback = function()
-    vim.opt_local.wrap = true
+  callback = function(ev)
+    -- markview can't draw tables/code blocks properly with wrap on
+    vim.opt_local.wrap = vim.bo[ev.buf].filetype ~= "markdown"
     vim.opt_local.spell = true
   end,
 })

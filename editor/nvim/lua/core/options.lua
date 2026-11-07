@@ -109,7 +109,7 @@ g.deprecation_warnings = false
 g.trouble_lualine = true
 g.markdown_recommended_style = 0
 
-opt.spelllang = { "en" }
+opt.spelllang = { "en", "uk", "ru" }
 opt.sessionoptions = { "buffers", "curdir", "tabpages", "winsize", "winpos", "help", "globals", "skiprtp", "folds" }
 opt.shell = "zsh"
 
