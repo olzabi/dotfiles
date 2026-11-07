@@ -1,0 +1,9 @@
+{
+  "id": "compact-folders",
+  "name": "Compact Folders",
+  "version": "0.1.0",
+  "minAppVersion": "1.15.0",
+  "description": "Show single-child folder chains as one row (A/B/C), like VS Code compact folders.",
+  "author": "olzabi",
+  "isDesktopOnly": false
+}

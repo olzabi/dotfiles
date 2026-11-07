@@ -1,0 +1,96 @@
+/* Darkvoid — palette shared with editor/waybar/style.css and editor/yazi/rich/darkvoid.py */
+.theme-dark {
+  --dv-bg: #1c1c1c;
+  --dv-bg-alt: #161616;
+  --dv-visual: #303030;
+  --dv-line: #404040;
+  --dv-border: #585858;
+  --dv-comment: #858585;
+  --dv-fg-dim: #b1b1b1;
+  --dv-fg: #c0c0c0;
+  --dv-fg-bright: #e1e1e1;
+  --dv-keyword: #f1f1f1;
+  --dv-focus: #83b7ad;
+  --dv-const: #b2d8d8;
+  --dv-info: #66b2b2;
+  --dv-added: #baffc9;
+  --dv-error: #ff7b72;
+  --dv-warning: #f2c879;
+
+  --accent-h: 169;
+  --accent-s: 27%;
+  --accent-l: 62%;
+
+  --background-primary: var(--dv-bg);
+  --background-primary-alt: var(--dv-bg-alt);
+  --background-secondary: var(--dv-bg-alt);
+  --background-secondary-alt: var(--dv-bg);
+  --background-modifier-border: var(--dv-line);
+  --background-modifier-border-hover: var(--dv-border);
+  --background-modifier-border-focus: var(--dv-focus);
+  --background-modifier-hover: var(--dv-visual);
+  --background-modifier-active-hover: var(--dv-visual);
+  --background-modifier-error: var(--dv-error);
+  --background-modifier-success: var(--dv-added);
+  --titlebar-background: var(--dv-bg-alt);
+  --titlebar-background-focused: var(--dv-bg-alt);
+
+  --text-normal: var(--dv-fg);
+  --text-muted: var(--dv-fg-dim);
+  --text-faint: var(--dv-comment);
+  --text-accent: var(--dv-focus);
+  --text-accent-hover: var(--dv-const);
+  --text-error: var(--dv-error);
+  --text-success: var(--dv-added);
+  --text-warning: var(--dv-warning);
+  --text-selection: var(--dv-visual);
+  --text-highlight-bg: rgba(242, 200, 121, 0.2);
+
+  --interactive-accent: var(--dv-focus);
+  --interactive-accent-hover: var(--dv-const);
+  --text-on-accent: var(--dv-bg);
+
+  --h1-color: var(--dv-keyword);
+  --h2-color: var(--dv-fg-bright);
+  --h3-color: var(--dv-fg-bright);
+  --h4-color: var(--dv-fg);
+  --h5-color: var(--dv-fg-dim);
+  --h6-color: var(--dv-comment);
+  --bold-color: var(--dv-fg-bright);
+  --italic-color: var(--dv-fg);
+  --link-color: var(--dv-focus);
+  --link-color-hover: var(--dv-const);
+  --link-external-color: var(--dv-info);
+  --link-external-color-hover: var(--dv-const);
+  --link-unresolved-color: var(--dv-comment);
+  --hr-color: var(--dv-line);
+  --blockquote-border-color: var(--dv-border);
+  --tag-color: var(--dv-const);
+  --tag-background: var(--dv-visual);
+  --checkbox-color: var(--dv-focus);
+  --list-marker-color: var(--dv-comment);
+  --table-border-color: var(--dv-line);
+  --table-header-background: var(--dv-bg-alt);
+
+  --code-background: var(--dv-bg-alt);
+  --code-normal: var(--dv-fg);
+  --code-comment: var(--dv-border);
+  --code-keyword: var(--dv-keyword);
+  --code-string: #d1d1d1;
+  --code-value: var(--dv-const);
+  --code-function: var(--dv-fg-bright);
+  --code-property: var(--dv-fg-dim);
+  --code-tag: var(--dv-fg-bright);
+  --code-operator: #1bfd9c;
+  --code-punctuation: #e6e6e6;
+  --code-important: var(--dv-warning);
+
+  --color-red: var(--dv-error);
+  --color-orange: var(--dv-warning);
+  --color-yellow: var(--dv-warning);
+  --color-green: var(--dv-added);
+  --color-cyan: var(--dv-info);
+  --color-blue: var(--dv-focus);
+  --color-purple: var(--dv-const);
+  --color-pink: #dea6a0;
+}

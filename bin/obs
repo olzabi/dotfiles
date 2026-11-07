@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+# Usage: obs [dir]   — read dir (default: git root of $PWD, else $PWD) in Obsidian with the shared dotfiles config.
+# Obsidian scans and watches every file in a vault ("Excluded files" only hides them), so instead of opening the
+# project itself we open a mirror vault under ~/.cache/obs holding symlinks to just its markdown and images.
+set -euo pipefail
+
+root=$(realpath "${1:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}")
+[ -d "$root" ] || { echo "obs: not a directory: $root" >&2; exit 1; }
+[ "$root" != "$HOME" ] || { echo "obs: refusing to open \$HOME as a vault" >&2; exit 1; }
+shared=$(realpath "$(dirname "$(readlink -f "$0")")/../editor/obsidian")
+reg="${XDG_CONFIG_HOME:-$HOME/.config}/obsidian/obsidian.json"
+sock="${XDG_RUNTIME_DIR:-$HOME}/.obsidian-cli.sock"
+vault="${XDG_CACHE_HOME:-$HOME/.cache}/obs/$(printf %s "$root" | sha1sum | cut -c1-8)/$(basename "$root")"
+
+list_docs() {
+  if git -C "$root" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    git -C "$root" ls-files -z -co --exclude-standard
+  else
+    find "$root" \( -name .git -o -name node_modules -o -name .venv -o -name vendor -o -name target -o -name dist -o -name build \) -prune \
+      -o -type f -printf '%P\0'
+  fi | grep -zaiE '\.(md|markdown|png|jpe?g|gif|svg|webp)$' || true
+}
+
+# Sync mirror: link new docs, drop links whose target is gone, prune emptied dirs.
+# Dot-folders (.claude/, .agents/) are mirrored as-is; the shared "unhide" plugin makes Obsidian show them.
+mkdir -p "$vault/.obsidian"
+while IFS= read -r -d '' rel; do
+  dst="$vault/$rel"
+  [ -L "$dst" ] && continue
+  mkdir -p "$(dirname "$dst")" && ln -s "$root/$rel" "$dst"
+done < <(list_docs)
+find "$vault" -xtype l -delete
+find "$vault" -mindepth 1 -type d -empty -not -path "$vault/.obsidian" -delete
+
+# Config: project's own real .obsidian files win, shared dotfiles config fills the rest; workspace.json stays per-vault.
+# Plugins always come from dotfiles: community plugins get auto-enabled below, so never run JS a repo ships.
+for src in "$root"/.obsidian/* "$shared"/*; do
+  [ -e "$src" ] && ! [ -L "$src" ] || continue
+  case "$src" in "$root"/.obsidian/plugins | "$root"/.obsidian/community-plugins.json) continue ;; esac
+  case "$(basename "$src")" in workspace*.json) continue ;; esac
+  dst="$vault/.obsidian/$(basename "$src")"
+  [ -e "$dst" ] || [ -L "$dst" ] || ln -s "$src" "$dst"
+done
+
+# Edits to link targets fire no watcher events inside the vault; touching the link does. Poll the ~hundreds of
+# targets (cheap) and stop once Obsidian quits. One poller per vault.
+pidf="$(dirname "$vault")/poll.pid"
+[ -f "$pidf" ] && kill "$(cat "$pidf")" 2>/dev/null || true
+( trap '' HUP  # survive the terminal closing
+  stamp="$(dirname "$vault")/poll.stamp"; touch "$stamp"
+  while sleep 2 && pgrep -f '/obsidian/app.asar' >/dev/null; do
+    touch "$stamp.next"
+    find -L "$vault" -path "$vault/.obsidian" -prune -o -type f -newer "$stamp" -print0 | xargs -0r touch -h
+    mv "$stamp.next" "$stamp"
+  done
+) >/dev/null 2>&1 &
+echo $! >"$pidf"
+
+# Open + verify runs detached so the shell returns at once; errors arrive as desktop notifications.
+fail() { notify-send -a obs "obs" "$1" 2>/dev/null || echo "obs: $1" >&2; return 1; }
+open_vault() {
+  if [ -S "$sock" ]; then
+    # Running app keeps its vault list in memory and ignores obsidian.json edits, so register through it:
+    # "vault-open" is the same IPC as "Open folder as vault" (adds the vault if new, then opens it).
+    out=$(obsidian eval "code=window.electron.ipcRenderer.sendSync('vault-open', $(jq -n --arg p "$vault" '$p'), false)" 2>&1) || true
+    case "$out" in *"not enabled"*)
+      fail "enable Settings > General > Advanced > Command line interface, then rerun" ;;
+    esac
+  else
+    # Not running: the registry is read at startup, so writing it is safe. cli=true lets the branch above work next time.
+    [ -f "$reg" ] || { mkdir -p "$(dirname "$reg")"; echo '{"vaults":{}}' >"$reg"; }
+    tmp=$(mktemp)
+    jq --arg id "$(openssl rand -hex 8)" --arg p "$vault" --argjson ts "$(date +%s%3N)" \
+      '.cli = true | if any(.vaults[]; .path == $p) then . else .vaults[$id] = {path: $p, ts: $ts} end' \
+      "$reg" >"$tmp" && mv "$tmp" "$reg"
+    out=""
+    setsid obsidian "obsidian://open?path=$(jq -rn --arg p "$vault" '$p | @uri')" >/dev/null 2>&1 &
+  fi
+
+  # Wait until the vault is live (eval output is often empty once a new window takes focus, so check the vault list).
+  # The socket check stops us calling the CLI before the app is up, which would spawn a second launch.
+  live() { [ -S "$sock" ] && obsidian vaults verbose 2>/dev/null | cut -f2- | grep -qxF "$vault"; }
+  for _ in $(seq 40); do live && return 0; sleep 0.5; done
+  fail "failed to open $vault${out:+: $out}"
+}
+( trap '' HUP; open_vault ) </dev/null >/dev/null 2>&1 &

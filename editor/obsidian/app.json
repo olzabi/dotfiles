@@ -1,0 +1,19 @@
+{
+  "defaultViewMode": "preview",
+  "livePreview": true,
+  "readableLineLength": true,
+  "showUnsupportedFiles": false,
+  "alwaysUpdateLinks": true,
+  "promptDelete": true,
+  "userIgnoreFilters": [
+    "node_modules/",
+    ".git/",
+    ".venv/",
+    "vendor/",
+    "dist/",
+    "build/",
+    "target/",
+    ".cache/",
+    "out-tsc/"
+  ]
+}
