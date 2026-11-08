@@ -33,6 +33,13 @@ navigate_workspace_up    = "k"
 navigate_workspace_down  = "j"
 rename_workspace         = "prefix+$"
 
+# worktrees: each one opens as its own workspace, so agents run in parallel without sharing a checkout.
+# open_worktree is the main path: it opens worktrees made by `claude --worktree`/wt, which carry repo setup
+# (sparse paths, node_modules links) that herdr's new_worktree does not.
+new_worktree    = "prefix+shift+g"
+open_worktree   = "prefix+shift+o"
+remove_worktree = "prefix+shift+x"
+
 [[keys.command]]
 key = "prefix+ctrl+g"
 type = "pane"
@@ -67,6 +74,7 @@ command = "herdr-splits.resize-right"
 
 [ui]
 agent_panel_sort = "spaces"
+agent_panel_scope = "all"  # list agents from every workspace, incl. other worktrees
 status_indicators = "symbols"
 confirm_close                = true
 mouse_capture                = true
@@ -78,38 +86,32 @@ pane_gaps              = false
 pane_borders           = true
 prompt_new_tab_name    = false
 
-# agents: what each agent is doing, where
-#   state · task title
-#     agent · project · branch          ($branch <- bin/herdr-vcs via agent hooks)
+# agents: grouped by workspace (agent_panel_sort = "spaces"); the workspace name leads each row as the group label
+#   project  status · branch            ($branch <- bin/herdr-vcs via agent hooks; worktree-aware)
+# Merged alternative with collapsible workspaces: bin/herdr-tree (niri Mod+A); then toggle this sidebar off.
 [ui.sidebar.agents]
+row_gap = 0
 rows = [
   [
+    { token = "workspace", fg = "#83b7ad" },
     { token = "state_text", dim = true, rules = [
       { starts_with = "working", fg = "#ffffba", dim = false },
       { starts_with = "blocked", fg = "#dea6a0", dim = false, bold = true },
     ] },
-    { token = "terminal_title_stripped", bold = true },
-  ],
-  [
-    { token = "agent", fg = "#83b7ad" },
-    "workspace",
     { token = "$branch", dim = true },
   ],
 ]
 
-# spaces: one line per project + its other worktrees/jj workspaces
+# spaces: one line per workspace; herdr lists a repo's worktree workspaces under it
 #   ● project · branch · ↑1↓2
-#     ⑂ wt-a wt-b                        ($worktrees <- bin/herdr-vcs)
 [ui.sidebar.spaces]
 rows = [
   [
     "state_icon",
     { token = "workspace", bold = true },
     { token = "branch", dim = true },
-    { token = "$jj", dim = true },
     "git_status",
   ],
-  [ { token = "$worktrees", dim = true } ],
 ]
 
 # Background notification popup delivery
