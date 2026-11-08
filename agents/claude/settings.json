@@ -20,8 +20,6 @@
       "mcp__codebase-memory__*"
     ],
     "deny": [
-      "Read(**/.env)",
-      "Read(**/.env.*)",
       "Read(./secrets/**)",
       "Bash(curl *)",
       "Bash(rm -rf /*:*)",
@@ -30,7 +28,6 @@
       "Bash(mkfs:*)"
     ],
     "ask": [
-      "Bash(rm -rf *)",
       "Bash(git push --force:*)",
       "Bash(git reset --hard:*)"
     ],
@@ -171,12 +168,16 @@
       "Editing the user's own agent configuration (Claude Code settings, hooks, mods, skills, rules) inside the dotfiles repo is allowed",
       "Running a trusted workspace's own declared tooling from its root is routine: tasks and tool installs defined by its version/task manager config, and dependency installs that are pinned to a committed lockfile",
       "Running scripts that live in the dotfiles repo's own bin directory is routine",
-      "Local automation of the user's own desktop applications (their CLIs, notifications, opening files/URLs) acting on the user's own files is allowed"
+      "Local automation of the user's own desktop applications (their CLIs, notifications, opening files/URLs) acting on the user's own files is allowed",
+      "Reading env files (.env, .env.*, including templates like .env.example/.env.sample) inside a trusted workspace to understand or debug configuration is allowed",
+      "Recursive deletion (rm -rf) inside a trusted workspace or the scratchpad/tmp of things that can be regenerated or are tracked by git is routine: build outputs, caches, node_modules/venvs, generated files, git worktrees the session created"
     ],
     "soft_deny": [
       "$defaults",
       "Destroying local persistent state in any workspace: removing data volumes, resetting/dropping/recreating databases, or deleting untracked data directories",
-      "Pushing to, or opening PRs/issues/releases on, a repository that is not trusted per Source control"
+      "Pushing to, or opening PRs/issues/releases on, a repository that is not trusted per Source control",
+      "Recursive or bulk deletion outside trusted workspaces and the scratchpad/tmp, of a whole repository or home/config directory, of anything matched via an unquoted or empty variable (e.g. rm -rf \"$X/\"), or of untracked files and directories that cannot be regenerated (uncommitted work, local data)",
+      "Moving secret values out of env/credential files: printing them in full into output, writing them into tracked files, commits, PRs, issues or logs, or sending them to any network destination (curl, gh, MCP tools, paste services)"
     ],
     "environment": [
       "### Org-wide",
