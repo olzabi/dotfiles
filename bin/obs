@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Usage: obs [dir]   — read dir (default: git root of $PWD, else $PWD) in Obsidian with the shared dotfiles config.
+# Usage: obs [dir] [file]   — read dir (default: git root of $PWD, else $PWD) in Obsidian with the shared dotfiles
+#                             config; file (relative to dir, e.g. docs/plans/active/x/README.md) is opened in it.
 # Obsidian scans and watches every file in a vault ("Excluded files" only hides them), so instead of opening the
 # project itself we open a mirror vault under ~/.cache/obs holding symlinks to just its markdown and images.
 set -euo pipefail
@@ -7,6 +8,8 @@ set -euo pipefail
 root=$(realpath "${1:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}")
 [ -d "$root" ] || { echo "obs: not a directory: $root" >&2; exit 1; }
 [ "$root" != "$HOME" ] || { echo "obs: refusing to open \$HOME as a vault" >&2; exit 1; }
+open_file=${2:-}
+case $open_file in /* | *..*) echo "obs: file must be relative to $root: $open_file" >&2; exit 1 ;; esac
 shared=$(realpath "$(dirname "$(readlink -f "$0")")/../editor/obsidian")
 reg="${XDG_CONFIG_HOME:-$HOME/.config}/obsidian/obsidian.json"
 sock="${XDG_RUNTIME_DIR:-$HOME}/.obsidian-cli.sock"
@@ -80,7 +83,27 @@ open_vault() {
   # Wait until the vault is live (eval output is often empty once a new window takes focus, so check the vault list).
   # The socket check stops us calling the CLI before the app is up, which would spawn a second launch.
   live() { [ -S "$sock" ] && obsidian vaults verbose 2>/dev/null | cut -f2- | grep -qxF "$vault"; }
-  for _ in $(seq 40); do live && return 0; sleep 0.5; done
+  for _ in $(seq 40); do
+    if live; then
+      if [ -n "$open_file" ]; then
+        xdg-open "obsidian://open?path=$(jq -rn --arg p "$vault/$open_file" '$p | @uri')"
+        # once it is the active file: collapse the file explorer, then expand just the folders leading to it
+        name=$(basename "$vault")
+        for _ in $(seq 10); do
+          [ "$(obsidian vault="$name" file 2>/dev/null | awk -F'\t' '$1 == "path" { print $2 }')" = "$open_file" ] && break
+          sleep 0.3
+        done
+        obsidian vault="$name" eval code="const v = app.workspace.getLeavesOfType('file-explorer')[0]?.view;
+          const f = app.vault.getAbstractFileByPath($(jq -n --arg p "$open_file" '$p'));
+          if (v && f) { v.tree.setCollapseAll(true); v.revealInFolder(f); }" >/dev/null 2>&1
+      fi
+      # niri does not raise an already-running app on its own; bring Obsidian to the front
+      win=$(niri msg -j windows 2>/dev/null | jq -r 'first(.[] | select(.app_id == "md.obsidian.Obsidian") | .id) // empty')
+      [ -z "$win" ] || niri msg action focus-window --id "$win"
+      return 0
+    fi
+    sleep 0.5
+  done
   fail "failed to open $vault${out:+: $out}"
 }
 ( trap '' HUP; open_vault ) </dev/null >/dev/null 2>&1 &

@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# herdr-side module: open pull requests of each agent repo (gh), with check rollup and review state; a PR whose
+# branch an agent is on is highlighted. Click / o: open the PR in the browser.
+#   ✓ checks pass  ✗ a check failed  ● running  ○ no checks   · draft is dimmed
+# ttl=60
+set -u
+. "$(dirname "$(readlink -f "$0")")/lib.sh"
+
+case ${1:-} in
+  rows)
+    run=${XDG_RUNTIME_DIR:-/tmp}/herdr-side
+    : > "$run/prs.tsv.tmp"
+    branches=$(snapshot | jq -r '[.panes[] | select(.agent != null) | .tokens.branch // empty] | unique | join("\n")')
+    repos | while read -r root; do
+      json=$(cd "$root" && gh pr list --state open --limit 20 \
+        --json number,title,headRefName,isDraft,reviewDecision,statusCheckRollup,url 2>/dev/null) || continue
+      repo_row "$root"
+      # index for the plans section: repo<TAB>number<TAB>branch<TAB>checks (pass|fail|run|none)<TAB>draft
+      jq -r --arg r "$root" '.[] | ([.statusCheckRollup[]? | (.conclusion // .state // "") | ascii_upcase]) as $c
+        | [$r, .number, .headRefName,
+           (if ($c | length) == 0 then "none" elif any($c[]; . == "FAILURE" or . == "ERROR" or . == "CANCELLED" or . == "TIMED_OUT") then "fail"
+            elif any($c[]; . == "" or . == "PENDING" or . == "IN_PROGRESS" or . == "QUEUED" or . == "EXPECTED") then "run" else "pass" end),
+           .isDraft] | @tsv' <<<"$json" >> "$run/prs.tsv.tmp"
+      [ "$json" = "[]" ] && { info_row "no open PRs"; continue; }
+      jq -r --arg branches "$branches" --arg R "$R" --arg DIM "$MUTED" --arg ACC "$ACC" --arg GRN "$OK" \
+        --arg RED "$ERR" --arg YEL "$WARN" '
+        ($branches | split("\n")) as $mine
+        | .[]
+          | ([.statusCheckRollup[]? | (.conclusion // .state // "") | ascii_upcase]) as $c
+          | (if ($c | length) == 0 then $DIM + "○"
+             elif any($c[]; . == "FAILURE" or . == "ERROR" or . == "CANCELLED" or . == "TIMED_OUT") then $RED + "✗"
+             elif any($c[]; . == "" or . == "PENDING" or . == "IN_PROGRESS" or . == "QUEUED" or . == "EXPECTED") then $YEL + "●"
+             else $GRN + "✓" end) as $icon
+          | {APPROVED: " ✔", CHANGES_REQUESTED: " ✎"}[.reviewDecision // ""] as $rev
+          | "pr\t\(.url)\t  \($icon)\($R) "
+            + (.headRefName as $h | if .isDraft then $DIM elif any($mine[]; . == $h) then $ACC else "" end)
+            + "#\(.number) \(.headRefName)\($R)\($rev // "")\($DIM) · \(.title)\($R)"
+        ' <<<"$json"
+    done
+    mv "$run/prs.tsv.tmp" "$run/prs.tsv" ;;
+  act) # act KIND ID [ACTION]
+    case ${2:-}:${4:-click} in
+      pr:click | pr:open) xdg-open "$3" ;;
+      repo:click | repo:open) (cd "$3" && gh pr list --web) ;;
+    esac ;;
+esac

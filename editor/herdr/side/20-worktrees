@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# herdr-side module: git worktrees of every repo an agent works in; branch, dirty file count, ●/○ = open/not open
+# as a herdr workspace. Click: focus its workspace, or open the worktree as a new herdr workspace;
+# o: read it in Obsidian (bin/obs); d: its changes in lazygit.
+# ttl=10
+set -u
+
+case ${1:-} in
+  rows)
+    . "$(dirname "$(readlink -f "$0")")/lib.sh"
+    herdr api snapshot 2>/dev/null | jq -r '.result.snapshot.panes[] | select(.agent != null) | .cwd // empty' |
+      while read -r d; do git -C "$d" rev-parse --path-format=absolute --git-common-dir 2>/dev/null; done |
+      sort -u | while read -r common; do
+        repo=$(git -C "$common" rev-parse --show-toplevel 2>/dev/null || dirname "$common")
+        herdr worktree list --cwd "$repo" 2>/dev/null | jq -r '
+          "repo\t\(.result.source.repo_root)",
+          (.result.worktrees[] | select(.is_bare | not) | [(.open_workspace_id // ""), .path, (.branch // "detached"), .is_prunable | tostring] | join("\u001f"))' |
+          while IFS=$'\x1f' read -r a b c d; do
+            case $a in repo$'\t'*) repo_row "${a#repo$'\t'}"; continue ;; esac  # repo header line
+            # a = open workspace id (may be empty), b = path, c = branch, d = prunable
+            [ "$d" = true ] && continue
+            n=$(git -C "$b" status --porcelain 2>/dev/null | wc -l)
+            dirty=$([ "$n" -gt 0 ] && printf ' %s±%s%s' "$WARN" "$n" "$R")
+            mark=$([ -n "$a" ] && printf '%s●' "$ACC" || printf '%s○' "$MUTED")
+            printf 'wt\t%s|%s\t  %s%s %s%s\n' "$a" "$b" "$mark" "$R" "$c" "$dirty"
+          done
+      done ;;
+  act) # act KIND ID [ACTION]
+    . "$(dirname "$(readlink -f "$0")")/lib.sh"
+    path=${3#*|}
+    case ${2:-}:${4:-click} in
+      wt:click)
+        ws=${3%%|*}
+        if [ -n "$ws" ]; then herdr workspace focus "$ws"; else herdr worktree open --cwd "$path" --path "$path" --focus; fi ;;
+      *:open) side_open "$path" ;;
+      *:changes) side_changes "$path" ;;
+    esac ;;
+esac

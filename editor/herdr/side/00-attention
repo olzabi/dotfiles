@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+# herdr-side module: what needs you, most urgent first; hidden when nothing does.
+#   ▲ agent blocked (approval/question)   ✕ exited (an agent pane whose agent is gone)
+#   ? plan blocker waiting for your decision   ◆ agent done, not seen yet   ? unknown agent state
+#   ⚑ plan blocker you have to do outside the code (browser, manual check)
+# Plan blockers come from the plans section ($XDG_RUNTIME_DIR/herdr-side/blockers.tsv, refreshed with it).
+# Click: go to it (an exited row is dismissed once visited); a blocker opens its plan in Obsidian.
+set -u
+. "$(dirname "$(readlink -f "$0")")/lib.sh"
+run=${XDG_RUNTIME_DIR:-/tmp}/herdr-side
+seen=$run/attention.seen     # pane<TAB>agent: agent panes from the previous render
+exited=$run/attention.exited # pane<TAB>agent<TAB>since: panes whose agent disappeared
+touch "$seen" "$exited" "$run/blockers.tsv"
+
+case ${1:-} in
+  rows)
+    s=$(snapshot) || exit 0
+    # agent panes now; a pane in $seen that still exists without an agent has exited
+    now=$(jq -r '.panes[] | select(.agent != null) | [.pane_id, .agent] | @tsv' <<<"$s")
+    alive=$(jq -r '.panes[].pane_id' <<<"$s")
+    while IFS=$'\t' read -r p a; do
+      [ -n "$p" ] || continue
+      grep -qxF "$p" <<<"$alive" || continue                       # pane closed: nothing to attend to
+      cut -f1 <<<"$now" | grep -qxF "$p" && continue                # still an agent
+      grep -q "^$p"$'\t' "$exited" || printf '%s\t%s\t%s\n' "$p" "$a" "$(date +%H:%M)" >> "$exited"
+    done < "$seen"
+    printf '%s\n' "$now" > "$seen"
+    # forget exited panes that closed or got an agent again
+    tmp=$(while IFS=$'\t' read -r p a t; do
+      grep -qxF "$p" <<<"$alive" && ! cut -f1 <<<"$now" | grep -qxF "$p" && printf '%s\t%s\t%s\n' "$p" "$a" "$t"
+    done < "$exited"); printf '%s' "${tmp:+$tmp$'\n'}" > "$exited"
+
+    jq -r --rawfile ex "$exited" --rawfile bl "$run/blockers.tsv" --arg R "$R" --arg ERR "$ERR" --arg INFO "$INFO" --arg WARN "$WARN" --arg MUTED "$MUTED" '
+      (.workspaces | map({(.workspace_id): .label}) | add) as $ws
+      | ([.panes[] | select(.agent != null and (.agent_status == "blocked" or .agent_status == "done" or .agent_status == "unknown"))
+          | {rank: {blocked: 0, done: 3, unknown: 4}[.agent_status], kind: "agent", id: .pane_id,
+             icon: {blocked: ($ERR + "▲"), done: ($INFO + "◆"), unknown: ($WARN + "?")}[.agent_status],
+             text: "\(.agent_status) \($MUTED)· \($ws[.workspace_id] // "?") · \(.terminal_title_stripped // .agent)"}]
+        + [$ex | split("\n")[] | select(. != "") | split("\t") as $e
+            | {rank: 1, kind: "exited", id: $e[0], icon: ($ERR + "✕"),
+               text: "\($e[1]) exited \($MUTED)\($e[2]) · \($ws[$e[0] | split(":")[0]] // "?")"}]
+        + [$bl | split("\n")[] | select(. != "") | split("\t") as $b # kind slug checkout|file num title
+            | {rank: (if $b[0] == "decision" then 2 else 5 end), kind: "blocker", id: $b[2],
+               icon: (if $b[0] == "decision" then $WARN + "?" else $INFO + "⚑" end),
+               text: "\($b[1]) \($MUTED)· \($b[3]) \($b[4])"}])
+      | sort_by(.rank)[]
+      | "\(.kind)\t\(.id)\t  \(.icon)\($R) \(.text)\($R)"
+    ' <<<"$s" ;;
+  act) # act KIND ID [ACTION]
+    [ "${4:-click}" = click ] || exit 0
+    case ${2:-} in
+      agent) herdr agent focus "$3" ;;
+      blocker) side_open "${3%%|*}" "${3#*|}" ;;
+      exited)
+        tab=$(snapshot | jq -r --arg p "$3" '.panes[] | select(.pane_id == $p) | .tab_id')
+        [ -n "$tab" ] && herdr tab focus "$tab"
+        sed -i "/^$3"$'\t'"/d" "$exited" ;;
+    esac ;;
+esac

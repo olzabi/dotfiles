@@ -1,0 +1,141 @@
+#!/usr/bin/env bash
+# Modular sidebar for herdr: a stack of module sections in one fzf list, run as a kitty split left of herdr.
+# Modules: executables in ~/.config/herdr/side/NN-name (section order = filename). Contract:
+#   <module> rows          print kind<TAB>id<TAB>display[<TAB>mark]; mark F = cursor follows this row, W = fallback
+#   <module> act KIND ID [ACTION]   handle a row action: click (default, also Enter), open (o: Obsidian),
+#                          changes (d: lazygit); ignore actions you do not support. A module with no rows is hidden.
+#   "# ttl=N" in the file: cache rows N seconds, refresh in the background (no line: run on every render)
+# Usage: herdr-side toggle            open/close the whole sidebar (niri Mod+A); opens with the last sections shown
+#        herdr-side toggle MODULE     add/remove one section; the split opens with the first, closes with the last
+#        herdr-side pick              rofi picker to toggle sections (niri Mod+Ctrl+A)
+#        herdr-side nav left|right    herdr prefix+h/l: focus the herdr pane that way; past herdr's left edge, the
+#                                     sidebar (opened if needed). In the sidebar l / → / Esc go back.
+#        herdr-side focus side|herdr  move keyboard focus between the sidebar and herdr
+#        herdr-side render | act MODULE KIND ID [ACTION] | follow | ui   (internal, used by the fzf UI)
+set -u
+dir=${HERDR_SIDE_DIR:-$HOME/.config/herdr/side}
+run=${XDG_RUNTIME_DIR:-/tmp}/herdr-side
+active=$run/active
+mkdir -p "$run/cache"
+touch "$active"
+self=$(readlink -f "$0")
+. "$dir/theme.sh"
+
+modules() { for f in "$dir"/[0-9]*-*; do [ -x "$f" ] && echo "$f"; done; }
+name_of() { local n=${1##*/}; echo "${n#*-}"; }
+path_of() { modules | while read -r f; do [ "$(name_of "$f")" = "$1" ] && { echo "$f"; break; }; done; }
+
+refresh() { # $1 module file, $2 cache file; one refresh per module at a time, in its own session:
+  # fzf kills a reload that outlives the next tick, and must not wait for (or kill) a slow module
+  setsid -f flock -n "$2.lock" sh -c '"$1" rows 2>/dev/null > "$2.tmp"; mv "$2.tmp" "$2"' _ "$1" "$2" \
+    </dev/null >/dev/null 2>&1
+}
+
+rows() { # $1 module file, $2 name; cached modules never block: the first render shows them once ready
+  local ttl c=$run/cache/$2
+  ttl=$(grep -m1 -oE '^# ttl=[0-9]+' "$1" | cut -d= -f2)
+  if [ -z "$ttl" ]; then "$1" rows 2>/dev/null; return; fi
+  if [ ! -f "$c" ] || [ $(($(date +%s) - $(stat -c %Y "$c"))) -ge "$ttl" ]; then refresh "$1" "$c"; fi
+  cat "$c" 2>/dev/null
+}
+
+plain() { # strip foreground colours, keeping MUTED so secondary text still recedes
+  local m=${MUTED//[/\\[}
+  sed -E "s/${m}/\x01/g; s/\x1b\[38;(2;[0-9]+;[0-9]+;[0-9]+|5;[0-9]+)m//g; s/\x01/${m}/g"
+}
+
+render() {
+  local f name out body first=1 tvar rvar width
+  width=$(( ${FZF_COLUMNS:-36} - 3 )) # fzf exports its width; minus gutter and pointer
+  out=$(modules | while read -r f; do
+    name=$(name_of "$f")
+    grep -qxF "$name" "$active" || continue
+    body=$(rows "$f" "$name" | awk -F'\t' -v OFS='\t' -v m="$name" 'NF >= 3 { print m, $0 }')
+    [ -n "$body" ] || continue
+    # theme.sh: sections outside SIDE_COLORED lose their foreground colours except MUTED (bold/italic stay)
+    case " $SIDE_COLORED " in *" $name "*) ;; *) body=$(plain <<<"$body") ;; esac
+    tvar=SIDE_TITLE_$name rvar=SIDE_RULE_$name
+    [ -n "$first" ] || printf '%s\tsep\t\t\n' "$name" # blank line between sections
+    first=
+    printf '%s\tsep\t\t%s%s%s%s\n%s\n' "$name" "$B" "${!tvar:-$TEXT}" "$name" "$R" "$body"
+    [ -z "${!rvar:-}" ] || printf '%s\tsep\t\t%s%s%s\n' "$name" "${!tvar:-$MUTED}" "$(printf '─%.0s' $(seq "$width"))" "$R"
+  done)
+  # remember the follow target of exactly this output, so `follow` never re-renders
+  printf '%s\n' "$out" | awk -F'\t' '$5 == "F" { print NR, $3; f = 1; exit } $5 == "W" && !w { w = NR " " $3 } END { if (!f && w) print w }' > "$run/follow"
+  printf '%s\n' "$out"
+}
+
+kitty_to() { # herdr's kitty (niri app-id "herdr") listens on unix:@kitty-<pid> (kitty.conf listen_on)
+  local pid
+  pid=$(niri msg -j windows | jq -r 'first(.[] | select(.app_id == "herdr") | .pid) // empty')
+  [ -n "$pid" ] && echo "unix:@kitty-$pid"
+}
+
+case ${1:-ui} in
+  render) render ;;
+  act)
+    [ "${3:-}" = sep ] && exit 0
+    f=$(path_of "${2:-}"); [ -n "$f" ] || exit 0
+    "$f" act "$3" "${4:-}" "${5:-click}" >/dev/null 2>&1
+    [ -f "$run/cache/$2" ] && touch -d @0 "$run/cache/$2" # stale: refreshed on the next render
+    exit 0 ;;
+  follow)
+    # fzf transform (no --track: it overrides pos() after reload): jump only when the target changed
+    read -r n id < "$run/follow" 2>/dev/null
+    [ -n "${id:-}" ] && [ "$id" != "$(cat "$run/followed" 2>/dev/null)" ] && { echo "$id" > "$run/followed"; echo "pos($n)"; }
+    exit 0 ;;
+  toggle)
+    name=${2:-}
+    [ -z "$name" ] || [ -n "$(path_of "$name")" ] || { echo "no module '$name' in $dir" >&2; exit 1; }
+    while read -r n; do [ -n "$(path_of "$n")" ] || sed -i "/^$n\$/d" "$active"; done < <(cat "$active") # deleted modules
+    to=$(kitty_to) || exit 1
+    if [ -z "$name" ]; then # whole sidebar
+      kitty @ --to "$to" close-window --match var:herdr_side >/dev/null 2>&1 && exit 0
+      [ -s "$active" ] || echo agents > "$active"
+      name=$(head -1 "$active") # already shown: the open path below keeps it
+    elif kitty @ --to "$to" ls --match var:herdr_side >/dev/null 2>&1; then
+      grep -qxF "$name" "$active" && sed -i "/^$name\$/d" "$active" || echo "$name" >> "$active"
+      [ -s "$active" ] || kitty @ --to "$to" close-window --match var:herdr_side >/dev/null
+      exit 0
+    fi
+    # split closed (Mod+A or quit with q): open it with this section shown
+    grep -qxF "$name" "$active" || echo "$name" >> "$active"
+    kitty @ --to "$to" goto-layout splits
+    # splits + before: new window on the left of herdr; bias = its share of the width (%)
+    exec kitty @ --to "$to" launch --type=window --location=before --keep-focus --bias=18 \
+      --var herdr_side=1 --title herdr-side "$self" ui >/dev/null ;;
+  nav)
+    dirn=${2:-left}
+    p=$(herdr api snapshot 2>/dev/null | jq -r '.result.snapshot.focused_pane_id // empty')
+    changed=$(herdr pane focus ${p:+--pane "$p"} --direction "$dirn" 2>/dev/null | jq -r '.result.focus.changed // false')
+    [ "$changed" = true ] || [ "$dirn" != left ] || exec "$self" focus side
+    exit 0 ;;
+  focus)
+    to=$(kitty_to) || exit 1
+    if [ "${2:-side}" = side ]; then
+      kitty @ --to "$to" ls --match var:herdr_side >/dev/null 2>&1 || "$self" toggle
+      kitty @ --to "$to" focus-window --match var:herdr_side >/dev/null 2>&1
+    else
+      kitty @ --to "$to" focus-window --match 'not var:herdr_side' >/dev/null 2>&1
+    fi
+    exit 0 ;;
+  pick)
+    choice=$(modules | while read -r f; do
+      n=$(name_of "$f"); grep -qxF "$n" "$active" && echo "✓ $n" || echo "  $n"
+    done | rofi -dmenu -i -p sidebar) || exit 0
+    exec "$self" toggle "${choice##* }" ;;
+  ui)
+    command -v herdr >/dev/null || { echo "herdr not found"; exit 1; }
+    rm -f "$run/followed" # first follow always jumps to the focused agent
+    FZF_DEFAULT_OPTS= FZF_DEFAULT_OPTS_FILE= exec fzf --ansi --no-input --no-info --no-sort --no-scrollbar --layout=reverse \
+      --delimiter='\t' --with-nth=4 \
+      --pointer=' ' --marker=' ' --no-separator --border=none \
+      --color='bg+:#303030,gutter:-1,hl:-1,hl+:-1' --gutter=' ' \
+      --bind "start,every(0.5):reload-sync($self render)" --bind "load:transform($self follow)" \
+      --bind "left-click,double-click,enter:execute-silent($self act {1} {2} {3})+reload($self render)" \
+      --bind "o:execute-silent($self act {1} {2} {3} open)" --bind "d:execute-silent($self act {1} {2} {3} changes)" \
+      --footer="${MUTED}${IT}l back · o obsidian · d diff${R}" --no-footer-border \
+      --bind 'j:down,k:up,g:first,G:last,ctrl-c:abort,q:abort' \
+      --bind "l,right,esc:execute-silent($self focus herdr)" ;;
+  *) sed -n '2,10p' "$self" | sed 's/^# \{0,1\}//'; exit 1 ;;
+esac

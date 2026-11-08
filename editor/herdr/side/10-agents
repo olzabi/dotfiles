@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# herdr-side module: open workspaces with their agents (status · branch); click a workspace to collapse/expand it,
+# an agent to focus it. The focused agent is marked F (sidebar cursor follows it), its workspace header W.
+set -u
+collapsed=${XDG_RUNTIME_DIR:-/tmp}/herdr-side/agents.collapsed
+touch "$collapsed"
+
+case ${1:-} in
+  rows)
+    . "$(dirname "$(readlink -f "$0")")/theme.sh"
+    herdr api snapshot 2>/dev/null | jq -r --rawfile closed "$collapsed" --arg r "$R" --arg acc "$ACC" --arg muted "$MUTED" \
+      --arg warn "$WARN" --arg err "$ERR" --arg info "$INFO" --arg ok "$OK" '
+      def r: $r;
+      def icon: {working: ($warn + "●"), blocked: ($err + "▲"), done: ($info + "◆"), idle: ($ok + "○")}[.] // ($muted + "·");
+      .result.snapshot as $s
+      | ($closed | split("\n")) as $closed
+      | $s.workspaces | sort_by(.number)[]
+      | . as $w
+      | ($closed | index($w.workspace_id)) as $isClosed
+      | ($w.workspace_id == $s.focused_workspace_id) as $wf
+      | [$s.panes[] | select(.workspace_id == $w.workspace_id and .agent != null)] as $agents
+      | ( "ws\t\($w.workspace_id)\t"
+          + (if $isClosed then "▸ " else "▾ " end)
+          + ($w.agent_status | icon) + r + " \u001b[1m"
+          + (if $wf then $acc else "" end) + $w.label + r
+          + (if $isClosed and ($agents | length) > 0 then $muted + " (\($agents | length))" + r else "" end)
+          + (if $wf then "\tW" else "" end) ),
+        ( if $isClosed then empty else
+            $agents[]
+            | (.pane_id == $s.focused_pane_id) as $f
+            | "agent\t\(.pane_id)\t    " + (.agent_status | icon) + " "
+              + (if $f then "\u001b[1m" + $acc else "" end) + .agent_status + r
+              + $muted + " · " + (.tokens.branch // "—") + r
+              + (if $f then "\tF" else "" end)
+          end )
+    ' ;;
+  act) # act KIND ID [ACTION]
+    case ${2:-}:${4:-click} in
+      ws:click) grep -qxF -- "$3" "$collapsed" && sed -i "/^$3\$/d" "$collapsed" || echo "$3" >> "$collapsed" ;;
+      agent:click) herdr agent focus "$3"; herdr-side focus herdr ;; # keyboard follows you to the agent
+      *:open | *:changes) # checkout of the agent's cwd (a workspace: its first agent's)
+        . "$(dirname "$(readlink -f "$0")")/lib.sh"
+        cwd=$(snapshot | jq -r --arg k "$2" --arg id "$3" '.panes
+          | map(select(if $k == "ws" then .workspace_id == $id else .pane_id == $id end))
+          | (map(select(.agent != null)) + .)[0].cwd // empty')
+        [ -n "$cwd" ] || exit 0
+        root=$(git -C "$cwd" rev-parse --show-toplevel 2>/dev/null || echo "$cwd")
+        if [ "$4" = open ]; then side_open "$root"; else side_changes "$root"; fi ;;
+    esac ;;
+esac

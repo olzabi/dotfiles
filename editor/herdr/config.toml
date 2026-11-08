@@ -40,6 +40,16 @@ new_worktree    = "prefix+shift+g"
 open_worktree   = "prefix+shift+o"
 remove_worktree = "prefix+shift+x"
 
+# prefix+h: like herdr's focus_pane_left, but past the leftmost pane it focuses the herdr-side sidebar
+# (bin/herdr-side nav); in the sidebar l / → / Esc return here.
+focus_pane_left = ""
+
+[[keys.command]]
+key = "prefix+h"
+type = "shell"
+command = "herdr-side nav left"
+description = "focus left pane or the sidebar"
+
 [[keys.command]]
 key = "prefix+ctrl+g"
 type = "pane"
@@ -88,7 +98,7 @@ prompt_new_tab_name    = false
 
 # agents: grouped by workspace (agent_panel_sort = "spaces"); the workspace name leads each row as the group label
 #   project  status · branch            ($branch <- bin/herdr-vcs via agent hooks; worktree-aware)
-# Merged alternative with collapsible workspaces: bin/herdr-tree (niri Mod+A); then toggle this sidebar off.
+# Merged alternative with collapsible workspaces + more sections: bin/herdr-side (niri Mod+A, Mod+Ctrl+A); then toggle this sidebar off.
 [ui.sidebar.agents]
 row_gap = 0
 rows = [
