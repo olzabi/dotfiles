@@ -9,7 +9,7 @@
   "properties": true,
   "page-preview": true,
   "command-palette": true,
-  "editor-status": true,
+  "editor-status": false,
   "bookmarks": true,
   "outline": true,
   "word-count": true,
@@ -24,9 +24,9 @@
   "slash-command": false,
   "zk-prefixer": false,
   "random-note": false,
-  "slides": false,
+  "slides": true,
   "audio-recorder": false,
-  "workspaces": false,
+  "workspaces": true,
   "publish": false,
   "webviewer": false
 }

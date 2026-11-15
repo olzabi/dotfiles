@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Keypoints dataset CLI (collector, teacher labelling); code lives with the Firefox config.
+exec node "$(dirname "$(readlink -f "$0")")/../config/firefox/keypoints/keypoints.ts" "$@"

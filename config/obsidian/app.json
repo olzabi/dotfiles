@@ -1,0 +1,31 @@
+{
+  "defaultViewMode": "preview",
+  "livePreview": true,
+  "readableLineLength": false,
+  "showUnsupportedFiles": true,
+  "alwaysUpdateLinks": true,
+  "promptDelete": true,
+  "userIgnoreFilters": [
+    "node_modules/",
+    ".venv/",
+    "vendor/",
+    "dist/",
+    "build/",
+    "target/",
+    ".cache/",
+    "out-tsc/"
+  ],
+  "showInlineTitle": false,
+  "strictLineBreaks": false,
+  "foldHeading": true,
+  "foldIndent": true,
+  "showLineNumber": true,
+  "showIndentGuide": false,
+  "rightToLeft": false,
+  "spellcheck": true,
+  "tabSize": 2,
+  "autoConvertHtml": true,
+  "vimMode": true,
+  "settingsPopoutWindow": true,
+  "focusNewTab": false
+}

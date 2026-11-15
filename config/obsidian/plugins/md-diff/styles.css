@@ -1,0 +1,10 @@
+.md-diff ins {
+  text-decoration: none;
+  background: rgba(var(--color-green-rgb), 0.25);
+  border-radius: 2px;
+}
+.md-diff del {
+  color: var(--text-muted);
+  background: rgba(var(--color-red-rgb), 0.2);
+  border-radius: 2px;
+}

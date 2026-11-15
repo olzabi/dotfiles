@@ -1,0 +1,35 @@
+filters:
+  and:
+    - file.ext == "md"
+    - or:
+        - file.basename == "README"
+        - file.folder.endsWith("plans/investigate")
+    - or:
+        - file.folder.contains("plans/active/")
+        - file.folder.endsWith("plans/investigate")
+formulas:
+  plan: if(file.basename == "README", file.folder.split("/").slice(-1)[0], file.basename)
+  stage: if(file.folder.contains("plans/active/"), "active", "investigate")
+properties:
+  formula.plan:
+    displayName: Plan
+  formula.stage:
+    displayName: Stage
+  note.next:
+    displayName: Next
+  note.tags:
+    displayName: Tags
+views:
+  - type: table
+    name: Plans
+    groupBy:
+      property: formula.stage
+      direction: ASC
+    order:
+      - formula.plan
+      - next
+      - tags
+      - file.mtime
+    sort:
+      - property: file.mtime
+        direction: DESC

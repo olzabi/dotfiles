@@ -1,0 +1,9 @@
+{
+  "id": "md-diff",
+  "name": "Rendered Diff",
+  "version": "0.1.0",
+  "minAppVersion": "1.15.0",
+  "description": "Rendered word-level diff of a note against git HEAD; tables and lists stay rendered.",
+  "author": "olzabi",
+  "isDesktopOnly": true
+}

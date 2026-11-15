@@ -1,0 +1,9 @@
+{
+  "id": "obs-git",
+  "name": "obs git",
+  "version": "0.1.0",
+  "minAppVersion": "1.15.0",
+  "description": "Point obsidian-git at the real repo behind an `obs` symlink mirror vault.",
+  "author": "olzabi",
+  "isDesktopOnly": true
+}

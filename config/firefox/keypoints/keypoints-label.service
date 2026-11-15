@@ -1,0 +1,8 @@
+[Unit]
+Description=Keypoints: label collected pages with the teacher model
+
+[Service]
+Type=oneshot
+Environment=PATH=%h/.local/share/mise/shims:/usr/local/bin:/usr/bin
+Nice=15
+ExecStart=%h/Dotfiles/bin/keypoints label --if-idle

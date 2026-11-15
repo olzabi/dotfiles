@@ -1,11 +1,9 @@
-ConfigFile = '/home/evernight/.config/lazysql/config.toml'
-
 [application]
 DefaultPageSize = 300
 DisableSidebar = false
-SidebarOverlay = false
 JSONViewerWordWrap = false
 MaxQueryHistoryPerConnection = 100
+SidebarOverlay = false
 TreeWidth = 30
 
 [[database]]
@@ -18,3 +16,6 @@ Name = 'postgres (localhost)'
 URL = 'postgresql://postgres:postgres@localhost:5432?sslmode=disable'
 Provider = 'postgres'
 ReadOnly = false
+
+[theme]
+Preset = 'default'

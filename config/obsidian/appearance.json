@@ -1,0 +1,15 @@
+{
+  "theme": "obsidian",
+  "cssTheme": "Darkvoid",
+  "baseFontSize": 18,
+  "showRibbon": false,
+  "baseFontSizeAction": true,
+  "nativeMenus": false,
+  "textFontFamily": "Iosevka Nerd Font,FiraCode Nerd Font,JetBrainsMono Nerd Font",
+  "monospaceFontFamily": "Iosevka Nerd Font Mono,JetBrainsMono Nerd Font Mono,FiraCode Nerd Font Mono",
+  "interfaceFontFamily": "JetBrainsMono Nerd Font,Iosevka Nerd Font,FiraCode Nerd Font",
+  "enabledCssSnippets": [
+    "hover-preview",
+    "editor"
+  ]
+}

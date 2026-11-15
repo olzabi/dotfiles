@@ -1,16 +1,22 @@
 #!/usr/bin/env bash
-# Usage: obs [dir] [file]   — read dir (default: git root of $PWD, else $PWD) in Obsidian with the shared dotfiles
+# Usage: ob [dir] [file] | ob <file>   — read dir (default: git root of $PWD, else $PWD) in Obsidian with the shared dotfiles
 #                             config; file (relative to dir, e.g. docs/plans/active/x/README.md) is opened in it.
 # Obsidian scans and watches every file in a vault ("Excluded files" only hides them), so instead of opening the
 # project itself we open a mirror vault under ~/.cache/obs holding symlinks to just its markdown and images.
 set -euo pipefail
 
+# ob <file>: open that file, in its git root (else its folder) as the vault.
+if [ $# -eq 1 ] && [ -f "$1" ]; then
+  f=$(realpath "$1"); d=$(dirname "$f")
+  r=$(git -C "$d" rev-parse --show-toplevel 2>/dev/null || echo "$d")
+  set -- "$r" "${f#"$r"/}"
+fi
 root=$(realpath "${1:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}")
-[ -d "$root" ] || { echo "obs: not a directory: $root" >&2; exit 1; }
-[ "$root" != "$HOME" ] || { echo "obs: refusing to open \$HOME as a vault" >&2; exit 1; }
+[ -d "$root" ] || { echo "ob: not a directory: $root" >&2; exit 1; }
+[ "$root" != "$HOME" ] || { echo "ob: refusing to open \$HOME as a vault" >&2; exit 1; }
 open_file=${2:-}
-case $open_file in /* | *..*) echo "obs: file must be relative to $root: $open_file" >&2; exit 1 ;; esac
-shared=$(realpath "$(dirname "$(readlink -f "$0")")/../editor/obsidian")
+case $open_file in /* | *..*) echo "ob: file must be relative to $root: $open_file" >&2; exit 1 ;; esac
+shared=$(realpath "$(dirname "$(readlink -f "$0")")/../config/obsidian")
 reg="${XDG_CONFIG_HOME:-$HOME/.config}/obsidian/obsidian.json"
 sock="${XDG_RUNTIME_DIR:-$HOME}/.obsidian-cli.sock"
 vault="${XDG_CACHE_HOME:-$HOME/.cache}/obs/$(printf %s "$root" | sha1sum | cut -c1-8)/$(basename "$root")"
@@ -24,14 +30,15 @@ list_docs() {
   fi | grep -zaiE '\.(md|markdown|png|jpe?g|gif|svg|webp)$' || true
 }
 
-# Sync mirror: link new docs, drop links whose target is gone, prune emptied dirs.
+# Sync mirror: link new docs (and the other files they link to, e.g. a plan's scripts/x.py, so those links work),
+# drop links whose target is gone, prune emptied dirs.
 # Dot-folders (.claude/, .agents/) are mirrored as-is; the shared "unhide" plugin makes Obsidian show them.
 mkdir -p "$vault/.obsidian"
 while IFS= read -r -d '' rel; do
   dst="$vault/$rel"
   [ -L "$dst" ] && continue
   mkdir -p "$(dirname "$dst")" && ln -s "$root/$rel" "$dst"
-done < <(list_docs)
+done < <(list_docs; list_docs | grep -zaiE '\.(md|markdown)$' | "$(dirname "$(readlink -f "$0")")/md-link-targets" "$root")
 find "$vault" -xtype l -delete
 find "$vault" -mindepth 1 -type d -empty -not -path "$vault/.obsidian" -delete
 
@@ -40,10 +47,12 @@ find "$vault" -mindepth 1 -type d -empty -not -path "$vault/.obsidian" -delete
 for src in "$root"/.obsidian/* "$shared"/*; do
   [ -e "$src" ] && ! [ -L "$src" ] || continue
   case "$src" in "$root"/.obsidian/plugins | "$root"/.obsidian/community-plugins.json) continue ;; esac
-  case "$(basename "$src")" in workspace*.json) continue ;; esac
+  case "$(basename "$src")" in workspace*.json | *.base) continue ;; esac
   dst="$vault/.obsidian/$(basename "$src")"
   [ -e "$dst" ] || [ -L "$dst" ] || ln -s "$src" "$dst"
 done
+# Plans dashboard (Bases view over plan front matter) for projects with the docs/plans layout.
+[ -d "$root/docs/plans" ] && ! [ -e "$vault/Plans.base" ] && ln -s "$shared/plans.base" "$vault/Plans.base"
 
 # Edits to link targets fire no watcher events inside the vault; touching the link does. Poll the ~hundreds of
 # targets (cheap) and stop once Obsidian quits. One poller per vault.
@@ -60,7 +69,7 @@ pidf="$(dirname "$vault")/poll.pid"
 echo $! >"$pidf"
 
 # Open + verify runs detached so the shell returns at once; errors arrive as desktop notifications.
-fail() { notify-send -a obs "obs" "$1" 2>/dev/null || echo "obs: $1" >&2; return 1; }
+fail() { notify-send -a ob "ob" "$1" 2>/dev/null || echo "ob: $1" >&2; return 1; }
 open_vault() {
   if [ -S "$sock" ]; then
     # Running app keeps its vault list in memory and ignores obsidian.json edits, so register through it:

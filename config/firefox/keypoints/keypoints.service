@@ -1,0 +1,11 @@
+[Unit]
+Description=Keypoints collector for the Firefox highlighter (127.0.0.1:11500)
+
+[Service]
+# systemd's PATH has no node: mise's shims carry it.
+Environment=PATH=%h/.local/share/mise/shims:/usr/local/bin:/usr/bin
+ExecStart=%h/Dotfiles/bin/keypoints serve
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

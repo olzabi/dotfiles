@@ -1,0 +1,6 @@
+/* Bigger hover previews: default 450x400 is a peephole at an 18px base font. */
+body {
+  --popover-width: min(900px, 60vw);
+  --popover-height: 70vh;
+  --popover-font-size: 15px;
+}
