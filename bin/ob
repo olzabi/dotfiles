@@ -49,10 +49,10 @@ for src in "$root"/.obsidian/* "$shared"/*; do
   case "$src" in "$root"/.obsidian/plugins | "$root"/.obsidian/community-plugins.json) continue ;; esac
   case "$(basename "$src")" in workspace*.json | *.base) continue ;; esac
   dst="$vault/.obsidian/$(basename "$src")"
-  [ -e "$dst" ] || [ -L "$dst" ] || ln -s "$src" "$dst"
+  [ -e "$dst" ] || ln -sfn "$src" "$dst"  # -e is false for a dangling link (e.g. dotfiles moved), so it gets repointed
 done
 # Plans dashboard (Bases view over plan front matter) for projects with the docs/plans layout.
-[ -d "$root/docs/plans" ] && ! [ -e "$vault/Plans.base" ] && ln -s "$shared/plans.base" "$vault/Plans.base"
+[ -d "$root/docs/plans" ] && ! [ -e "$vault/Plans.base" ] && ln -sfn "$shared/plans.base" "$vault/Plans.base"
 
 # Edits to link targets fire no watcher events inside the vault; touching the link does. Poll the ~hundreds of
 # targets (cheap) and stop once Obsidian quits. One poller per vault.
