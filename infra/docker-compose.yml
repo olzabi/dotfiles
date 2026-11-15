@@ -1,3 +1,6 @@
+# Project name pinned: the Makefile filters on it, and it was "dotfiles" when this lived at the repo root.
+name: infra
+
 services:
   postgres:
     image: postgres:${POSTGRES_VERSION:-18}-alpine
@@ -8,13 +11,13 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: ${POSTGRES_DB:-dev}
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432" # localhost only: default credentials
     volumes:
       - postgres_data:/var/lib/postgresql
       - ./storage/postgres:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-dev}"]
-      interval: 10s
+      interval: 60s
       timeout: 5s
       retries: 5
     networks:
@@ -31,13 +34,13 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-secret}
       MYSQL_DATABASE: ${MYSQL_DB:-devdb}
     ports:
-      - "${MYSQL_PORT:-3306}:3306"
+      - "127.0.0.1:${MYSQL_PORT:-3306}:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./storage/mysql:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-rootsecret}"]
-      interval: 10s
+      interval: 60s
       timeout: 5s
       retries: 5
     networks:
@@ -69,17 +72,18 @@ services:
     container_name: dozzle
     image: amir20/dozzle:latest
     volumes:
-      - /run/user/1000/podman/podman.sock:/var/run/docker.sock:ro
+      - ${XDG_RUNTIME_DIR}/podman/podman.sock:/var/run/docker.sock:ro
       - dozzle_data:/data
     ports:
-      - 9999:8080
+      - "127.0.0.1:9999:8080"
     restart: unless-stopped
+    profiles: [monitor, all]
   grafana:
     image: docker.io/grafana/grafana-oss:latest
     container_name: grafana
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000" # anonymous Admin: never expose
     environment:
       GF_AUTH_ANONYMOUS_ENABLED: "true"
       GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
@@ -97,12 +101,19 @@ services:
     networks:
       - db_psql
       - db_mysql
+    profiles: [monitor, all]
+# Explicit names keep the data created under the old "dotfiles" project.
 volumes:
   dozzle_data:
+    name: dotfiles_dozzle_data
   grafana-data:
+    name: dotfiles_grafana-data
   postgres_data:
+    name: dotfiles_postgres_data
   mysql_data:
+    name: infra_mysql_data
   searxng_cache:
+    name: dotfiles_searxng_cache
 networks:
   db_psql:
     external: true
