@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Usage: ./yt2txt.sh <URL> [lang]   (lang defaults to "en")
+# uv pip install -U "yt-dlp[default,curl-cffi]"
+set -euo pipefail
+
+url="$1"
+lang="${2:-en}"
+
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+
+yt-dlp --skip-download --no-playlist --quiet --no-warnings --no-progress \
+  --write-subs --write-auto-subs \
+  --sub-langs "$lang" --sub-format json3 \
+  -o "$tmp/%(id)s" "$url" >&2
+
+f=$(ls "$tmp"/*.json3 2>/dev/null | head -n1) || true
+[ -n "${f:-}" ] || { echo "No subtitles found" >&2; exit 1; }
+
+jq -r '[.events[] | select(.segs)
+        | (.segs | map(.utf8) | join("")) | gsub("\n";" ")]
+       | join(" ")' "$f" | tr -s ' ' | fold -s -w 180

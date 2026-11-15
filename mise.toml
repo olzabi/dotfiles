@@ -1,6 +1,112 @@
 
+# Fresh machine: `mise trust && mise run install`. Re-running is safe; each step skips what is done.
+[tasks.install]
+description = "Link configs, install tools and plugins, enable user services"
+run = [
+  "mise run symlinks:create",
+  "mise install",
+  "mise run plugins:install",
+  "mise run completions:update",
+  "mise run services:enable",
+  "mise run shell:zsh",
+]
+
 [tasks."symlinks:create"]
-run = "bin/symlinks.sh --create"
+description = "Link config/, home/ and symlinks.conf entries into $HOME"
+run = "bin/symlinks --create"
+
+[tasks."plugins:install"]
+description = "Fetch plugins and caches the configs expect (yazi, tv channels, bat, tmux via tpack)"
+run = [
+  "ya pkg install",
+  "tv update-channels",
+  "bat cache --build",
+  "tpack install",
+]
+
+[tasks."services:enable"]
+description = "Enable the systemd user units linked from symlinks.conf"
+run = "systemctl --user daemon-reload && systemctl --user enable --now keypoints.service keypoints-label.timer hush-digest.timer"
+
+[tasks."shell:zsh"]
+description = "Make zsh the login shell (asks for your password)"
+run = '[ "$(getent passwd "$USER" | cut -d: -f7)" = /usr/bin/zsh ] || chsh -s /usr/bin/zsh'
+
+[tasks.check]
+description = "Run the hk linters on the whole repo (secrets, shell, lua, yaml, ts)"
+run = "hk check --all"
+
+[tasks.fix]
+description = "Apply hk's fixers (shfmt, stylua, oxfmt) to the whole repo"
+run = "hk fix --all"
+
+[tasks."completions:update"]
+description = "Generate zsh completions for mise-installed tools"
+run = "config/zsh/completions.sh"
+
+[tasks."tv:update"]
+description = "Refresh television's community channels"
+run = ["tv update-channels", "config/television/theme-channels.sh"]
+
+# --- infra/: dev containers (podman compose). Credentials come from infra/.env when present.
+[tasks."infra:up"]
+description = "Start a compose profile: postgres | mysql | sql | searxng | monitor | all"
+dir = "{{config_root}}/infra"
+usage = 'arg "[profile]" default="postgres"'
+run = 'podman compose --profile "$usage_profile" up -d'
+
+[tasks."infra:down"]
+description = "Stop one service, or remove every container (volumes are kept)"
+dir = "{{config_root}}/infra"
+usage = 'arg "[service]"'
+run = 'if [ -n "${usage_service:-}" ]; then podman compose stop "$usage_service"; else podman compose --profile all down; fi'
+
+[tasks."infra:ps"]
+description = "List the infra containers with health"
+dir = "{{config_root}}/infra"
+run = "podman compose --profile all ps"
+
+[tasks."infra:logs"]
+description = "Follow logs of one service, or all"
+dir = "{{config_root}}/infra"
+usage = 'arg "[service]"'
+run = 'podman compose --profile all logs -f ${usage_service:-}'
+
+[tasks."infra:psql"]
+description = "psql shell in the postgres container"
+dir = "{{config_root}}/infra"
+usage = 'arg "[db]" default="dev"'
+run = 'set -a; [ -f .env ] && . ./.env; podman exec -it postgres psql -U "${POSTGRES_USER:-postgres}" -d "$usage_db"'
+
+[tasks."infra:backup"]
+description = "Dump all Postgres databases to infra/backups/"
+dir = "{{config_root}}/infra"
+run = """
+set -a; [ -f .env ] && . ./.env; set +a
+mkdir -p backups
+f="backups/postgres_$(date +%Y%m%d_%H%M%S).sql"
+podman exec postgres pg_dumpall -U "${POSTGRES_USER:-postgres}" > "$f"
+echo "-> infra/$f"
+"""
+
+[tasks."infra:restore"]
+description = "Restore a dump made by infra:backup"
+dir = "{{config_root}}/infra"
+usage = 'arg "<file>" help="path relative to infra/, e.g. backups/postgres_20261115.sql"'
+run = 'set -a; [ -f .env ] && . ./.env; podman exec -i postgres psql -U "${POSTGRES_USER:-postgres}" -d postgres < "$usage_file"'
+
+[tasks."infra:pull"]
+description = "Pull newer images and recreate the running services"
+dir = "{{config_root}}/infra"
+run = ["podman compose --profile all pull", "podman compose up -d"]
+
+[tasks."system:save"]
+description = "Snapshot packages and /etc into system/aconfmgr (asks for sudo)"
+run = "aconfmgr save"
+
+[tasks."system:apply"]
+description = "Make this machine match system/aconfmgr (shows changes, asks before applying)"
+run = "aconfmgr apply"
 
 [tasks."yazi-cli:update"]
 description = "Upgrade yazi packages/plugins"
@@ -17,3 +123,10 @@ run = "bat cache --build"
 description = "Run mise up plus every *:update task"
 run = "mise up"
 depends = ["*:update"]
+
+[tools]
+"github:chojs23/concord" = "latest"
+"github:graykode/abtop" = "latest"
+"github:wger-project/wger" = "latest"
+hk = { version = "latest", workflow = "release.yml" }
+pkl = "latest"

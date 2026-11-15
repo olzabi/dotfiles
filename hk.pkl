@@ -1,0 +1,36 @@
+amends "package://github.com/jdx/hk/releases/download/v2.10.0/hk@2.10.0#/Config.pkl"
+import "package://github.com/jdx/hk/releases/download/v2.10.0/hk@2.10.0#/Builtins.pkl"
+// Dotfiles checks. `hk install --mise` wires the git hook; `mise run check` / `mise run fix` run them on demand.
+
+exclude = List(
+  "config/tmux/plugins/**", // vendored tmux plugins
+  "agents/pi/agent/extensions/.packages/**", // vendored pi extensions
+  "**/lazy-lock.json"
+)
+
+local linters = new Mapping<String, Step> {
+  // secrets and accidents first: this repo is public-facing config
+  ["gitleaks"] = (Builtins.gitleaks) { scan = "staged" }
+  ["private-key"] = Builtins.detect_private_key
+  ["merge-conflict"] = Builtins.check_merge_conflict
+  ["large-files"] = (Builtins.check_added_large_files) { exclude = List("assets/**", "config/obsidian/plugins/**", "config/nvim/alpha/**") }
+
+  ["shellcheck"] = (Builtins.shellcheck) { exclude = List("**/*.zsh", "config/zsh/**") }
+  ["shfmt"] = (Builtins.shfmt) { exclude = List("**/*.zsh", "config/zsh/**") } // zsh syntax is not POSIX/bash
+  ["stylua"] = (Builtins.stylua) { glob = "config/nvim/**/*.lua" } // only nvim has a .stylua.toml
+  ["oxfmt"] = Builtins.oxfmt
+  ["yamllint"] = (Builtins.yamllint) { exclude = "infra/searxng/**" } // searxng's upstream settings.yml
+}
+
+hooks {
+  ["pre-commit"] {
+    fix = true
+    stash = "git"
+    steps = linters
+  }
+  ["check"] { steps = linters }
+  ["fix"] {
+    fix = true
+    steps = linters
+  }
+}

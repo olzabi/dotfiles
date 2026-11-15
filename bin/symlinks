@@ -16,7 +16,24 @@ require_config() {
   fi
   # Relative sources in the conf resolve against the repo, not the caller's cwd.
   export DOTFILES_DIR="$REPO_DIR"
+  # A bare machine has no ~/.zshenv yet, so the conf's variables get defaults here.
+  export DOTFILES="${DOTFILES:-$REPO_DIR}" XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+  export DOTFILES_CONFIG="${DOTFILES_CONFIG:-$DOTFILES/config}" DOTFILES_THEMES="${DOTFILES_THEMES:-$DOTFILES/themes}" DOTFILES_AI="${DOTFILES_AI:-$DOTFILES/agents}"
   cd "$REPO_DIR" || exit 1
+}
+
+# Automatic links: config/<x> → ~/.config/<x>, home/<x> → ~/<x>; `!<x>` in the conf opts config/<x> out. Then the conf's own entries.
+links() {
+  local x
+  for x in "$REPO_DIR"/config/* "$REPO_DIR"/config/.[!.]*; do
+    [ -e "$x" ] || continue
+    x=${x##*/}
+    grep -qxF "!$x" "$CONFIG_FILE" || echo "\$DOTFILES_CONFIG/$x:\$XDG_CONFIG_HOME/$x"
+  done
+  for x in "$REPO_DIR"/home/* "$REPO_DIR"/home/.[!.]*; do
+    [ -e "$x" ] && echo "\$DOTFILES/home/${x##*/}:\$HOME/${x##*/}"
+  done
+  expand_conf "$CONFIG_FILE"
 }
 
 create_symlinks() {
@@ -65,7 +82,7 @@ create_symlinks() {
     ln -s "$source" "$target"
     success "Created symlink: $target → $source"
     ((created++))
-  done < <(expand_conf "$CONFIG_FILE")
+  done < <(links)
   info "Done: $created created, $skipped already up to date, $warned need attention."
 }
 
@@ -89,7 +106,7 @@ delete_symlinks() {
     else
       warn "Not found (or not a symlink): $target"
     fi
-  done <"$CONFIG_FILE"
+  done < <(links)
 }
 
 usage() {
