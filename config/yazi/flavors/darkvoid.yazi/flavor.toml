@@ -33,11 +33,8 @@
 #   hint             #bedc74
 #   info             #7fa1c3
 
-[manager]
+[mgr]
 cwd = { fg = "#66b2b2", bold = true }
-
-hovered         = { fg = "#f1f1f1", bg = "#303030", bold = true }
-preview_hovered = { fg = "#66b2b2", bold = true, underline = true }
 
 find_keyword  = { fg = "#66b2b2", bold = true, italic = true, underline = true }
 find_position = { fg = "#66b2b2", bold = true }
@@ -47,20 +44,29 @@ marker_cut      = { fg = "#ffb3ba", bg = "#ffb3ba" }
 marker_marked   = { fg = "#ffffba", bg = "#ffffba" }
 marker_selected = { fg = "#66b2b2", bg = "#303030", bold = true }
 
-tab_active   = { fg = "#66b2b2", bg = "#303030", bold = true }
-tab_inactive = { fg = "#585858", bg = "#1c1c1c" }
-
 border_symbol = "│"
 border_style  = { fg = "#585858" }
 
-[status]
-separator_open  = ""
-separator_close = ""
-separator_style = { fg = "#303030", bg = "#303030" }
+[indicator]
+current = { fg = "#f1f1f1", bg = "#303030", bold = true }
+preview = { fg = "#66b2b2", bold = true, underline = true }
 
-mode_normal = { fg = "#66b2b2", bg = "#303030", bold = true }
-mode_select = { fg = "#66b2b2", bg = "#303030", bold = true }
-mode_unset  = { fg = "#1c1c1c", bg = "#ffb3ba", bold = true }
+[tabs]
+active   = { fg = "#66b2b2", bg = "#303030", bold = true }
+inactive = { fg = "#585858", bg = "#1c1c1c" }
+
+[mode]
+normal_main = { fg = "#66b2b2", bg = "#303030", bold = true }
+normal_alt  = { fg = "#66b2b2", bg = "#1c1c1c" }
+select_main = { fg = "#66b2b2", bg = "#303030", bold = true }
+select_alt  = { fg = "#66b2b2", bg = "#1c1c1c" }
+unset_main  = { fg = "#1c1c1c", bg = "#ffb3ba", bold = true }
+unset_alt   = { fg = "#ffb3ba", bg = "#1c1c1c" }
+
+[status]
+overall   = { bg = "#1c1c1c" }
+sep_left  = { open = "", close = "" }
+sep_right = { open = "", close = "" }
 
 progress_label  = { fg = "#c0c0c0", bold = true }
 progress_normal = { fg = "#66b2b2", bg = "#1c1c1c", bold = true }
@@ -78,7 +84,7 @@ title    = { fg = "#66b2b2", bold = true }
 value    = { fg = "#c0c0c0" }
 selected = { fg = "#66b2b2", bg = "#303030", bold = true }
 
-[select]
+[pick]
 border   = { fg = "#585858" }
 active   = { fg = "#66b2b2", bold = true }
 inactive = { fg = "#585858" }
@@ -109,7 +115,7 @@ icon_error = "󰅚"
 border = { fg = "#585858" }
 title  = { fg = "#66b2b2", bold = true }
 
-[completion]
+[cmp]
 border   = { fg = "#585858" }
 active   = { fg = "#66b2b2", bg = "#303030", bold = true }
 inactive = { fg = "#585858" }

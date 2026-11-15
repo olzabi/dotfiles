@@ -1,9 +1,0 @@
-flavors/*
-!flavors/darkvoid.yazi/
-!flavors/darkvoid.yazi/**
-
-plugins/*
-!plugins/motions.yazi/
-!plugins/motions.yazi/**
-!plugins/rich-darkvoid.yazi/
-!plugins/rich-darkvoid.yazi/**

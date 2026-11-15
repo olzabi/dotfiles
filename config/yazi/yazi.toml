@@ -20,8 +20,11 @@ wrap = "no"
 tab_size = 2
 
 [tasks]
-micro_workers = 10
-macro_workers = 25
+file_workers = 10
+plugin_workers = 10
+fetch_workers = 10
+preload_workers = 5
+process_workers = 25
 bizarre_retry = 5
 image_alloc = 1073741824 # = 1024*1024*1024 = 1024MB
 image_bound = [0, 0]
@@ -33,12 +36,11 @@ prepend_fetchers = [
   { url = "*/", run = "git", group = "git" },
 ]
 prepend_previewers = [
-  # { url = "*.md", run = 'piper -- glow --style "$HOME/.config/glow/darkvoid.glow.json" -w=$w  "$1"' },
-  { url = "*.md", run = 'rich-darkvoid' },
-  { mime = "text/*", run = "rich-darkvoid" },
-  { mime = "application/json", run = "rich-darkvoid" },
-  { mime = "application/*+json", run = "rich-darkvoid" },
-  { mime = "application/{javascript,x-javascript,toml,yaml,x-yaml,x-ndjson}", run = "rich-darkvoid" },
+  # bat: darkvoid theme (config/bat/themes), line numbers and git change marks. Markdown stays as source on purpose.
+  { mime = "text/*", run = 'piper -- COLORTERM=truecolor bat --color=always --theme=darkvoid --style=numbers,changes --paging=never --wrap=never --terminal-width="$w" "$1"' },
+  { mime = "application/json", run = 'piper -- COLORTERM=truecolor bat --color=always --theme=darkvoid --style=numbers,changes --paging=never --wrap=never --terminal-width="$w" "$1"' },
+  { mime = "application/*+json", run = 'piper -- COLORTERM=truecolor bat --color=always --theme=darkvoid --style=numbers,changes --paging=never --wrap=never --terminal-width="$w" "$1"' },
+  { mime = "application/{javascript,x-javascript,toml,yaml,x-yaml,x-ndjson}", run = 'piper -- COLORTERM=truecolor bat --color=always --theme=darkvoid --style=numbers,changes --paging=never --wrap=never --terminal-width="$w" "$1"' },
   { mime = "{audio,video,image}/*", run = "mediainfo --no-metadata" },
 ]
 prepend_preloaders = [
@@ -53,6 +55,9 @@ edit = [
 open = [
   { run = 'nvim %s',            desc = "Edit in Neovim",    block = true,  for = "unix" },
   { run = 'xdg-open %s1', orphan = true, desc = "Open with default app", for = "linux" },
+]
+obsidian = [
+  { run = 'ob %s1', orphan = true, desc = "Open in Obsidian", for = "linux" },
 ]
 reveal = [
   { run = 'xdg-open "$(dirname -- %s1)"', orphan = true, desc = "Open containing folder", for = "linux" },
@@ -74,6 +79,7 @@ image = [
 prepend_rules = [
   { mime = "application/*zip",                               use = [ "extract", "reveal", ] },
 	{ mime = "application/x-{tar,bzip*,7z-compressed,xz,rar}", use = [ "extract", "reveal", ] },
+  { url = "*.{md,markdown}",                                 use = [ "edit", "obsidian", "reveal" ] },
   { url = "*.blade.php",                                     use = "edit" },
   { url = "*.php",                                           use = "edit" },
   { mime = "image/*",                                        use = "image" },
@@ -123,5 +129,3 @@ shell_title = ["Shell:", "Shell (block):"]
 shell_origin = "center"
 shell_offset = [0, 2, 50, 3]
 
-[log]
-enabled = false

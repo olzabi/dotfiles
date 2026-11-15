@@ -1,4 +1,4 @@
-require("motions"):setup({
+require("relative-motions"):setup({
 	show_numbers = "relative",
 	show_motion = true,
 })
@@ -46,3 +46,6 @@ require("starship"):setup({
 	hide_count = false,
 	count_separator = " ",
 })
+
+-- Keep zoxide's database in sync with directories visited in yazi, so `cd`/`z` in the shell and tv's zoxide channel know them.
+require("zoxide"):setup({ update_db = true })

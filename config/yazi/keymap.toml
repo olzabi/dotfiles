@@ -12,11 +12,12 @@ prepend_keymap = [
     { on = ["g", "l"], run = "plugin lazygit",                    desc = "Run Lazygit" },
     { on = ["d", "u"], run = "plugin restore",                    desc = "Restore last deleted files/folders" },
     { on = ["d", "U"], run = "plugin restore -- --interactive",   desc = "Restore deleted files/folders (Interactive)" },
-    { on = "l",        run = "plugin --sync smart-enter",         desc = "Enter the child directory, or open the file" },
-    { on = "L",        run = 'shell "hunk diff \"$1\"" --block',  desc = "Review git diff in Hunk" },
+    { on = "l",        run = "plugin smart-enter",         desc = "Enter the child directory, or open the file" },
+    { on = "L",        run = 'shell --block -- hunk diff -- %h',  desc = "Review git diff in Hunk" },
+    { on = "<S-Enter>", run = 'shell -- case %h in *.md|*.markdown) ob %h ;; *) ya emit open --interactive ;; esac', desc = "Markdown: open in Obsidian; others: choose how to open" },
 
     { on = ["<Space>", "j"],        run = [ "toggle", "arrow next" ],  desc = "Toggle the current selection state" },
-    { on = ["<Space>", "<Space>"],  run = "plugin motions",            desc = "Relative Motions" },
+    { on = ["<Space>", "<Space>"],  run = "plugin relative-motions",   desc = "Relative Motions" },
     { on = "f",                     run = "plugin jump-to-char",       desc = "Jump to char" },
     { on = "F",                     run = "plugin smart-filter",       desc = "Smart filter" },
 
@@ -26,6 +27,16 @@ prepend_keymap = [
     { on = ["g", "p"], run = "cd ~/Projects",                                                    desc = "Go to the Projects" },
     { on = ["g", "<Space>"], run = "cd --interactive",                                            desc = "Go to a directory interactively" },
     { on = ["g", "r"], run  = 'shell --orphan -- ya emit cd "$(git rev-parse --show-toplevel)"',  desc = "Go to the repository root" },
+    { on = ["g", "w"], run  = 'shell --block -- p=$(wt switch --no-cd --format json | jq -r .path) && [ -n "$p" ] && ya emit cd "$p"', desc = "Go to a worktree (wt picker, with diff preview)" },
+    { on = ["g", "s"], run  = 'shell --orphan -- herdr-app do space.new --folder "$PWD"',        desc = "Open this folder as a herdr space" },
+
+    # Pickers and tools (tv = television; channels from `tv update-channels`)
+    { on = "<C-p>",      run = 'shell --block -- p=$(tv files) && [ -n "$p" ] && ya emit reveal "$p"', desc = "Find a file (tv) and reveal it" },
+    { on = ["g", "/"],   run = 'shell --block -- p=$(tv dirs) && [ -n "$p" ] && ya emit cd "$p"',     desc = "Find a directory (tv) and cd" },
+    { on = "<C-s>",      run = 'shell --block -- tv text',                                            desc = "Grep (tv + rg), open the hit in $EDITOR" },
+    { on = ["g", "b"],   run = 'shell --block -- tv git-branch',                                      desc = "Git branches (tv)" },
+    { on = ["c", "s"],   run = 'shell -- herdr-paths %s',                                             desc = "Send selected paths to the last focused agent (herdr)" },
+    { on = "!",          run = 'shell "$SHELL" --block',                                              desc = "Open $SHELL here" },
 
     { on = [ "J" ], run = "seek 2",  desc = "Seek down 2 lines in preview" },
     { on = [ "K" ], run = "seek -2", desc = "Seek up 2 lines in preview" },

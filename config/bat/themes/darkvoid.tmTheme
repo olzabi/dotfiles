@@ -162,10 +162,11 @@
     <!-- Preprocessor / Macro -->
     <dict>
       <key>name</key><string>Preprocessor</string>
-      <key>scope</key><string>meta.preprocessor, keyword.control.import, keyword.other.include, entity.name.tag</string>
+      <key>scope</key><string>meta.preprocessor, keyword.control.import, keyword.other.include</string>
       <key>settings</key>
       <dict>
-        <key>foreground</key><string>#4b8902</string>
+        <key>foreground</key><string>#f1f1f1</string>
+        <key>fontStyle</key><string>bold</string>
       </dict>
     </dict>
 
@@ -195,7 +196,8 @@
       <key>scope</key><string>entity.name.tag</string>
       <key>settings</key>
       <dict>
-        <key>foreground</key><string>#f1f1f1</string>
+        <key>foreground</key><string>#b1b1b1</string>
+        <key>fontStyle</key><string>bold</string>
       </dict>
     </dict>
 
