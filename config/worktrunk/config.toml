@@ -1,0 +1,41 @@
+# worktrunk (wt): everything about worktrees except creating agents' ones. Claude creates those itself
+# (claude --worktree, isolated subagents: .claude/worktrees/<name>, branch worktree-<name>, sparse from the start);
+# its worktrunk plugin is off, agents/claude/hooks/wt-marker.sh keeps 🤖/💬 in `wt list`.
+# wt creates manual and PR worktrees (lazygit N/O, gh-dash T/A, herdr-app New worktree), lists, merges and
+# removes all of them (bin/wt-rm drops a dead Claude session's lock first).
+
+# Same folder as Claude's own, so every tool finds them in one place; ignored globally (git/ignore).
+# Long branch names get a short hash so paths stay readable.
+worktree-path = """
+{%- set b = branch | sanitize -%}
+{%- if b | length > 32 -%}{%- set b = b[:32] ~ '_' ~ (branch | hash) -%}{%- endif -%}
+{{ repo_path }}/.claude/worktrees/{{ b }}
+"""
+
+[list]
+timeout-ms = 3000 # cap a slow remote/CI lookup; CI and LLM summaries only with --full
+
+[switch.picker]
+pager = "delta --paging=never" # hunk is a full-screen TUI; the picker preview needs a plain pager
+
+# LLM commit messages for wt merge / wt step commit (worktrunk's documented Claude recipe)
+[commit.generation]
+command = "MAX_THINKING_TOKENS=0 claude -p --no-session-persistence --model=haiku --tools='' --safe-mode --setting-sources='user' --system-prompt=''"
+
+# Any repo with Claude worktree settings: give worktrees wt makes what Claude's worktree.sparsePaths and
+# symlinkDirectories (.claude/settings.json) give its own, then run the repo's own worktree setup script if any.
+# git copies sparse settings from the worktree `git worktree add` runs in, so one made from a sparse worktree
+# is sparse from the start; made from a full checkout it is trimmed here (after the skipped files were written).
+[pre-start]
+claude-worktree = """
+c=.claude/settings.json
+[ -f "$c" ] || exit 0
+paths=$(jq -r '.worktree.sparsePaths // [] | .[]' "$c")
+if [ -n "$paths" ] && [ "$(git config core.sparseCheckout)" != true ]; then
+  git sparse-checkout set --cone $paths
+fi
+for d in $(jq -r '.worktree.symlinkDirectories // [] | .[]' "$c"); do
+  [ -e "$d" ] || [ ! -e "{{ primary_worktree_path }}/$d" ] || ln -s "{{ primary_worktree_path }}/$d" "$d"
+done
+[ ! -x scripts/agents/worktree-deps.sh ] || scripts/agents/worktree-deps.sh
+"""

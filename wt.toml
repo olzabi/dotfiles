@@ -1,0 +1,8 @@
+[pre-start]
+deps = "npm ci"
+
+[aliases]
+deploy = "fly deploy --config=fly.{{ env }}.toml --app=myproject-{{ branch }}"
+open = "open http://localhost:{{ branch | hash_port }}"
+since-main = "git log --oneline {{ default_branch }}..HEAD"
+

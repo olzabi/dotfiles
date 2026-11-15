@@ -1,0 +1,64 @@
+# gh-dash: only overrides here. Anything left out keeps gh-dash's built-in default
+# (sections, limits, columns, preview); `?` inside gh-dash lists every key.
+
+defaults:
+  refetchIntervalMinutes: 5 # default 30: lists go stale fast
+
+# Hide notifications you've already read (default shows them).
+includeReadNotifications: false
+notificationsSections: # default has 8 overlapping tabs
+  - title: Unread
+    filters: ""
+  - title: Review Requested
+    filters: reason:review-requested
+  - title: Mentioned
+    filters: reason:mention
+  - title: Participating
+    filters: reason:participating
+
+# Built-in: y copies PR number, Y its URL, o opens in browser.
+# Where your clones live, so checkout (C/Space) and the keys below work outside a repo.
+repoPaths:
+  olzabi/dotfiles: /home/chronica/Dotfiles
+  ":owner/:repo": /home/chronica/Projects/:repo # no ~ expansion
+
+pager:
+  diff: hunk pager # d: diff in hunk instead of less
+
+# Worktrees through bin/herdr-wt (worktrunk + a herdr-app space), so a PR checkout gets the same path,
+# hooks and repo setup as Claude's worktrees and lands as its own space instead of inside this popup.
+keybindings:
+  prs:
+    - key: T
+      name: worktree → herdr space
+      command: herdr-wt -C {{.RepoPath}} pr:{{.PrNumber}}
+    - key: A
+      name: claude reviews it in its worktree
+      command: >-
+        herdr-wt -C {{.RepoPath}} --agent "Review PR #{{.PrNumber}} ({{.HeadRefName}}): gh pr view {{.PrNumber}}
+        and its diff against the base. Read-only: report bugs, risky spots and missing tests, most severe first,
+        with file:line." pr:{{.PrNumber}}
+    - key: z # g = jump to top
+      name: lazygit
+      command: cd {{.RepoPath}} && lazygit
+    - key: D
+      name: review in hunk
+      command: hunk gh pr {{.PrNumber}} --repo {{.RepoName}}
+
+# Same palette as herdr (config/herdr/config.toml [theme.custom]).
+theme:
+  colors:
+    text:
+      primary: "#c0c0c0"
+      secondary: "#83b7ad"
+      inverted: "#1c1c1c"
+      faint: "#585858"
+      warning: "#ffffba"
+      success: "#baffc9"
+      error: "#dea6a0"
+    background:
+      selected: "#3c3c3c"
+    border:
+      primary: "#83b7ad"
+      secondary: "#404040"
+      faint: "#303030"

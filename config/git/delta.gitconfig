@@ -5,6 +5,7 @@
   pager = delta
 
 [delta]
+  features = darkvoid # the theme in darkvoid.gitconfig only applies when selected here
   navigate = true
   line-numbers = true
   decorations = true

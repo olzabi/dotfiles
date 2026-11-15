@@ -1,0 +1,44 @@
+#:schema https://jj-vcs.github.io/jj/latest/config-schema.json
+# Linked to ~/.config/jj/config.toml (file, not dir: ~/.config/jj/repos is jj-managed state).
+# Extra files in conf.d/ are loaded automatically (see conf.d/lazyjj.toml); [user] lives in the gitignored conf.d/user.toml.
+
+[ui]
+editor = "nvim"
+default-command = "log"
+graph.style = "curved"
+# git-style diffs so delta (darkvoid feature from git/delta.gitconfig) can render them
+diff-formatter = ":git"
+pager = "delta"
+conflict-marker-style = "git"   # <<<<<<< markers nvim/git tools understand
+
+[git]
+private-commits = "description(glob:'wip:*') | description(glob:'private:*')"
+
+[remotes.origin]
+auto-track-bookmarks = "glob:*"
+
+[revset-aliases]
+"trunk()" = "latest(remote_bookmarks(exact:'main') | remote_bookmarks(exact:'master') | remote_bookmarks(exact:'dev'))"
+"stack()" = "ancestors(reachable(@, mutable()), 2)"
+
+[aliases]
+l = ["log", "-r", "stack()"]
+la = ["log", "-r", "all()"]
+s = ["status"]
+d = ["diff"]
+n = ["new"]
+c = ["commit"]
+e = ["edit"]
+sq = ["squash"]
+fetch = ["git", "fetch"]
+push = ["git", "push"]
+# move nearest bookmark up to @- (the commit you just finished)
+tug = ["bookmark", "move", "--from", "heads(::@- & bookmarks())", "--to", "@-"]
+# rebase current stack onto updated trunk
+sync = ["rebase", "-d", "trunk()"]
+
+[core]
+fsmonitor = "watchman"
+
+[core.watchman]
+register-snapshot-trigger = true
