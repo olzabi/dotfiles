@@ -1,8 +1,6 @@
 local function find_fn(t, path, server, seen)
   seen = seen or {}
-  if seen[t] then
-    return
-  end
+  if seen[t] then return end
   seen[t] = true
   for k, v in pairs(t) do
     local p = path .. "." .. tostring(k)
@@ -20,9 +18,7 @@ local function init_servers()
     capabilities = vim.tbl_deep_extend("force", vim.lsp.protocol.make_client_capabilities(), require("blink.cmp").get_lsp_capabilities()),
   })
   local srv_path = vim.api.nvim_get_runtime_file("lua/lsp/servers", false)[1]
-  if not srv_path then
-    return
-  end
+  if not srv_path then return end
 
   local enabled = {}
   for name, type in vim.fs.dir(srv_path) do
@@ -66,9 +62,7 @@ local function cursor_highlight(buf)
 end
 
 local function lsp_keymaps(buf)
-  local function map(mode, lhs, rhs, desc)
-    vim.keymap.set(mode, lhs, rhs, { silent = true, buffer = buf, desc = desc })
-  end
+  local function map(mode, lhs, rhs, desc) vim.keymap.set(mode, lhs, rhs, { silent = true, buffer = buf, desc = desc }) end
 
   -- Already built in on 0.11+: K (hover), gO (symbols), grn (rename), gra (code action),
   -- grr (references), gri (implementation), grt (type def), <C-S> (insert signature help)
@@ -85,6 +79,8 @@ return {
   {
     "LSP",
     virtual = true,
+    -- servers/misc.lua reads JSON/YAML schemas from SchemaStore when the server list is built
+    dependencies = { "b0o/SchemaStore.nvim" },
     config = function()
       vim.o.winborder = "rounded"
       vim.diagnostic.config { severity_sort = true, float = { source = true } }
@@ -97,22 +93,17 @@ return {
       })
 
       init_servers()
+      vim.lsp.codelens.enable(true) -- 0.12: lenses render as virtual lines; run with grx
 
       vim.api.nvim_create_autocmd("LspAttach", {
         group = vim.api.nvim_create_augroup("lsp_global_attach", { clear = true }),
         callback = function(e)
           local buf = e.buf
           local c = vim.lsp.get_client_by_id(e.data.client_id)
-          if not c then
-            return
-          end
+          if not c then return end
 
-          if c:supports_method("textDocument/inlayHint", buf) then
-            vim.lsp.inlay_hint.enable(true, { bufnr = buf })
-          end
-          if c:supports_method("textDocument/documentHighlight", buf) then
-            cursor_highlight(buf)
-          end
+          if c:supports_method("textDocument/inlayHint", buf) then vim.lsp.inlay_hint.enable(true, { bufnr = buf }) end
+          if c:supports_method("textDocument/documentHighlight", buf) then cursor_highlight(buf) end
 
           lsp_keymaps(buf)
         end,
@@ -123,9 +114,10 @@ return {
       vim.api.nvim_create_autocmd("LspDetach", {
         group = vim.api.nvim_create_augroup("lsp_global_detach", { clear = true }),
         callback = function(e)
-          local left = vim.tbl_filter(function(c)
-            return c.id ~= e.data.client_id and c:supports_method("textDocument/documentHighlight", e.buf)
-          end, vim.lsp.get_clients { bufnr = e.buf })
+          local left = vim.tbl_filter(
+            function(c) return c.id ~= e.data.client_id and c:supports_method("textDocument/documentHighlight", e.buf) end,
+            vim.lsp.get_clients { bufnr = e.buf }
+          )
           if #left == 0 and vim.api.nvim_buf_is_valid(e.buf) then
             vim.api.nvim_buf_call(e.buf, vim.lsp.buf.clear_references)
             pcall(vim.api.nvim_del_augroup_by_name, "lsp-highlight-" .. e.buf)

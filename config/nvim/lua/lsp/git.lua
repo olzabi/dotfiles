@@ -15,27 +15,20 @@ return {
       }
     end,
     keys = {
-      { "<leader>Gp", "<cmd>Gitsigns preview_hunk<cr>",           desc = "Preview hunk" },
+      -- stylua: ignore start
+      { "<leader>Gp", "<cmd>Gitsigns preview_hunk<cr>", desc = "Preview hunk" },
       { "<leader>GB", function() require("gitsigns").blame() end, desc = "Blame" },
+      -- stylua: ignore end
     },
   },
 
+  -- lazygit.nvim -> snacks.lazygit (snacks is already loaded); git-worktree.nvim -> worktrunk (`wt`)
   {
-    "kdheepak/lazygit.nvim",
-    dependencies = { "nvim-lua/plenary.nvim" },
+    "folke/snacks.nvim",
     keys = {
-      { ";G", "<cmd>LazyGit<cr>", desc = "LazyGit" }
+      -- stylua: ignore start
+      { ";G", function() Snacks.lazygit() end, desc = "LazyGit" },
+      -- stylua: ignore end
     },
-    init = function()
-      vim.g.lazygit_floating_window_scaling_factor = 0.9
-      vim.g.lazygit_floating_window_winblend = 0
-      vim.g.lazygit_use_neovim_remote = 1
-    end,
-  },
-
-  {
-    "ThePrimeagen/git-worktree.nvim",
-    dependencies = { "nvim-lua/plenary.nvim" },
-    config = true,
   },
 }

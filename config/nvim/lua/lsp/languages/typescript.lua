@@ -1,9 +1,7 @@
 return {
   {
     "bennypowers/nvim-regexplainer",
-    config = function()
-      require("regexplainer").setup()
-    end,
+    config = function() require("regexplainer").setup() end,
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
       "MunifTanjim/nui.nvim",
@@ -14,8 +12,10 @@ return {
     "Redoxahmii/json-to-types.nvim",
     build = "sh install.sh npm",
     keys = {
+      -- stylua: ignore start
       { "<leader>cCU", "<CMD>ConvertJSONtoLang typescript<CR>", desc = "Convert JSON to TS" },
       { "<leader>cCt", "<CMD>ConvertJSONtoLangBuffer typescript<CR>", desc = "Convert JSON to TS Buffer" },
+      -- stylua: ignore end
     },
   },
 
@@ -43,7 +43,9 @@ return {
       -- })
     end,
     keys = {
+      -- stylua: ignore start
       { "<leader>us", "<cmd>lua require('package-info').show({ force = true })<cr>" },
+      -- stylua: ignore end
     },
   },
 }

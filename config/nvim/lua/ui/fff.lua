@@ -1,13 +1,9 @@
-local function live_grep_fuzzy()
-  require("fff").live_grep { grep = { modes = { "fuzzy", "plain" } } }
-end
+local function live_grep_fuzzy() require("fff").live_grep { grep = { modes = { "fuzzy", "plain" } } } end
 
 return {
   {
     "dmtrKovalenko/fff.nvim",
-    build = function()
-      require("fff.download").download_or_build_binary()
-    end,
+    build = function() require("fff.download").download_or_build_binary() end,
     lazy = false,
     opts = {
       title = "FFFiles",
@@ -18,7 +14,7 @@ return {
         prompt_position = "bottom",
         preview_position = "right",
         preview_size = 0.5,
-        border = vim.g.border_style,
+        border = "rounded",
       },
       preview = {
         enabled = true,
@@ -57,6 +53,7 @@ return {
       },
     },
     keys = {
+      -- stylua: ignore start
       { ";;", function() require("fff").live_grep() end, desc = "Live grep" },
       { ";<leader>", function() require("fff").find_files() end, desc = "Find files" },
       { ";ff", function() require("fff").find_files() end, desc = "Find files" },
@@ -65,6 +62,7 @@ return {
       { ";fr", function() require("fff").find_files { resume = true } end, desc = "Resume file search" },
       { ";gr", function() require("fff").live_grep { resume = true } end, desc = "Resume grep" },
       { ";fR", "<cmd>FFFScan<cr>", desc = "Rescan files" },
+      -- stylua: ignore end
     },
   },
 }

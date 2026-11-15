@@ -26,7 +26,7 @@ return {
         { "<leader>uE", group = "Editor" },
         { "<leader>uC", group = "Code" },
 
-        { "<leader>c", group =  "Code" },
+        { "<leader>c", group = "Code" },
         { "<leader>cT", group = "Typescript" },
 
         { "<leader>cG", group = "Go Language" },

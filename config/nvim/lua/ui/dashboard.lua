@@ -27,9 +27,7 @@ local function animated_header()
       end
     end
 
-    if #current_frame > 0 then
-      table.insert(frames, current_frame)
-    end
+    if #current_frame > 0 then table.insert(frames, current_frame) end
 
     file:close()
     print("Loaded " .. #frames .. " frames")
@@ -38,11 +36,9 @@ local function animated_header()
 
   local function create_animation_timer(dashboard)
     local frames = read_ascii_frames()
-    if #frames == 0 then
-      return
-    end
+    if #frames == 0 then return end
 
-    local timer = vim.loop.new_timer()
+    local timer = vim.uv.new_timer()
     local frame_index = 1
 
     timer:start(
@@ -57,9 +53,7 @@ local function animated_header()
 
     vim.api.nvim_create_autocmd("BufLeave", {
       pattern = "alpha",
-      callback = function()
-        timer:stop()
-      end,
+      callback = function() timer:stop() end,
     })
   end
 
@@ -70,9 +64,7 @@ local function animated_header()
 
   vim.api.nvim_create_autocmd("User", {
     pattern = "AlphaReady",
-    callback = function()
-      create_animation_timer(dashboard)
-    end,
+    callback = function() create_animation_timer(dashboard) end,
   })
 end
 
@@ -106,29 +98,29 @@ return {
       end
       local function buttons()
         return {
-        dashboard.button("<leader><leader>", "  > Files", "<cmd>lua require('fff').find_files()<cr>"),
-        dashboard.button("g", "󰱼  > Grep", "<cmd>lua require('fff').live_grep()<cr>"),
-        dashboard.button("r", "  > Resume files", "<cmd>lua require('fff').find_files({ resume = true })<cr>"),
-        dashboard.button("s", "  > Restore Session", "<cmd>lua require('persistence').load()<cr>"),
-        dashboard.button("S", "  > Last Session", "<cmd>lua require('persistence').load({ last = true })<cr>"),
-        dashboard.button("c", "  > Configuration", string.format("<cmd>e %s<cr>", config_dir)),
-        dashboard.button("l", "󰏓  > Lazy", "<cmd>Lazy<cr>"),
-        dashboard.button("q", "  > Quit", "<cmd>qa<cr>"),
-      }
+          dashboard.button("<leader><leader>", "  > Files", "<cmd>lua require('fff').find_files()<cr>"),
+          dashboard.button("g", "󰱼  > Grep", "<cmd>lua require('fff').live_grep()<cr>"),
+          dashboard.button("r", "  > Resume files", "<cmd>lua require('fff').find_files({ resume = true })<cr>"),
+          dashboard.button("s", "  > Restore Session", "<cmd>lua require('persistence').load()<cr>"),
+          dashboard.button("S", "  > Last Session", "<cmd>lua require('persistence').load({ last = true })<cr>"),
+          dashboard.button("c", "  > Configuration", string.format("<cmd>e %s<cr>", config_dir)),
+          dashboard.button("l", "󰏓  > Lazy", "<cmd>Lazy<cr>"),
+          dashboard.button("q", "  > Quit", "<cmd>qa<cr>"),
+        }
       end
       local function layout()
         dashboard.section.footer.val = footer
         dashboard.section.buttons.val = buttons
 
         return {
-        { type = "padding", val = 3 },
-        dashboard.section.header,
-        { type = "padding", val = 2 },
-        dashboard.section.buttons,
-        { type = "padding", val = 3 },
-        author_section,
-        dashboard.section.footer,
-      }
+          { type = "padding", val = 3 },
+          dashboard.section.header,
+          { type = "padding", val = 2 },
+          dashboard.section.buttons,
+          { type = "padding", val = 3 },
+          author_section,
+          dashboard.section.footer,
+        }
       end
 
       dashboard.opts.layout = layout()

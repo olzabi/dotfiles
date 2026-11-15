@@ -15,14 +15,10 @@ local nvim_config_settings = {
 }
 
 local function is_nvim_config(client)
-  if not client.workspace_folders then
-    return false
-  end
+  if not client.workspace_folders then return false end
   local path = client.workspace_folders[1].name
   -- Has its own .luarc? Respect it, don't inject anything
-  if vim.uv.fs_stat(path .. "/.luarc.json") or vim.uv.fs_stat(path .. "/.luarc.jsonc") then
-    return false
-  end
+  if vim.uv.fs_stat(path .. "/.luarc.json") or vim.uv.fs_stat(path .. "/.luarc.jsonc") then return false end
   return path == vim.fn.stdpath "config"
 end
 
@@ -31,7 +27,6 @@ return {
     cmd = { "bash-language-server", "start" },
     filetypes = { "bash", "sh", "zsh" },
     root_markers = { ".git" },
-    single_file_support = true,
     settings = {
       bashIde = { globPattern = "*@(.sh|.inc|.bash|.command)" },
     },
@@ -48,9 +43,7 @@ return {
       ".git",
     },
     on_init = function(client)
-      if not is_nvim_config(client) then
-        return
-      end
+      if not is_nvim_config(client) then return end
       client.config.settings = vim.tbl_deep_extend("force", client.config.settings, nvim_config_settings)
       client:notify("workspace/didChangeConfiguration", { settings = client.config.settings })
     end,

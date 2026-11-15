@@ -11,25 +11,19 @@ return {
       ".git",
     },
     on_init = function(client, init_result)
-      if init_result.offsetEncoding then
-        client.offset_encoding = init_result.offsetEncoding
-      end
+      if init_result.offsetEncoding then client.offset_encoding = init_result.offsetEncoding end
     end,
     on_attach = function(client, bufnr)
       vim.api.nvim_buf_create_user_command(bufnr, "ClangdSwitchSourceHeader", function()
-        client:request(
-          "textDocument/switchSourceHeader",
-          vim.lsp.util.make_text_document_params(bufnr),
-          function(err, result)
-            if err then
-              vim.notify(err.message, vim.log.levels.ERROR)
-            elseif result then
-              vim.cmd.edit(vim.uri_to_fname(result))
-            else
-              vim.notify("Corresponding file could not be determined", vim.log.levels.WARN)
-            end
+        client:request("textDocument/switchSourceHeader", vim.lsp.util.make_text_document_params(bufnr), function(err, result)
+          if err then
+            vim.notify(err.message, vim.log.levels.ERROR)
+          elseif result then
+            vim.cmd.edit(vim.uri_to_fname(result))
+          else
+            vim.notify("Corresponding file could not be determined", vim.log.levels.WARN)
           end
-        )
+        end)
       end, { desc = "clangd: Switch Between Source and Header" })
 
       vim.keymap.set("n", "grs", "<Cmd>ClangdSwitchSourceHeader<CR>", {
@@ -62,7 +56,6 @@ return {
     cmd = { "gopls" },
     filetypes = { "go", "gomod", "gowork" },
     root_markers = { "go.mod", "go.work", ".git" },
-    single_file_support = true,
     settings = {
       gopls = {
         gofumpt = true,

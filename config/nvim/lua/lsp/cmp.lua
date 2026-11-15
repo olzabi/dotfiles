@@ -5,9 +5,7 @@ local get_bufnrs = function()
     bufs[vim.api.nvim_win_get_buf(win)] = true
   end
   for _, buf in ipairs(vim.fn.getbufinfo { buflisted = 1 }) do
-    if os.time() - buf.lastused < mins * 60 then
-      bufs[buf.bufnr] = true
-    end
+    if os.time() - buf.lastused < mins * 60 then bufs[buf.bufnr] = true end
   end
   return vim.tbl_keys(bufs)
 end
@@ -40,12 +38,6 @@ return {
     dependencies = {
       "rafamadriz/friendly-snippets",
       "Kaiser-Yang/blink-cmp-dictionary",
-      { "saghen/blink.compat", version = "2.*", lazy = true, opts = {} },
-      {
-        "petertriho/cmp-git",
-        dependencies = { "nvim-lua/plenary.nvim" },
-        opts = { filetypes = { "gitcommit", "gitrebase" } },
-      },
       {
         "L3MON4D3/LuaSnip",
         build = "make install_jsregexp",
@@ -85,14 +77,10 @@ return {
             components = {
               -- no custom `highlight`: the default keeps per-kind / devicon colours
               kind_icon = {
-                text = function(ctx)
-                  return " " .. ctx.kind_icon .. " "
-                end,
+                text = function(ctx) return " " .. ctx.kind_icon .. " " end,
               },
               kind = {
-                text = function(ctx)
-                  return " " .. ctx.kind .. " "
-                end,
+                text = function(ctx) return " " .. ctx.kind .. " " end,
               },
             },
           },
@@ -110,19 +98,14 @@ return {
           lua = { inherit_defaults = true, "lazydev" },
           sql = { "buffer" },
           markdown = { "lsp", "snippets", "path", "buffer", "dictionary" },
-          gitcommit = { "git", "buffer", "dictionary" },
-          gitrebase = { "git", "buffer" },
+          gitcommit = { "buffer", "dictionary" },
+          gitrebase = { "buffer" },
         },
         providers = {
           lazydev = { name = "LazyDev", module = "lazydev.integrations.blink", score_offset = 100 },
           lsp = { score_offset = 10 },
           snippets = { score_offset = 6 },
           path = { score_offset = 3, opts = { trailing_slash = true, label_trailing_slash = true } },
-          git = {
-            name = "git",
-            module = "blink.compat.source",
-            opts = { filetypes = { "gitcommit", "gitrebase" } },
-          },
           buffer = { min_keyword_length = 3, max_items = 4, opts = { get_bufnrs = get_bufnrs } },
           dictionary = {
             name = "Dict",

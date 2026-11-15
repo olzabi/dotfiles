@@ -25,9 +25,7 @@ local float = {
   border = "rounded",
   style = "minimal",
   prefix = "",
-  format = function(d)
-    return string.format("%s", d.message)
-  end,
+  format = function(d) return string.format("%s", d.message) end,
 }
 
 vim.diagnostic.config {
@@ -48,9 +46,7 @@ vim.diagnostic.config {
 
 local diagnostic_goto = function(next, severity)
   severity = severity and vim.diagnostic.severity[severity] or nil
-  return function()
-    vim.diagnostic.jump({ count = next and 1 or -1, float = true, severity = severity })
-  end
+  return function() vim.diagnostic.jump({ count = next and 1 or -1, float = true, severity = severity }) end
 end
 
 map("n", "]d", diagnostic_goto(true), { desc = "Next Diagnostic" })

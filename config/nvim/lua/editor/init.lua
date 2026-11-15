@@ -1,3 +1,17 @@
+local function delete_sessions()
+  local files = vim.fn.glob(vim.fn.stdpath "state" .. "/sessions/*.vim", false, true)
+  for _, file in ipairs(files) do
+    vim.fn.delete(file)
+  end
+  vim.notify(("Deleted %d sessions"):format(#files), vim.log.levels.INFO)
+end
+
+-- grug-far prefilled with the current file's extension
+local function grug_far_by_ext()
+  local ext = vim.bo.buftype == "" and vim.fn.expand "%:e"
+  require("grug-far").open { transient = true, prefills = { filesFilter = ext and ext ~= "" and "*." .. ext or nil } }
+end
+
 return {
   {
     "folke/persistence.nvim",
@@ -15,14 +29,7 @@ return {
       { ";qw", function() require("persistence").save() end, desc = "Save Session" },
       { ";qr", function() require("persistence").start() end, desc = "Resume Session Saving" },
       { ";qd", function() require("persistence").stop() end, desc = "Stop Session Saving" },
-      { ";qx", function()
-        local dir = vim.fn.stdpath("state") .. "/sessions/"
-        local files = vim.fn.glob(dir .. "*.vim", false, true)
-        for _, file in ipairs(files) do
-          vim.fn.delete(file)
-        end
-        vim.notify(("Deleted %d sessions"):format(#files), vim.log.levels.INFO)
-      end, desc = "Delete All Sessions" },
+      { ";qx", delete_sessions, desc = "Delete All Sessions" },
       -- stylua: ignore end
     },
   },
@@ -32,18 +39,9 @@ return {
     "MagicDuck/grug-far.nvim",
     opts = { headerMaxWidth = 80 },
     keys = {
-      {
-        "<leader>sR",
-        function()
-          local ext = vim.bo.buftype == "" and vim.fn.expand "%:e"
-          require("grug-far").open {
-            transient = true,
-            prefills = { filesFilter = ext and ext ~= "" and "*." .. ext or nil },
-          }
-        end,
-        mode = { "n", "v" },
-        desc = "Search and Replace",
-      },
+      -- stylua: ignore start
+      { "<leader>sR", grug_far_by_ext, mode = { "n", "v" }, desc = "Search and Replace" },
+      -- stylua: ignore end
     },
     config = function()
       require("grug-far").setup({
@@ -59,8 +57,10 @@ return {
     "lucidph3nx/nvim-sops",
     event = { "BufEnter" },
     keys = {
+      -- stylua: ignore start
       -- { "<leader>ef", vim.cmd.SopsEncrypt, desc = "Encrypt File" },
       -- { "<leader>df", vim.cmd.SopsDecrypt, desc = "Decrypt File" },
+      -- stylua: ignore end
     },
   },
 
@@ -69,7 +69,9 @@ return {
     dependencies = "nvim-treesitter/nvim-treesitter",
     opts = {},
     keys = {
+      -- stylua: ignore start
       { ".j", "<cmd>TSJToggle<cr>", desc = "Join Toggle" },
+      -- stylua: ignore end
     },
   },
 
@@ -84,7 +86,7 @@ return {
       { "p", "<Plug>(YankyPutAfter)", mode = { "n", "x" }, desc = "Put after" },
       { "P", "<Plug>(YankyPutBefore)", mode = { "n", "x" }, desc = "Put before" },
       { "gp", "<Plug>(YankyGPutAfter)", mode = { "n", "x" }, desc = "Put after selection" },
-      { "gP", "<Plug>(YankyGPutBefore)", mode = { "n", "x" }, desc = "Put before selection", },
+      { "gP", "<Plug>(YankyGPutBefore)", mode = { "n", "x" }, desc = "Put before selection" },
       { "]p", "<Plug>(YankyPutIndentAfterLinewise)", desc = "Put indented after" },
       { "[p", "<Plug>(YankyPutIndentBeforeLinewise)", desc = "Put indented before" },
       { "]P", "<Plug>(YankyPutIndentAfterLinewise)", desc = "Put indented after" },
@@ -99,23 +101,11 @@ return {
     },
   },
 
+  -- mini.nvim was listed but never set up (no opts/config), so it did nothing: removed.
   {
-    -- TODO:
-    "nvim-mini/mini.nvim",
-    dependencies = {
-      { "nvim-mini/mini.bracketed" },
-      { "nvim-mini/mini.jump" },
-      { "nvim-mini/mini.ai" },
-      { "nvim-mini/mini.operators" },
-    },
-  },
-
-  {
-    -- TODO:
     "kylechui/nvim-surround",
-    config = function()
-      require("nvim-surround").setup()
-    end,
+    event = "VeryLazy",
+    opts = {},
   },
 
   {
@@ -140,15 +130,13 @@ return {
     },
     keys = {
       -- stylua: ignore start
-      { "..", function() require("actions-preview").code_actions() end, },
+      { "..", function() require("actions-preview").code_actions() end },
       -- stylua: ignore end
     },
   },
 
   {
     "ckolkey/ts-node-action",
-    config = function()
-      vim.keymap.set({ "n" }, ".<leader>", require("ts-node-action").node_action, { desc = "Trigger Node Action" })
-    end,
+    config = function() vim.keymap.set({ "n" }, ".<leader>", require("ts-node-action").node_action, { desc = "Trigger Node Action" }) end,
   },
 }

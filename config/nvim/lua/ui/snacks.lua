@@ -11,7 +11,7 @@ return {
       input     = { enabled = true },
       scratch   = { enabled = true },
       quickfile = { enabled = true },
-      terminal  = { enabled = false, win = { style = "terminal", border = vim.g.border_style } },
+      terminal  = { enabled = false, win = { style = "terminal", border = "rounded" } },
       lazygit   = { enabled = true, configure = true, win = { style = "lazygit" } },
       notifier  = {
         enabled = true,
@@ -73,8 +73,10 @@ return {
     },
 
     keys = {
-      { "<leader>bd", function() Snacks.bufdelete() end,      desc = "Delete buffer" },
+      -- stylua: ignore start
+      { "<leader>bd", function() Snacks.bufdelete() end, desc = "Delete buffer" },
       { ";s<leader>", function() Snacks.scratch.select() end, desc = "Select scratch" },
+      -- stylua: ignore end
     },
     -- stylua: ignore end
 
@@ -82,12 +84,8 @@ return {
       vim.api.nvim_create_autocmd("User", {
         pattern = "VeryLazy",
         callback = function()
-          _G.dd = function(...)
-            Snacks.debug.inspect(...)
-          end
-          _G.bt = function()
-            Snacks.debug.backtrace()
-          end
+          _G.dd = function(...) Snacks.debug.inspect(...) end
+          _G.bt = function() Snacks.debug.backtrace() end
           vim.print = _G.dd
         end,
       })

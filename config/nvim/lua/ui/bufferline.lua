@@ -18,15 +18,13 @@ return {
         show_buffer_close_icons = false,
       },
     },
-    config = function(_,opts)
+    config = function(_, opts)
       local bufferline = require "bufferline"
       bufferline.setup(opts)
 
       vim.api.nvim_create_autocmd({ "BufAdd", "BufDelete" }, {
         callback = function()
-          vim.schedule(function()
-            pcall(nvim_bufferline)
-          end)
+          vim.schedule(function() pcall(nvim_bufferline) end)
         end,
       })
     end,

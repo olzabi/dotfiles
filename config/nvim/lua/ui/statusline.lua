@@ -15,25 +15,15 @@ return {
         "quickfix",
         "trouble",
       },
+      -- cdate / ctime / conform-lualine-status / lsp_client_name / navic were never installed components.
+      -- 0.12 exposes the same data natively: LSP & other progress, and LSP client names via "lsp_status".
       sections = {
         lualine_x = {
+          function() return vim.ui.progress_status() end,
+          "lsp_status",
           "encoding",
           "fileformat",
           "filetype",
-          "cdate",
-          "ctime",
-          "conform-lualine-status",
-          "lsp_client_name",
-        },
-      },
-      winbar = {
-        lualine_c = {
-          {
-            "navic",
-            color_correction = nil,
-            -- navic_opts = nil,
-            -- padding = { left = 1, right = 0 },
-          },
         },
       },
       inactive_sections = {

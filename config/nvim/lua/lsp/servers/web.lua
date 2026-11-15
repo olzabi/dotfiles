@@ -89,12 +89,7 @@ M.angularls = {
       mise_ls_dir(root),
       vim.fn.stdpath "data" .. "/mason/packages/angular-language-server/node_modules",
     }
-    local probe = table.concat(
-      vim.tbl_filter(function(p)
-        return p
-      end, paths),
-      ","
-    )
+    local probe = table.concat(vim.tbl_filter(function(p) return p end, paths), ",")
     return vim.lsp.rpc.start(
       { "ngserver", "--stdio", "--tsProbeLocations", probe, "--ngProbeLocations", probe },
       dispatchers,
@@ -102,78 +97,10 @@ M.angularls = {
     )
   end,
 }
--- M.angularls = (function()
---   local function get_probe_dir()
---     local node_modules = vim.fs.find("node_modules", { path = vim.uv.cwd(), upward = true })[1]
---     return node_modules and vim.fs.dirname(node_modules) .. "/node_modules" or ""
---   end
---
---   local function get_angular_version()
---     local node_modules = vim.fs.find("node_modules", { path = vim.uv.cwd(), upward = true })[1]
---     if not node_modules then
---       return ""
---     end
---     local pkg_path = vim.fs.dirname(node_modules) .. "/package.json"
---     if not vim.uv.fs_stat(pkg_path) then
---       return ""
---     end
---     local f = io.open(pkg_path)
---     if not f then
---       return ""
---     end
---     local ok, json = pcall(vim.json.decode, f:read "*a")
---     f:close()
---     if not ok or not json.dependencies then
---       return ""
---     end
---     local v = json.dependencies["@angular/core"]
---     return v and (v:match "%d+%.%d+%.%d+" or "") or ""
---   end
---
---   local ngserver_exe = vim.fn.exepath "ngserver"
---   local ngserver_dir = #(ngserver_exe or "") > 0 and vim.fs.dirname(vim.uv.fs_realpath(ngserver_exe)) or ""
---   local extension_path = vim.fs.normalize(ngserver_dir .. "/../../../")
---
---   return {
---     cmd = function()
---       local probe = get_probe_dir()
---       local ts_probe = table.concat({ extension_path, probe }, ",")
---       local ng_probe = table.concat({
---         extension_path .. "/@angular/language-server/node_modules",
---         probe .. "/@angular/language-server/node_modules",
---       }, ",")
---       return {
---         "ngserver",
---         "--stdio",
---         "--tsProbeLocations",
---         ts_probe,
---         "--ngProbeLocations",
---         ng_probe,
---         "--angularCoreVersion",
---         get_angular_version(),
---       }
---     end,
---     filetypes = { "typescript", "html", "htmlangular" },
---     root_markers = { "angular.json", "nx.json" },
---   }
--- end)()
-
-M.svelte = {
-  cmd = { "svelteserver", "--stdio" },
-  filetypes = { "svelte" },
-  root_markers = { "svelte.config.js", "svelte.config.ts" },
-  settings = {
-    svelte = {
-      plugin = {
-        html = { completions = { enable = true } },
-        svelte = { defaultScriptLanguage = "ts" },
-      },
-    },
-  },
-}
 
 M.html = {
   cmd = { "vscode-html-language-server", "--stdio" },
+  on_attach = function(client) vim.lsp.linked_editing_range.enable(true, { client_id = client.id }) end,
   filetypes = { "html", "htmlangular", "eruby", "handlebars", "svelte", "vue" },
   init_options = {
     provideFormatter = true,
@@ -185,12 +112,22 @@ M.html = {
 M.eslint = {
   cmd = { "vscode-eslint-language-server", "--stdio" },
   filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact", "vue", "svelte" },
-  root_markers = { "eslint.config.js", "eslint.config.mjs", "eslint.config.ts", ".eslintrc", ".eslintrc.js", ".eslintrc.json", "package.json" },
+  -- no "package.json": it made eslint attach to every JS project, oxlint ones included
+  root_markers = {
+    "eslint.config.js",
+    "eslint.config.mjs",
+    "eslint.config.cjs",
+    "eslint.config.ts",
+    ".eslintrc",
+    ".eslintrc.js",
+    ".eslintrc.cjs",
+    ".eslintrc.json",
+  },
   workspace_required = true,
   settings = {
     validate = "on",
     useESLintClass = false,
-    experimental = { useFlatConfig = false },
+    useFlatConfig = true,
     codeActionOnSave = { enable = false, mode = "all" },
     format = true,
     quiet = false,
@@ -213,15 +150,11 @@ M.eslint = {
   end,
   handlers = {
     ["eslint/openDoc"] = function(_, result)
-      if result then
-        vim.ui.open(result.url)
-      end
+      if result then vim.ui.open(result.url) end
       return {}
     end,
     ["eslint/confirmESLintExecution"] = function(_, result)
-      if result then
-        return 4
-      end
+      if result then return 4 end
     end,
     ["eslint/probeFailed"] = function()
       vim.notify("ESLint probe failed", vim.log.levels.WARN)
@@ -234,9 +167,17 @@ M.eslint = {
   },
 }
 
+-- oxlint ships its own LSP (`oxlint --lsp`): diagnostics + quick fixes, only where the project configures it
+M.oxlint = {
+  cmd = { "oxlint", "--lsp" },
+  filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact", "vue", "svelte", "astro" },
+  root_markers = { ".oxlintrc.json", ".oxlintrc.jsonc", "oxlint.config.ts" },
+  workspace_required = true,
+}
+
 M.emmet_language_server = {
   cmd = { "emmet-language-server", "--stdio" },
-  filetypes = { "html", "css", "scss", "less", "javascriptreact", "typescriptreact", "vue", "svelte", "htmlangular", "eruby", "php", "blade" },
+  filetypes = { "html", "css", "scss", "less", "javascriptreact", "typescriptreact", "vue", "svelte", "htmlangular", "eruby" },
 }
 
 M.css_variables = {
@@ -269,9 +210,7 @@ M.cssls = {
   },
   on_attach = function(client, bufnr)
     local name = vim.api.nvim_buf_get_name(bufnr)
-    if name:match("/waybar/") or name:match("/swaync/") then
-      vim.diagnostic.enable(false, { bufnr = bufnr })
-    end
+    if name:match("/waybar/") or name:match("/swaync/") then vim.diagnostic.enable(false, { bufnr = bufnr }) end
   end,
 }
 

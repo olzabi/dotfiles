@@ -56,7 +56,7 @@ local views = {
   cmdline_popup = {
     relative = "editor",
     position = { row = 26, col = "50%" },
-    border = { style = vim.g.borderStyle },
+    border = { style = "rounded" },
   },
 }
 
@@ -73,44 +73,6 @@ local lsp = {
 }
 
 return {
-
-  {
-    "j-hui/fidget.nvim",
-    event = "LspAttach",
-    opts = {
-      progress = {
-        suppress_on_insert = true,
-        ignore_done_already = false,
-        ignore_empty_message = true,
-        display = {
-          done_ttl = 2,
-          done_icon = "✔",
-          progress_icon = { "dots" },
-          skip_history = true,
-          group_style = "Title",
-          priority = 10,
-        },
-      },
-      notification = {
-        view = {
-          stack_upwards = false,
-          align = "message",
-          line_margin = 1,
-        },
-        override_vim_notify = false,
-        window = {
-          winblend = 5,
-          border = "none",
-          zindex = 45,
-          align = "bottom",
-          relative = "editor",
-        },
-      },
-      logger = {
-        level = vim.log.levels.ERROR,
-      },
-    },
-  },
 
   {
     "folke/noice.nvim",

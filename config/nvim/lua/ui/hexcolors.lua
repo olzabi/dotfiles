@@ -11,7 +11,7 @@ return {
     }
 
     local ns = vim.api.nvim_create_namespace("hexcolors")
-    local seen = {}     -- highlight groups already created
+    local seen = {} -- highlight groups already created
     local attached = {} -- buffers with an on_lines watcher
 
     local function group(hex)
@@ -27,21 +27,15 @@ return {
       return name
     end
 
-    local function eligible(buf)
-      return vim.api.nvim_buf_is_loaded(buf) and vim.bo[buf].buftype == ""
-    end
+    local function eligible(buf) return vim.api.nvim_buf_is_loaded(buf) and vim.bo[buf].buftype == "" end
 
     -- Re-highlight lines [first, last) (0-indexed, end-exclusive). Defaults to the whole buffer.
     local function colorize(buf, first, last)
-      if not eligible(buf) then
-        return
-      end
+      if not eligible(buf) then return end
       local count = vim.api.nvim_buf_line_count(buf)
       first = math.max(first or 0, 0)
       last = math.min(last or count, count)
-      if first >= last then
-        return
-      end
+      if first >= last then return end
 
       vim.api.nvim_buf_clear_namespace(buf, ns, first, last)
 
@@ -50,9 +44,7 @@ return {
         local init = 1
         while true do
           local s, e, digits = text:find("#(%x+)", init)
-          if not s then
-            break
-          end
+          if not s then break end
           init = e + 1
 
           local len = #digits
@@ -79,9 +71,7 @@ return {
     end
 
     local function attach(buf)
-      if attached[buf] or not eligible(buf) then
-        return
-      end
+      if attached[buf] or not eligible(buf) then return end
       attached[buf] = true
       colorize(buf)
 
@@ -92,21 +82,15 @@ return {
           end
           -- buffer text can't be safely touched mid-callback; defer
           vim.schedule(function()
-            if vim.api.nvim_buf_is_valid(b) then
-              colorize(b, first, new_last + 1)
-            end
+            if vim.api.nvim_buf_is_valid(b) then colorize(b, first, new_last + 1) end
           end)
         end,
         on_reload = function(_, b)
           vim.schedule(function()
-            if vim.api.nvim_buf_is_valid(b) then
-              colorize(b)
-            end
+            if vim.api.nvim_buf_is_valid(b) then colorize(b) end
           end)
         end,
-        on_detach = function(_, b)
-          attached[b] = nil
-        end,
+        on_detach = function(_, b) attached[b] = nil end,
       })
     end
 
@@ -114,9 +98,7 @@ return {
 
     vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile", "BufEnter" }, {
       group = aug,
-      callback = function(a)
-        attach(a.buf)
-      end,
+      callback = function(a) attach(a.buf) end,
     })
 
     vim.api.nvim_create_autocmd("ColorScheme", {

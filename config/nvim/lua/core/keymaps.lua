@@ -47,3 +47,12 @@ nmap("<leader>w", "<cmd>w<cr><esc>", "Save File")
 nmap("<leader>q", "<cmd>q<cr>", "Exit vim")
 nmap("<leader>rs", "<cmd>restart<cr>", "Reload Neovim (init.lua)")
 -- stylua: ignore end
+
+-- 0.12 built-ins. Defaults worth knowing (no mapping needed): visual `an`/`in` grow/shrink the selection
+-- by syntax node, `]n`/`[n` move to siblings; `ZR` restarts nvim keeping the session; `gx` follows LSP links.
+-- Ex: `:iput` (paste re-indented), `:uniq`, `:retab -indentonly`, `:wall ++p` (creates missing dirs).
+vim.cmd.packadd "nvim.difftool" -- :DiffTool {left} {right} compares files or whole directories
+vim.keymap.set("n", "<leader>U", function()
+  vim.cmd.packadd "nvim.undotree"
+  vim.cmd.Undotree()
+end, { desc = "Undo tree" })

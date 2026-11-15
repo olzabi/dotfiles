@@ -1,35 +1,60 @@
 -- nvim-treesitter `main` branch: no lazy-loading, no highlight/indent opts.
+-- Incremental selection is native in 0.12: `an` / `in` (and ]n [n) in visual mode.
 -- Parsers are installed with ts.install(), highlighting/indent are started
 -- from a FileType autocmd.
 
+-- The single parser list (init.lua's old `ensure_installed` did nothing on `main`).
 local parsers_to_install = {
+  -- nvim
   "lua",
+  "luadoc",
+  "luap",
   "vim",
   "vimdoc",
   "query",
+  -- docs / data
   "markdown",
   "markdown_inline",
-  "bash",
   "json",
+  "json5",
   "yaml",
   "toml",
-  "go",
-  "gomod",
-  "gosum",
-  "php",
-  "blade",
-  "templ",
-  "gotmpl",
+  "xml",
+  "kdl",
+  "regex",
+  "diff",
+  -- shell / infra
+  "bash",
+  "dockerfile",
+  "make",
+  "sql",
+  -- git
+  "gitcommit",
+  "git_rebase",
+  "git_config",
+  "gitattributes",
+  "gitignore",
+  -- web (Angular / NestJS)
   "javascript",
   "typescript",
   "tsx",
+  "jsdoc",
   "html",
   "css",
-  "sql",
-  "regex",
-  "diff",
-  "gitcommit",
-  "git_rebase",
+  "scss",
+  "angular",
+  "graphql",
+  "vue",
+  -- systems
+  "go",
+  "gomod",
+  "gosum",
+  "gowork",
+  "rust",
+  "c",
+  "cpp",
+  "cmake",
+  "python",
 }
 
 return {
@@ -40,26 +65,12 @@ return {
     build = ":TSUpdate",
     dependencies = { { "nvim-treesitter/nvim-treesitter-textobjects", branch = "main" } },
     config = function()
-      -- Custom parsers must be registered on the TSUpdate event.
-      -- blade / templ / gotmpl are probably built in on `main` already:
-      -- if `:TSInstall blade templ gotmpl` works without this block, delete it.
-      -- NOTE: do NOT list "yaml" as a gotmpl language (it hijacked YAML before).
-      vim.api.nvim_create_autocmd("User", {
-        pattern = "TSUpdate",
-        callback = function()
-          local parsers = require "nvim-treesitter.parsers"
-          parsers.blade = { install_info = { url = "https://github.com/EmranMR/tree-sitter-blade", branch = "main" } }
-          parsers.templ = { install_info = { url = "https://github.com/vrischmann/tree-sitter-templ", branch = "master" } }
-          parsers.gotmpl = { install_info = { url = "https://github.com/ngalaiko/tree-sitter-go-template" } }
-        end,
-      })
-
       local ts = require "nvim-treesitter"
       ts.setup {}
       ts.install(parsers_to_install) -- async, skips what's already installed
 
       vim.filetype.add {
-        extension = { mdx = "mdx", tmpl = "gotmpl", tpl = "gotmpl" },
+        extension = { mdx = "mdx" },
       }
       vim.treesitter.language.register("markdown", "mdx")
 
@@ -69,9 +80,7 @@ return {
         callback = function(args)
           local buf = args.buf
           local lang = vim.treesitter.language.get_lang(args.match)
-          if not lang then
-            return
-          end
+          if not lang then return end
 
           local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(buf))
           if ok and stats and stats.size > 100 * 1024 then
@@ -80,9 +89,7 @@ return {
           end
 
           -- fails silently if the parser isn't installed yet (first run, async install)
-          if pcall(vim.treesitter.start, buf, lang) then
-            vim.bo[buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
-          end
+          if pcall(vim.treesitter.start, buf, lang) then vim.bo[buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()" end
         end,
       })
 
@@ -109,9 +116,7 @@ return {
         ["at"] = "@comment.outer",
       }
       for key, query in pairs(select_maps) do
-        vim.keymap.set({ "x", "o" }, key, function()
-          to_select.select_textobject(query, "textobjects")
-        end, { desc = "TS select " .. query })
+        vim.keymap.set({ "x", "o" }, key, function() to_select.select_textobject(query, "textobjects") end, { desc = "TS select " .. query })
       end
 
       -- ]c / [c are Neovim's diff-hunk motions, so classes use ]k / [k instead
@@ -126,9 +131,7 @@ return {
         { key = "[K", method = "goto_previous_end", query = "@class.outer" },
       }
       for _, m in ipairs(move_maps) do
-        vim.keymap.set({ "n", "x", "o" }, m.key, function()
-          to_move[m.method](m.query, "textobjects")
-        end, { desc = "TS " .. m.method .. " " .. m.query })
+        vim.keymap.set({ "n", "x", "o" }, m.key, function() to_move[m.method](m.query, "textobjects") end, { desc = "TS " .. m.method .. " " .. m.query })
       end
 
       -- stylua: ignore start

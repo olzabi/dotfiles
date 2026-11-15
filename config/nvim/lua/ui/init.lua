@@ -46,7 +46,6 @@ return {
     opts = {
       enabled = true,
       cloak_character = "*",
-      cloak_telescope = true,
       highlight_group = "Comment",
       patterns = {
         {

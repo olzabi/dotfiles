@@ -1,4 +1,7 @@
-local prettier = { "eslint_d", "prettier" }
+-- oxfmt when the project has an oxfmt config (conform's oxfmt builtin knows the file names),
+-- prettier otherwise. eslint_d is gone: lint comes from the oxlint / eslint LSPs.
+local web = { "oxfmt", "prettier", stop_after_first = true }
+local oxfmt_configs = { ".oxfmtrc.json", ".oxfmtrc.jsonc", "oxfmt.config.ts" }
 
 return {
 
@@ -7,46 +10,15 @@ return {
     event = { "BufWritePost", "BufReadPost", "InsertLeave" },
     config = function()
       local lint = require "lint"
-      local php_linters = {}
-
-      -- Use either composer or phive tools.
-      if vim.fn.filereadable "./tools/psalm" == 1 then
-        lint.linters.psalm.cmd = "./tools/psalm"
-        table.insert(php_linters, "psalm")
-      elseif vim.fn.filereadable "./vendor/bin/psalm" == 1 then
-        lint.linters.psalm.cmd = "./vendor/bin/psalm"
-        table.insert(php_linters, "psalm")
-      end
-
       lint.linters_by_ft = {
         go = { "golangcilint" },
         rust = { "clippy" },
 
-        terraform = { "terraform_validate", "tflint", "tfsec" },
-        cmake = { "cmakelint", "cmakelang" },
         yaml = { "yamllint" },
-        php = php_linters,
-        python = { "ruff", "pylint" },
+        python = { "ruff" },
         sh = { "shellcheck" },
         bash = { "shellcheck" },
         zsh = {},
-      }
-
-      lint.linters.eslint_d.args = {
-        "--no-warn-ignored",
-        "--format",
-        "json",
-        "--stdin",
-        "--stdin-filename",
-        function()
-          return vim.api.nvim_buf_get_name(0)
-        end,
-      }
-
-      lint.linters.phpcs.args = {
-        "-q",
-        "--report=json",
-        "-",
       }
 
       lint.linters.shellcheck.args = {
@@ -84,13 +56,9 @@ return {
           end,
         },
         parser = function(output, bufnr)
-          if output == "" then
-            return {}
-          end
+          if output == "" then return {} end
           local ok, decoded = pcall(vim.json.decode, output)
-          if not ok or not decoded or not decoded.Issues then
-            return {}
-          end
+          if not ok or not decoded or not decoded.Issues then return {} end
           local diagnostics = {}
           local bufname = vim.api.nvim_buf_get_name(bufnr)
           for _, issue in ipairs(decoded.Issues) do
@@ -127,9 +95,7 @@ return {
           "clippy::missing_docs_in_private_items",
         },
         parser = function(output, bufnr)
-          if output == "" then
-            return {}
-          end
+          if output == "" then return {} end
           local diagnostics = {}
           local bufname = vim.api.nvim_buf_get_name(bufnr)
           for line in output:gmatch "[^\n]+" do
@@ -165,6 +131,12 @@ return {
         end,
       }
 
+      vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost", "InsertLeave" }, {
+        group = vim.api.nvim_create_augroup("nvim-lint", { clear = true }),
+        callback = function() lint.try_lint(nil, { ignore_errors = true }) end,
+      })
+      lint.try_lint(nil, { ignore_errors = true }) -- the buffer whose event loaded the plugin
+
       -- stylua: ignore start
       vim.keymap.set("n", "<leader>cl", function() lint.try_lint() end, { desc = "Trigger linting" })
       -- stylua: ignore end
@@ -173,28 +145,14 @@ return {
 
   {
     "stevearc/conform.nvim",
-    dependencies = { "MunifTanjim/prettier.nvim", "mcauley-penney/tidy.nvim", "bennypowers/svgo.nvim" },
     event = { "BufWritePre", "BufReadPre", "BufNewFile" },
     cmd = { "ConformInfo" },
     opts = {
       format_on_save = false,
       formatters = {
         shfmt = { prepend_args = { "-i", "2" } },
-        prettier = {
-          command = "prettier",
-          args = {
-            "--stdin-filepath",
-            "$FILENAME",
-            "--tab-width",
-            "2",
-            "--use-tabs",
-            "false",
-          },
-        },
-        taplo = {
-          command = "taplo",
-          args = { "format", "-" },
-          stdin = true,
+        oxfmt = {
+          condition = function(_, ctx) return vim.fs.root(ctx.dirname, oxfmt_configs) ~= nil end,
         },
         golines = {
           command = "golines",
@@ -212,26 +170,27 @@ return {
         rust = { "rustfmt" },
         c = { "clang-format" },
         cpp = { "clang-format" },
-        javascript = prettier,
-        javascriptreact = prettier,
-        typescript = prettier,
-        typescriptreact = prettier,
-        vue = prettier,
-        css = prettier,
-        html = prettier,
-        json = { "jq" },
-        yaml = { "yamlfmt" },
-        xml = { "xmlformatter" },
+        javascript = web,
+        javascriptreact = web,
+        typescript = web,
+        typescriptreact = web,
+        vue = web,
+        css = web,
+        scss = web,
+        html = web,
+        htmlangular = web,
+        json = { "oxfmt", "jq", stop_after_first = true },
+        jsonc = { "oxfmt", "prettier", stop_after_first = true },
+        yaml = { "oxfmt", "yamlfmt", stop_after_first = true },
         toml = { "taplo" },
         lua = { "stylua" },
         kdl = { "kdlfmt" },
-        python = { "isort", "ruff_format" },
-        php = { "pint" },
-        sql = { "sqlfluff" },
+        python = { "ruff_format" },
+        sql = { "sql_formatter" },
         sh = { "shfmt" },
         bash = { "shfmt" },
-        markdown = { "prettier", "markdownlint-cli2", "markdown-toc" },
-        ["markdown.mdx"] = { "prettier", "markdownlint-cli2", "markdown-toc" },
+        markdown = { "oxfmt", "markdownlint-cli2", "markdown-toc" },
+        ["markdown.mdx"] = { "markdownlint-cli2", "markdown-toc" },
       },
     },
     config = function(_, opts)
@@ -240,14 +199,12 @@ return {
 
       vim.api.nvim_create_autocmd("BufWritePre", {
         pattern = "*.go",
-        callback = function()
-          conform.format { bufnr = vim.api.nvim_get_current_buf(), timeout_ms = 3000 }
-        end,
+        callback = function() conform.format { bufnr = vim.api.nvim_get_current_buf(), timeout_ms = 3000 } end,
       })
     end,
     keys = {
       -- stylua: ignore start
-      { "<leader>cp", function() require("conform").format { notify_on_error = true, async = true, lsp_fallback = true } end, mode = { "n", "v" }, desc = "Format", },
+      { "<leader>cp", function() require("conform").format { notify_on_error = true, async = true, lsp_format = "fallback" } end, mode = { "n", "v" }, desc = "Format" },
       -- stylua: ignore end
     },
   },

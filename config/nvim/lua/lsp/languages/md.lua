@@ -84,9 +84,7 @@ return {
 
       vim.api.nvim_create_autocmd("User", {
         pattern = "MarkviewSplitviewClose",
-        callback = function(ev)
-          bind(vim.fn.win_findbuf(ev.data.source), false)
-        end,
+        callback = function(ev) bind(vim.fn.win_findbuf(ev.data.source), false) end,
       })
     end,
   },
