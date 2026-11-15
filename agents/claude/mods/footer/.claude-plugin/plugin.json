@@ -1,1 +1,1 @@
-{ "name": "footer", "version": "0.2.0", "description": "Footer under the prompt: vim mode badge, the engine's hint line, jumpers between typed prompts, model, effort and context fill.", "types": "./types/index.d.ts" }
+{ "name": "footer", "version": "0.2.0", "description": "One quiet line under the prompt (modes, a trace navigator, agents, hint, branch and worktrees, model with the last turn's time, context with cache share) and its panes: Session (tabs), Trace, Worktrees.", "types": "./types/index.d.ts" }
