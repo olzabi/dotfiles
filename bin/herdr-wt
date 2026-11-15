@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Get a worktree from worktrunk and show it as a herdr-app space: the one path lazygit (N/T), gh-dash (T/A)
+# and yazi (g w) use, so every worktree gets wt's path template and hooks (repo setup) like Claude's do.
+#   herdr-wt [-C repo] [--agent [task]] <wt switch args>   e.g.  herdr-wt -c fix/login   herdr-wt pr:42
+# Focuses the space already showing that folder, else makes one (with claude, and a first message, if --agent).
+# Outside a herdr-app window it just prints the path.
+set -euo pipefail
+argv=() task="" agent=0
+[ "${1:-}" = -C ] && { cd "$2"; shift 2; }
+if [ "${1:-}" = --agent ]; then
+  agent=1; shift
+  case ${1:-} in -*|pr:*|"") ;; *) [ $# -gt 1 ] && { task=$1; shift; } ;; esac
+fi
+[ $# -gt 0 ] || { echo "usage: herdr-wt [-C repo] [--agent [task]] <wt switch args>" >&2; exit 2; }
+
+err=$(mktemp); trap 'rm -f "$err"' EXIT
+# callers like gh-dash and lazygit hide a failed command's output: say why as a desktop notification
+if ! path=$(wt switch "$@" --no-cd --yes --format json 2>"$err" | jq -er .path); then
+  cat "$err" >&2
+  notify-send -a herdr-wt "wt switch $* failed" "$(sed -E 's/\x1b\[[0-9;]*m//g' "$err" | grep -E '✗|fatal|error' | tail -3)" 2>/dev/null
+  exit 1
+fi
+echo "$path"
+herdr-app ls >/dev/null 2>&1 || exit 0
+
+space=$(herdr-app ls | jq -r --arg p "$path" 'first(.spaces[] | select(.folder == $p) | .id) // empty')
+if [ -n "$space" ]; then
+  herdr-app do space.select --id "$space" >/dev/null
+else
+  [ $agent = 1 ] && argv=(--argv '["claude"]')
+  [ -n "$task" ] && argv+=(--task "$task")
+  # unnamed on purpose: herdr names it after the folder and nests it under the repo's space
+  herdr-app do space.new --folder "$path" "${argv[@]}" >/dev/null
+fi

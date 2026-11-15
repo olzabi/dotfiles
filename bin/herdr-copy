@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Copy mode for herdr-app: open the focused terminal's screen + scrollback in nvim.
+# Run from a key as a split; the source is the focused pane that isn't this one.
+set -euo pipefail
+st=$(herdr-app status)
+tab=$(jq -r .tab <<<"$st")
+panes=$(jq -r .focused_pane <<<"$st"; jq -r --arg t "$tab" '.tabs[$t].before[]?' ~/.config/herdr-app/view.json)
+ls=$(herdr-app ls)
+src=""
+for p in $panes; do
+  t=$(jq -r --arg p "$p" '[.. | objects | select(.pane? == $p) | .terminal][0] // empty' <<<"$ls")
+  [[ -n $t && $t != "${HC_TERMINAL_ID:-}" ]] && { src=$t; break; }
+done
+[[ -n $src ]] || { echo "herdr-copy: no source terminal found" >&2; sleep 2; exit 1; }
+f=$(mktemp --suffix=.herdr-copy)
+trap 'rm -f "$f"' EXIT
+hc read "$src" >"$f"
+# shortcut: plain text only (colours dropped); upgrade to `nvim +term` with ANSI if needed
+nvim -R -c 'set clipboard=unnamedplus nomodified' -c 'normal! G' "$f"

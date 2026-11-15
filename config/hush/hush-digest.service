@@ -1,0 +1,9 @@
+[Unit]
+Description=hush weekly digest into the local wiki (~/wiki/raw/hush)
+
+[Service]
+Type=oneshot
+Environment=CLAUDE_CONFIG_DIR=%h/Dotfiles/agents/claude
+# systemd's PATH has no node: mise's shims carry it.
+Environment=PATH=%h/.local/share/mise/shims:/usr/local/bin:/usr/bin
+ExecStart=%h/Dotfiles/bin/hush digest --days 7

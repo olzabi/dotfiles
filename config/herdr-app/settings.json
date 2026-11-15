@@ -1,0 +1,13 @@
+{
+  "zoom": 1.0,
+  "sounds": {
+    "enabled": true
+  },
+  "font": "Iosevka Nerd Font",
+  "font_size": 16.555555,
+  "font_ligatures": true,
+  "telemetry": false,
+  "minimum_contrast": 1.0,
+  "appearance": "dark",
+  "theme": "darkvoid"
+}

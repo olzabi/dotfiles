@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# herdr-side module: agent sessions from the hush ledger (~/.local/state/hush) active in the last
+# $HERDR_SIDE_HUSH_HOURS hours (default 3): place · last call · calls in the last hour · subagents · open failures.
+#   ✗ a call still failing (no later success of the same row)   ○ quiet
+# Click: the session's span tree (hush tree) in an overlay; o: its replay with subagents.
+# ttl=20
+set -u
+. "$(dirname "$(readlink -f "$0")")/lib.sh"
+command -v hush >/dev/null || exit 0
+
+case ${1:-} in
+  rows)
+    # hush prints "○ id place · 3s ago · N calls/h · N subagents[ · N open ✗ TOOL]"; regroup it per place as
+    #   ✗ 3a9144e9  44m  ⑂3  ✗4 sed      (⑂ subagents, ✗N open failures + tool; zero counts hidden)
+    hush board --rows --no-color --hours "${HERDR_SIDE_HUSH_HOURS:-3}" 2>/dev/null |
+      awk -F'\t' -v R="$R" -v DIM="$MUTED" -v RED="$ERR" '
+        { n = split($3, f, / · /); split(f[1], h, " "); place = h[3]
+          ago = f[2]; sub(/ ago$/, "", ago); sub(/^[0-9]+s$/, "now", ago)
+          ns = f[4] + 0; fail = ""
+          if (n >= 5) { split(f[5], o, " "); fail = "  " RED "✗" o[1] " " tolower(o[4]) R }
+          icon = fail != "" ? RED "✗" : DIM "○"
+          if (place != last) { printf "repo\t%s\t%s%s%s\n", place, DIM, place, R; last = place }
+          printf "%s\t%s\t  %s%s %s  %s%s%s%s%s\n", $1, $2, icon, R, h[2], DIM, ago, R,
+            (ns ? "  " DIM "⑂" ns R : ""), fail }' ;;
+  act) # act KIND ID [ACTION]
+    case ${2:-}:${4:-click} in
+      # The id is passed as an argument, never spliced into the shell text.
+      session:click) kitty @ launch --type=overlay --next-to 'not var:herdr_side' sh -c 'hush tree "$1" --full | less -R' sh "$3" >/dev/null 2>&1 ;;
+      session:open) kitty @ launch --type=overlay --next-to 'not var:herdr_side' sh -c 'hush replay "$1" --agents | less -R' sh "$3" >/dev/null 2>&1 ;;
+    esac ;;
+esac

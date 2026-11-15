@@ -1,5 +1,5 @@
 # herdr-side colours. Sourced by bin/herdr-side and side/lib.sh; edit here to restyle every section.
-# Palette = herdr's [theme.custom] in editor/herdr/config.toml.
+# Palette = herdr's [theme.custom] in config/herdr/config.toml.
 hex() { printf '\033[38;2;%d;%d;%dm' "0x${1:1:2}" "0x${1:3:2}" "0x${1:5:2}"; } # hex "#83b7ad" -> fg escape
 
 R=$'\033[0m' B=$'\033[1m' IT=$'\033[3m'

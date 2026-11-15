@@ -1,0 +1,9 @@
+#!/bin/sh
+# herdr-ready "summary"   tell herdr-app this agent's task is done and ready for review (attention: "ready" row)
+# herdr-ready --status "what I'm doing"   a short live status line (≤40 chars) shown on this agent's attention rows
+# Labels on this herdr-core terminal; the attention mod clears "ready" once you open it or the agent works again.
+set -eu
+[ -n "${HC_TERMINAL_ID:-}" ] || { echo "herdr-ready: not in a herdr-core terminal" >&2; exit 0; }
+if [ "${1:-}" = --status ]; then shift; set -- "herdr.status=$(printf %.40s "$*")"; else set -- "herdr.ready=$(printf %.160s "${*:-ready}")"; fi
+# A background session keeps the terminal id of whatever started the Claude daemon; that terminal may be long gone.
+hc label "$HC_TERMINAL_ID" "$1" >/dev/null 2>&1 || echo "herdr-ready: terminal $HC_TERMINAL_ID is gone, nothing labelled" >&2

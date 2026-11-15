@@ -1,0 +1,26 @@
+# herdr-app home: the app writes most of it (docs, types, shipped mods, state, sockets); track only what's mine
+*
+!.gitignore
+!keys.json
+!settings.json
+!themes/
+themes/*
+!themes/darkvoid.json
+!layouts/
+layouts/*
+!layouts/mine.json
+!layouts/my-terminals.json
+!layouts/review.json
+!mods/
+mods/*
+!mods/attention/
+!mods/my-agents/
+!mods/palette/
+!mods/popup/
+!mods/my-changes/
+!mods/custom-spaces/
+!mods/my-menu/
+!mods/tasks/
+!mods/*/*.js
+!mods/*/*.svg
+!mods/*/mod.json

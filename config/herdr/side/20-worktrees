@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # herdr-side module: git worktrees of every repo an agent works in; branch, dirty file count, ●/○ = open/not open
 # as a herdr workspace. Click: focus its workspace, or open the worktree as a new herdr workspace;
-# o: read it in Obsidian (bin/obs); d: its changes in lazygit.
+# o: read it in Obsidian (bin/ob); d: its changes in lazygit.
 # ttl=10
 set -u
 

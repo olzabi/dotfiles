@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# Usage: herdr-paths [--to <terminal>] [--pick [dir]] [path...]
+# Types the paths into a herdr terminal as Claude @-mentions, without pressing Enter, so they land in the draft.
+#   --to     target terminal (t7); default: the agent you last focused in herdr-app
+#   --pick   choose the paths in yazi first, starting in dir (default: the target's folder)
+# Paths under the target's folder are written relative to it, others absolute.
+# Used by yazi (`c s`) and herdr-app's file picker popup (`ctrl-space f`).
+set -euo pipefail
+
+to="" pick=0 start=""
+while [ $# -gt 0 ]; do
+  case $1 in
+    --to) to=$2; shift 2 ;;
+    --pick) pick=1; shift; if [ $# -gt 0 ] && [ -d "$1" ]; then start=$1; shift; fi ;;
+    --) shift; break ;;
+    *) break ;;
+  esac
+done
+
+fail() { notify-send -a herdr-paths "herdr-paths" "$1" 2>/dev/null || echo "herdr-paths: $1" >&2; exit 1; }
+[ -n "$to" ] || to=$(herdr-app status 2>/dev/null | jq -r '.agent // empty')
+[ -n "$to" ] || fail "no agent to send to: focus one in herdr-app first"
+cwd=$(hc get "$to" --json 2>/dev/null | jq -r '.cwd // empty') || true
+
+paths=("$@")
+if [ "$pick" = 1 ]; then
+  chosen=$(mktemp)
+  trap 'rm -f "$chosen"' EXIT
+  yazi --chooser-file="$chosen" "${start:-${cwd:-$PWD}}"
+  mapfile -t paths <"$chosen"
+fi
+[ ${#paths[@]} -gt 0 ] || exit 0
+
+text=""
+for p in "${paths[@]}"; do
+  p=$(realpath -m -- "$p")
+  [ -n "$cwd" ] && case $p in "$cwd"/*) p=${p#"$cwd"/} ;; esac
+  case $p in *[[:space:]]*) p="\"$p\"" ;; esac # Claude reads a quoted @"path with spaces"
+  text+="@$p "
+done
+
+# Paste rather than `hc send`, which presses Enter. The clipboard is the paste source, so it ends up holding the paths.
+printf %s "$text" | wl-copy
+# shortcut: from the popup, wait out its close (it polls every 500 ms) so the paste reaches the target; an app event would be exact.
+# setsid: the popup's terminal (and its process group) goes away right after we exit.
+setsid -f bash -c '[ "$1" = 1 ] && sleep 0.8; herdr-app do pane.focus --terminal "$2" && herdr-app do terminal.paste' _ "$pick" "$to" </dev/null >/dev/null 2>&1

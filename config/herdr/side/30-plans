@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# herdr-side module: active plans (docs/plans/active/) of each agent repo, read from every worktree, with the bold
-# part of their "Status:" line, open checkboxes (☐N) and open blockers (⛔N) listed under the plan.
+# herdr-side module: active plans (docs/plans/active/) of each agent repo, read from every worktree, with their front
+# matter `next:` (else the bold
+# part of their "Status:" line), open checkboxes (☐N) and open blockers (⛔N) listed under the plan.
 #   plan mark: state of the agents working on it (▲ blocked ● working ◆ done ○ idle, ·N = agents; grey · = none);
 #              an agent works on a plan when its branch contains the plan's slug (feat/catalog-engine-forms ->
 #              catalog-engine; a plural slug also matches singular), or the plan is the one most mentioned in the
@@ -12,9 +13,10 @@
 #     • other   (items may be numbered or bulleted)
 # A plan in several worktrees is read from the one an agent works on it in, else the main checkout, else the newest
 # copy (a plan that so far exists only on a branch); a plan already
-# moved out of active/ in the main checkout is skipped unless an agent works on it.
+# moved out of active/ in the main checkout or its fetched upstream (origin fetched every 5 min) is skipped unless an
+# agent works on it.
 # Decision and manual blockers are also written to $XDG_RUNTIME_DIR/herdr-side/blockers.tsv for the attention section.
-# Click / o: read the plan in Obsidian (bin/obs), revealed in the file explorer.
+# Click / o: read the plan in Obsidian (bin/ob), revealed in the file explorer.
 # ttl=30
 set -u
 . "$(dirname "$(readlink -f "$0")")/lib.sh"
@@ -91,6 +93,15 @@ case ${1:-} in
       copies=$(plan_copies "$root")
       [ -n "$copies" ] || continue
       repo_row "$root"
+      # fetch at most every 5 min, so a plan closed upstream (merged PR) drops off before you pull
+      fh=$(git -C "$root" rev-parse --path-format=absolute --git-path FETCH_HEAD)
+      [ $(($(date +%s) - $(stat -c %Y "$fh" 2>/dev/null || echo 0))) -lt 300 ] ||
+        GIT_TERMINAL_PROMPT=0 timeout 20 git -C "$root" fetch -q origin 2>/dev/null
+      up=$(git -C "$root" rev-parse --abbrev-ref '@{upstream}' 2>/dev/null)
+      # names of closed plans: done/superseded in the main checkout or on its upstream branch
+      closed=$(cd "$root" && { ls -d docs/plans/done/*/* docs/plans/superseded/* 2>/dev/null
+        [ -z "$up" ] || git ls-tree -r --name-only "$up" -- docs/plans/done docs/plans/superseded; } |
+        sed -E 's#^docs/plans/(done/[^/]+|superseded)/([^/]+).*#\2#' | sort -u)
       cut -f1 <<<"$copies" | sort -u | while read -r plan; do
         slug=${plan%.md}; slug=${slug#[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-}
         # agents on it: transcript names it, or their branch contains the slug (or its singular)
@@ -98,8 +109,8 @@ case ${1:-} in
           $1 == r && ($2 == p || index($5, s) || (s ~ /s$/ && index($5, substr(s, 1, length(s) - 1)))) { print $1, $2, $3, $4 }' <<<"$links")
         prs=$(awk -F'\t' -v r="$root" -v s="$slug" '$1 == r && (index($3, s) || (s ~ /s$/ && index($3, substr(s, 1, length(s) - 1)))) {
           printf " #%s%s", $2, ($4 == "pass" ? "✓" : $4 == "fail" ? "✗" : $4 == "run" ? "●" : "") }' "$run/prs.tsv")
-        # closed in the main checkout and nobody on it: a stale copy on an old branch
-        [ -z "$mine" ] && ls -d "$root"/docs/plans/done/*/"$plan"* "$root"/docs/plans/superseded/"$plan"* >/dev/null 2>&1 && continue
+        # closed (locally or upstream) and nobody on it: a stale copy on an old branch
+        [ -z "$mine" ] && grep -qxF "$plan" <<<"$closed" && continue
         # copy to read: where an agent works on it, else the main checkout, else the newest
         pick=$(awk -F'\t' -v p="$plan" '$1 == p' <<<"$copies" | while IFS=$'\t' read -r _ wt rel mt; do
           pref=0; [ "$wt" = "$root" ] && pref=1; cut -f4 <<<"$mine" | grep -qxF "$wt" && pref=2
@@ -107,7 +118,9 @@ case ${1:-} in
         done | sort -t$'\t' -k1,1nr -k2,2nr | head -1)
         IFS=$'\t' read -r _ _ wt rel <<<"$pick"
         f=$wt/$rel
-        status=$(grep -m1 -E '^\**Status:?\**' "$f" | grep -oE '\*\*[^*]+\*\*' | head -1 | tr -d '*' | sed 's/\. .*//; s/\.$//')
+        # front matter `next:` when the plan has it, else the bold part of its Status line
+        status=$(awk 'NR == 1 && $0 != "---" { exit } NR > 1 && $0 == "---" { exit } sub(/^next: */, "") { print "next: " $0; exit }' "$f")
+        [ -n "$status" ] || status=$(grep -m1 -E '^\**Status:?\**' "$f" | grep -oE '\*\*[^*]+\*\*' | head -1 | tr -d '*' | sed 's/\. .*//; s/\.$//')
         open=$(grep -cE '^\s*- \[ \]' "$f")
         bl=$(blockers "$f")
         nb=$(grep -c . <<<"$bl")

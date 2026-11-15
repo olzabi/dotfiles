@@ -11,13 +11,17 @@
 #        herdr-side nav left|right    herdr prefix+h/l: focus the herdr pane that way; past herdr's left edge, the
 #                                     sidebar (opened if needed). In the sidebar l / → / Esc go back.
 #        herdr-side focus side|herdr  move keyboard focus between the sidebar and herdr
+#        herdr-side restore           reopen the sidebar if it was open when herdr's kitty closed (niri Mod+Shift+Q)
 #        herdr-side render | act MODULE KIND ID [ACTION] | follow | ui   (internal, used by the fzf UI)
+# Shown sections and whether the sidebar is open persist in $XDG_STATE_HOME/herdr-side (survive kitty and reboots).
 set -u
 dir=${HERDR_SIDE_DIR:-$HOME/.config/herdr/side}
 run=${XDG_RUNTIME_DIR:-/tmp}/herdr-side
-active=$run/active
-mkdir -p "$run/cache"
-touch "$active"
+state=${XDG_STATE_HOME:-$HOME/.local/state}/herdr-side
+active=$state/active
+open=$state/open # present while the sidebar is meant to be shown; closing kitty keeps it, q / Mod+A remove it
+mkdir -p "$run/cache" "$state"
+[ -f "$active" ] || cp "$run/active" "$active" 2>/dev/null || touch "$active" # one-time move off the tmpfs
 self=$(readlink -f "$0")
 . "$dir/theme.sh"
 
@@ -90,20 +94,30 @@ case ${1:-ui} in
     while read -r n; do [ -n "$(path_of "$n")" ] || sed -i "/^$n\$/d" "$active"; done < <(cat "$active") # deleted modules
     to=$(kitty_to) || exit 1
     if [ -z "$name" ]; then # whole sidebar
-      kitty @ --to "$to" close-window --match var:herdr_side >/dev/null 2>&1 && exit 0
+      kitty @ --to "$to" close-window --match var:herdr_side >/dev/null 2>&1 && { rm -f "$open"; exit 0; }
       [ -s "$active" ] || echo agents > "$active"
       name=$(head -1 "$active") # already shown: the open path below keeps it
     elif kitty @ --to "$to" ls --match var:herdr_side >/dev/null 2>&1; then
       grep -qxF "$name" "$active" && sed -i "/^$name\$/d" "$active" || echo "$name" >> "$active"
-      [ -s "$active" ] || kitty @ --to "$to" close-window --match var:herdr_side >/dev/null
+      [ -s "$active" ] || { rm -f "$open"; kitty @ --to "$to" close-window --match var:herdr_side >/dev/null; }
       exit 0
     fi
     # split closed (Mod+A or quit with q): open it with this section shown
     grep -qxF "$name" "$active" || echo "$name" >> "$active"
+    touch "$open"
     kitty @ --to "$to" goto-layout splits
     # splits + before: new window on the left of herdr; bias = its share of the width (%)
     exec kitty @ --to "$to" launch --type=window --location=before --keep-focus --bias=18 \
       --var herdr_side=1 --title herdr-side "$self" ui >/dev/null ;;
+  restore) # at kitty start: wait (up to 15 s) for herdr's kitty to answer, then open the sidebar as it was
+    [ -f "$open" ] && [ -s "$active" ] || exit 0
+    for _ in $(seq 30); do
+      to=$(kitty_to) && kitty @ --to "$to" ls >/dev/null 2>&1 && break
+      sleep 0.5
+    done
+    [ -n "${to:-}" ] || exit 0
+    kitty @ --to "$to" ls --match var:herdr_side >/dev/null 2>&1 && exit 0
+    exec "$self" toggle ;;
   nav)
     dirn=${2:-left}
     p=$(herdr api snapshot 2>/dev/null | jq -r '.result.snapshot.focused_pane_id // empty')
@@ -127,7 +141,8 @@ case ${1:-ui} in
   ui)
     command -v herdr >/dev/null || { echo "herdr not found"; exit 1; }
     rm -f "$run/followed" # first follow always jumps to the focused agent
-    FZF_DEFAULT_OPTS= FZF_DEFAULT_OPTS_FILE= exec fzf --ansi --no-input --no-info --no-sort --no-scrollbar --layout=reverse \
+    # not exec: q / ctrl-c (fzf exits 130) closes the sidebar for good; kitty closing kills us first, so it stays open
+    FZF_DEFAULT_OPTS= FZF_DEFAULT_OPTS_FILE= fzf --ansi --no-input --no-info --no-sort --no-scrollbar --layout=reverse \
       --delimiter='\t' --with-nth=4 \
       --pointer=' ' --marker=' ' --no-separator --border=none \
       --color='bg+:#303030,gutter:-1,hl:-1,hl+:-1' --gutter=' ' \
@@ -136,6 +151,8 @@ case ${1:-ui} in
       --bind "o:execute-silent($self act {1} {2} {3} open)" --bind "d:execute-silent($self act {1} {2} {3} changes)" \
       --footer="${MUTED}${IT}l back · o obsidian · d diff${R}" --no-footer-border \
       --bind 'j:down,k:up,g:first,G:last,ctrl-c:abort,q:abort' \
-      --bind "l,right,esc:execute-silent($self focus herdr)" ;;
+      --bind "l,right,esc:execute-silent($self focus herdr)"
+    [ $? -eq 130 ] && rm -f "$open"
+    exit 0 ;;
   *) sed -n '2,10p' "$self" | sed 's/^# \{0,1\}//'; exit 1 ;;
 esac

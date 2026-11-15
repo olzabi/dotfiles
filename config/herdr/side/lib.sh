@@ -16,8 +16,8 @@ repos() {
     done
 }
 
-# Shared row actions: o = read in Obsidian (bin/obs), d = lazygit over the herdr window (q returns).
-side_open() { setsid -f obs "$@" >/dev/null 2>&1; }
+# Shared row actions: o = read in Obsidian (bin/ob), d = lazygit over the herdr window (q returns).
+side_open() { setsid -f ob "$@" >/dev/null 2>&1; }
 side_changes() {
   [ -d "$1" ] || return 0
   kitty @ launch --type=overlay --next-to 'not var:herdr_side' --cwd "$1" lazygit >/dev/null 2>&1
