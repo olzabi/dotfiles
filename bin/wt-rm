@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# wt remove, after dropping a stale Claude lock: Claude locks the worktrees it makes ("claude session <name>
+# (pid N ...)") and normally unlocks on exit; a crashed or killed session leaves the lock, which wt refuses.
+# A lock whose pid is still alive stays, so a running agent's worktree is never removed.
+# Usage: wt-rm <branch> [wt remove flags]   (lazygit X, herdr-app my-worktree)
+set -euo pipefail
+branch=${1:?usage: wt-rm <branch> [wt remove flags]}
+path=$(git worktree list --porcelain | awk -v b="refs/heads/$branch" '/^worktree /{p=substr($0,10)} $0=="branch " b {print p; exit}')
+if [ -n "$path" ]; then
+  lock=$(git worktree list --porcelain | awk -v p="$path" '/^worktree /{w=substr($0,10)} w==p && /^locked/ {print; exit}')
+  pid=$(printf '%s' "$lock" | sed -nE 's/.*claude session .*\(pid ([0-9]+).*/\1/p')
+  if [ -n "$pid" ] && ! kill -0 "$pid" 2>/dev/null; then git worktree unlock "$path"; fi
+fi
+exec wt remove "$@" --yes --foreground

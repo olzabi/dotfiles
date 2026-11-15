@@ -46,6 +46,11 @@
           {
             "type": "command",
             "command": "$CLAUDE_CONFIG_DIR/hooks/notify.sh"
+          },
+          {
+            "type": "command",
+            "command": "$CLAUDE_CONFIG_DIR/hooks/wt-marker.sh wait",
+            "timeout": 5
           }
         ]
       }
@@ -74,6 +79,11 @@
             "type": "command",
             "command": "$CLAUDE_CONFIG_DIR/hooks/herdr-vcs.sh",
             "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "$CLAUDE_CONFIG_DIR/hooks/wt-marker.sh work",
+            "timeout": 5
           }
         ]
       }
@@ -85,6 +95,11 @@
             "type": "command",
             "command": "$CLAUDE_CONFIG_DIR/hooks/herdr-vcs.sh",
             "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "$CLAUDE_CONFIG_DIR/hooks/wt-marker.sh wait",
+            "timeout": 5
           }
         ]
       }
@@ -95,6 +110,17 @@
           {
             "type": "command",
             "command": "$CLAUDE_CONFIG_DIR/hooks/herdr-vcs.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_CONFIG_DIR/hooks/wt-marker.sh clear",
             "timeout": 5
           }
         ]
@@ -111,7 +137,7 @@
     "typescript-native-lsp@anthropic-plugin-directory": true,
     "frontend-design@anthropic-plugin-directory": true,
     "chrome-devtools-mcp@claude-plugins-official": true,
-    "worktrunk@worktrunk": true
+    "worktrunk@worktrunk": false
   },
   "extraKnownMarketplaces": {
     "ecc": {
