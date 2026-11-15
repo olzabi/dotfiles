@@ -1,0 +1,9 @@
+{
+  "custom/neko": {
+    "class": "accent-focus",
+    "exec": "~/.config/waybar/scripts/neko.sh",
+    "return-type": "json",
+    "restart-interval": 5,
+    "on-click": "pkill -USR1 -f waybar/scripts/neko.sh"
+  }
+}

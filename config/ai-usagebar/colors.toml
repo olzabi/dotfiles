@@ -1,0 +1,7 @@
+# darkvoid, read by ai-usagebar as an Omarchy theme (accent → blue, fg/bg → dim + empty bar)
+accent = "#83b7ad"
+foreground = "#c0c0c0"
+background = "#1c1c1c"
+red = "#ff7b72"
+green = "#baffc9"
+yellow = "#f2c879"

@@ -10,9 +10,17 @@
   "spacing": 6,
 
   "clock": {
-    "format": "{:%H:%M}",
-    "format-alt": "{:%a %d %b}",
-    "tooltip-format": "<tt>{calendar}</tt>"
+    "format": "{:%a %d %b  %H:%M}",
+    "tooltip-format": "<tt>{calendar}</tt>",
+    "calendar": {
+      "mode": "month",
+      "weeks-pos": "",
+      "format": {
+        "months": "<span color='#e1e1e1'><b>{}</b></span>",
+        "weekdays": "<span color='#858585'>{}</span>",
+        "today": "<span background='#83b7ad' color='#1c1c1c'><b>{}</b></span>"
+      }
+    }
   },
 
   "tray": {

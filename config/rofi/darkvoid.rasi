@@ -1,7 +1,7 @@
 * {
     /* palette */
     bg:          #1c1c1c;
-    bg-alpha:    #1c1c1ccc;
+    bg-alpha:    #1c1c1c;   // opaque: rofi 2.0 on wayland lets text bleed through even at 96% alpha
     fg:          #c0c0c0;
     func:        #e1e1e1;
     kw:          #f1f1f1;
@@ -33,7 +33,7 @@ window {
 mainbox {
     padding:  12px;
     spacing:  8px;
-    children: [ inputbar, listview ];
+    children: [ inputbar, listview, mode-switcher ];
 }
 
 inputbar {
@@ -61,7 +61,7 @@ listview {
     lines:       5;
     columns:     1;
     scrollbar:   false;
-    fixed-height:false;
+    fixed-height: true;    // keep 5 rows so the window never resizes between modes
     spacing:     2px;
     cycle:       true;
 }
@@ -92,4 +92,19 @@ element selected.normal {
     text-color:       @kw;
     border:           0 0 0 2px;     /* thin mint marker on the left; delete for pure subtle highlight */
     border-color:     @accent-dim;
+}
+
+mode-switcher {
+    spacing: 4px;
+}
+
+button {
+    padding:       6px 10px;
+    border-radius: 8px;
+    text-color:    @comment;
+}
+
+button selected {
+    background-color: @visual;
+    text-color:       @accent;
 }

@@ -7,12 +7,14 @@
     "~/.config/waybar/modules/hyprwhspr.jsonc",
     "~/.config/waybar/modules/splitkb.jsonc",
     "~/.config/waybar/modules/system.jsonc",
+    "~/.config/waybar/modules/neko.jsonc",
+    "~/.config/waybar/modules/aibar.jsonc",
     "~/.config/waybar/modules/gpu.jsonc"
   ],
 
 
-  "modules-left": ["niri/workspaces", "niri/window"],
-  "modules-center": ["niri/language", "clock", "wireplumber"],
+  "modules-left": ["niri/workspaces", "custom/neko", "niri/window"],
+  "modules-center": ["niri/language", "clock", "custom/aibar", "wireplumber"],
   "modules-right": [
     "tray",
     "custom/notifications",

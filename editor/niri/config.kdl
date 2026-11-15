@@ -1,8 +1,0 @@
-include "~/.config/niri/dms/startup.kdl"
-include "~/.config/niri/dms/general.kdl"
-include "~/.config/niri/dms/layout.kdl"
-include "~/.config/niri/dms/rules.kdl"
-
-include "~/.config/niri/binds/binds.kdl"
-include "~/.config/niri/binds/nav.kdl"
-

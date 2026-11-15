@@ -66,10 +66,19 @@ window-rule {
 }
 window-rule {
     match app-id="^chromium$" title="^Picture in picture$"
+    match app-id="^firefox$" title="^Picture-in-Picture$"
     open-floating true
     default-column-width { fixed 600; }
     default-window-height { fixed 400; }
     default-floating-position x=16 y=48 relative-to="top-right"
+}
+// Firefox side windows: Library (bookmarks/history/downloads), About, Page Info.
+window-rule {
+    match app-id="^firefox$" title="^(Library|About Mozilla Firefox)$"
+    match app-id="^firefox$" title="^Page Info — "
+    open-floating true
+    default-column-width { fixed 1000; }
+    default-window-height { fixed 700; }
 }
 window-rule {
     match app-id="^org\\.telegram\\.desktop$" title="^Media viewer$"
@@ -82,4 +91,14 @@ window-rule {
 window-rule {
     match app-id="nm-connection-editor"
     open-floating true
+}
+window-rule {
+    match app-id="steam" title=r#"^notificationtoasts_\d+_desktop$"#
+    open-floating true
+    open-focused false
+    default-floating-position x=16 y=16 relative-to="bottom-right"
+}
+window-rule {
+    match app-id="^herdr-app$"
+    opacity 0.965 // herdr-app has no see-through window of its own; matches kitty's background_opacity
 }

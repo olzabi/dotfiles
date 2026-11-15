@@ -2,6 +2,8 @@ environment {
     XDG_CURRENT_DESKTOP "niri"
     XDG_SESSION_DESKTOP "niri"
     XDG_SESSION_TYPE "wayland"
+    MOZ_DISABLE_RDD_SANDBOX "1" // Firefox's sandboxed decoder can't open /dev/nvidia*, so nvidia-vaapi-driver silently falls back to CPU
+    NVD_BACKEND "direct"        // nvidia-vaapi-driver's EGL backend is broken on driver 525+
  // XDG_DATA_DIRS "/usr/local/share:/usr/share"
     // MOZ_ENABLE_WAYLAND "1"
     // ELECTRON_OZONE_PLATFORM_HINT "auto"      // Electron apps (Discord, VS Code, etc.) run native Wayland, no blurry scaling
@@ -10,6 +12,11 @@ environment {
     // QT_QPA_PLATFORMTHEME "gtk3"
     // QT_QPA_PLATFORMTHEME "qt6ct"
     // QT_WAYLAND_DISABLE_WINDOWDECORATION "1"  // avoids Qt drawing its own title bars
+}
+cursor {
+    xcursor-theme "KleinCat"
+    // xcursor-theme "SungJinWoo"
+    xcursor-size 64
 }
 input {
     keyboard {
@@ -28,7 +35,7 @@ input {
 
     }
     mouse {
-        accel-speed -0.25
+        accel-speed -0.5
         scroll-factor vertical=1.0 horizontal=-2.0
         natural-scroll
     }

@@ -1,0 +1,14 @@
+{
+  "custom/aibar": {
+    "class": "accent-focus",
+    "exec": " ai-usagebar --format '{session_pct}% · {session_reset}'",
+    "return-type": "json",
+    "interval": 300,
+    "signal": 13,
+    "tooltip": true,
+    "hide-empty-text": true,
+    "on-click": "kitty --class popup-aibar -e ai-usagebar-tui",
+    "on-scroll-up": "ai-usagebar --cycle-next",
+    "on-scroll-down": "ai-usagebar --cycle-prev"
+  }
+}

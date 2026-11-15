@@ -1,0 +1,26 @@
+binds {
+    Mod+X repeat=false { close-window; }
+    Mod+A repeat=false { spawn "herdr-side" "toggle"; }   // herdr sidebar (bin/herdr-side): open/close it whole
+    Mod+D repeat=false { toggle-overview; }
+    Mod+T { toggle-column-tabbed-display; }   // the tmux-tabs replacement
+    Mod+V { toggle-window-floating; }
+    Mod+E { spawn "nautilus"; }
+    Mod+F { maximize-column; }
+    Mod+C { center-column; }
+
+    Mod+Q { spawn "kitty" "-e" "tmux" "new-session" "-A" "-s" "main"; }
+    Mod+Shift+Q { spawn "sh" "-c" "herdr-side restore & exec kitty --class herdr -e herdr"; }   // herdr; reopens its sidebar if it was open
+    Mod+Ctrl+A repeat=false { spawn "herdr-side" "pick"; }         // pick which herdr sidebar sections are shown
+    Mod+Shift+Slash { show-hotkey-overlay; }
+    Mod+Shift+P { power-off-monitors; }
+    Mod+Shift+A { screenshot; }
+
+    // Window sizing and layout.
+    Mod+BracketLeft  { consume-or-expel-window-left; }
+    Mod+BracketRight { consume-or-expel-window-right; }
+    Mod+W       { switch-preset-column-width; }
+    Mod+Shift+W { switch-preset-column-width-back; }
+    Mod+Shift+F { fullscreen-window; }
+    Mod+Minus   { set-column-width "-2%"; }
+    Mod+Equal   { set-column-width "+2%"; }
+}

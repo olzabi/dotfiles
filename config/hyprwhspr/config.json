@@ -4,5 +4,8 @@
   "transcription_backend": "faster-whisper",
   "faster_whisper_model": "large-v3",
   "audio_ducking": true,
-  "use_hypr_bindings": true
+  "use_hypr_bindings": true,
+  "auto_submit": true,
+  "clipboard_behavior": true,
+  "clipboard_clear_delay": 5.0
 }

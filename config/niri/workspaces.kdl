@@ -1,0 +1,37 @@
+// Named workspaces come first on their monitor, so Mod+1.. still map to them.
+workspace "dev"   { open-on-output "HDMI-A-2"; }
+workspace "web"   { open-on-output "HDMI-A-2"; }
+workspace "games" { open-on-output "HDMI-A-2"; }
+workspace "chat"  { open-on-output "HDMI-A-1"; }
+workspace "notes" { open-on-output "HDMI-A-1"; }
+
+// Terminals and browser: only place them at login, so new ones open where you are.
+window-rule {
+    match at-startup=true app-id="^(kitty|com\\.mitchellh\\.ghostty)$"
+    exclude app-id="^popup-"
+    open-on-workspace "dev"
+}
+window-rule {
+    match at-startup=true app-id="^(chromium|firefox)$"
+    exclude title="^(Picture in picture|Picture-in-Picture)$"
+    open-on-workspace "web"
+}
+
+// Single-purpose apps always go to their home.
+window-rule {
+    match app-id="^steam$"
+    match app-id=r#"^steam_app_\d+$"#
+    match app-id="^gamescope$"
+    exclude title=r#"^notificationtoasts_\d+_desktop$"#
+    open-on-workspace "games"
+}
+window-rule {
+    match app-id=r#"^org\.telegram\.desktop"#
+    match app-id="^discord$"
+    exclude title="^Media viewer$"
+    open-on-workspace "chat"
+}
+window-rule {
+    match app-id="^obsidian$"
+    open-on-workspace "notes"
+}

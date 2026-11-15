@@ -52,3 +52,9 @@ invisible=0
 format=(%g) <b>%s</b>\n%b
 [group-index=0]
 invisible=0
+
+[app-name=Herdr]
+group-by=app-name,summary,body
+
+[app-name=kitty]
+group-by=app-name,summary,body

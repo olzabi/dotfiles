@@ -1,0 +1,6 @@
+binds {
+  Mod+B { spawn "~/.config/waybar/scripts/bt-menu.sh"; }
+
+  Mod+R { spawn "~/Dotfiles/bin/rofi-menu"; }              // drun, with all mode tabs available
+  Mod+Y { spawn "~/Dotfiles/bin/rofi-menu" "cliphist"; }  // jump straight into a mode
+}

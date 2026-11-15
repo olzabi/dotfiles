@@ -1,0 +1,13 @@
+// niri is started directly (not niri-session): hand the Wayland env to systemd/dbus so portals (dark mode, file picker, screencast) can start.
+spawn-at-startup "dbus-update-activation-environment" "--systemd" "WAYLAND_DISPLAY" "DISPLAY" "XDG_CURRENT_DESKTOP" "NIRI_SOCKET"
+spawn-at-startup "~/.config/waybar/launch.sh"
+// still frame of workshop 3411797914 (Mac Baconai), extracted from its scene.pkg; live wpe cost ~1.5 GB VRAM
+spawn-sh-at-startup "swaybg -c '#1c1c1c' -o HDMI-A-2 -i ~/Media/Wallpapers/mac-baconai.jpg -m fill"
+spawn-at-startup "mako"
+spawn-at-startup "chromium"
+spawn-at-startup "sh" "-c" "wl-paste --watch cliphist store"
+spawn-at-startup "kitty" "-e" "tmux" "new-session" "-A" "-s" "main"
+
+// niri exports XCURSOR_THEME/XCURSOR_SIZE from its cursor block; mirror them for GTK apps
+// and for X11 apps (xwayland-satellite), which fall back to the "default" icon theme.
+spawn-sh-at-startup "gsettings set org.gnome.desktop.interface cursor-theme \"$XCURSOR_THEME\"; gsettings set org.gnome.desktop.interface cursor-size \"$XCURSOR_SIZE\"; d=~/.local/share/icons/default; mkdir -p $d && printf '[Icon Theme]\\nInherits=%s\\n' \"$XCURSOR_THEME\" > $d/index.theme"

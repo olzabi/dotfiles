@@ -7,11 +7,13 @@
     "~/.config/waybar/modules/bluetooth.jsonc",
     "~/.config/waybar/modules/splitkb.jsonc",
     "~/.config/waybar/modules/system.jsonc",
+    "~/.config/waybar/modules/neko.jsonc",
+    "~/.config/waybar/modules/aibar.jsonc",
     "~/.config/waybar/modules/gpu.jsonc"
   ],
 
   "modules-center": ["clock"],
-  "modules-left": ["hyprland/workspaces", "hyprland/window"],
+  "modules-left": ["hyprland/workspaces", "custom/neko", "hyprland/window"],
   "modules-right": [
     "tray",
     "custom/notifications",
@@ -19,6 +21,7 @@
     "custom/bluetooth",
     "custom/splitkb",
     "custom/system",
+    "custom/aibar",
     "custom/gpu",
     "wireplumber",
     "network",

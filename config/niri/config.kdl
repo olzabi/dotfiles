@@ -1,0 +1,12 @@
+include "startup.kdl"
+include "general.kdl"
+include "layout.kdl"
+include "rules.kdl"
+include "workspaces.kdl"
+
+include "binds/binds.kdl"
+include "binds/nav.kdl"
+include "binds/scroll.kdl"
+include "binds/ws.kdl"
+include "binds/custom.kdl"
+include "binds/audio.kdl"
