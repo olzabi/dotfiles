@@ -2,9 +2,7 @@ typeset -gU fpath
 fpath=($XDG_CACHE_HOME/zsh/site-functions $fpath) # is necessary for mise `mise completion zsh --install`
 fpath=(/usr/share/zsh/site-functions $fpath)
 
-[[ -r $ANTIDOTE_DIR/antidote.zsh ]] || git clone --depth=1 https://github.com/mattmc3/antidote.git "$ANTIDOTE_DIR"
-
-. $ANTIDOTE_DIR/antidote.zsh
+. /usr/share/zsh-antidote/antidote.zsh # pacman zsh-antidote
 antidote load $ZSHCONF/plugins.txt $XDG_CACHE_HOME/zsh/plugins.zsh
 
 if (( $+functions[run-compinit] )); then

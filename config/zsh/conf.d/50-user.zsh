@@ -1,0 +1,1 @@
+. "$ZSHCONF/fzf.zsh"

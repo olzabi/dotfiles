@@ -1,0 +1,25 @@
+# Own channel (tracked): files and directories in one list, so one picker covers both.
+# ctrl-s cycles sources; alt-t inside tv switches to another channel.
+[metadata]
+name = "paths"
+description = "Files and directories, previewed with bat (darkvoid) or an eza tree"
+requirements = ["fd", "bat", "eza"]
+
+[source]
+command = [
+  { name = "All",   run = "fd -t f -t d" },
+  { name = "Files", run = "fd -t f" },
+  { name = "Dirs",  run = "fd -t d" },
+  { name = "Hidden", run = "fd -t f -t d -H -E .git" },
+]
+
+[preview]
+command = "if [ -d '{}' ]; then eza --tree --level=2 --icons --color=always '{}'; else bat -n --color=always '{}'; fi"
+
+[keybindings]
+f12 = "actions:edit"
+
+[actions.edit]
+description = "Open the selection in $EDITOR"
+command = "${EDITOR:-nvim} {}"
+mode = "execute"

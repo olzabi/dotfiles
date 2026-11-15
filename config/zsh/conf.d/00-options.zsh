@@ -7,8 +7,6 @@
 # at the oh-my-zsh checkout); use-omz points $ZSH at antidote's own clone.
 unset ZSH
 
-ANTIDOTE_DIR=$XDG_DATA_HOME/antidote   # per-machine install, not part of the repo
-
 export MANPAGER='nvim +Man!'
 export MANPATH="/usr/local/man:$MANPATH"
 export RUSTFLAGS="-C opt-level=3 -C target-cpu=native" # Rust app build optimization

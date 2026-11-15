@@ -1,0 +1,13 @@
+# darkvoid: same palette as config/herdr/config.toml [theme.custom]
+[theme]
+name = "darkvoid"
+
+[colors]
+Base = "#c0c0c0"
+Title = "#83b7ad"
+Guidance = "#585858"
+Important = "#1bfd9c"
+Annotation = "#7fa1c3"
+AlertInfo = "#baffc9"
+AlertWarn = "#ffffba"
+AlertError = "#dea6a0"

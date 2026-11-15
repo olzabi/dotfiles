@@ -1,0 +1,23 @@
+# Overrides only; atuin fills in the rest. History, key and sync session stay in ~/.atuin/data (not in the repo).
+enter_accept = true          # enter runs the pick; tab puts it on the line to edit
+style = "compact"
+inline_height = 20
+show_preview = true
+search_mode = "fuzzy"
+filter_mode = "global"
+filter_mode_shell_up_key_binding = "session"
+workspaces = true            # inside a git repo, ctrl-r starts filtered to that repo
+show_help = false
+secrets_filter = true
+# Not worth remembering, and keeps credentials typed on the command line out of history.
+history_filter = [
+  "^(ls|ll|la|l|cd|z|y|yy|pwd|exit|clear|c)$",
+  "(?i)(password|passwd|token|secret|api[_-]?key)=",
+]
+cwd_filter = ["^/tmp"]
+
+[theme]
+name = "darkvoid"
+
+[search]
+filters = ["workspace", "directory", "session", "global", "host"]

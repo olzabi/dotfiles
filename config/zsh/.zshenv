@@ -1,4 +1,5 @@
-#typeset -U path PATH
+# Runs for every zsh, including non-interactive ones (scripts, agent tool calls): keep it to exports.
+typeset -gU path fpath
 
 _prepend_path() { path=("$1" ${path:#$1}); }
 _append_path()  { path=(${path:#$1} "$1"); }
@@ -9,31 +10,28 @@ export XDG_LOCAL_HOME="$HOME/.local"
 export XDG_BIN_HOME="$HOME/.local/bin"
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
-export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/run/user/$(id -u)}
+export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/run/user/$UID}
 export SSH_AUTH_SOCK=${SSH_AUTH_SOCK:-$XDG_RUNTIME_DIR/ssh-agent.socket}
 
 export DOTFILES="$HOME/Dotfiles"
-export DOTFILES_GIT="$DOTFILES/git"
-export DOTFILES_EDITOR="$DOTFILES/editor"
-export DOTFILES_TOOLS="$DOTFILES/tools"
+export DOTFILES_CONFIG="$DOTFILES/config"
 export DOTFILES_THEMES="$DOTFILES/themes"
 export DOTFILES_AI="$DOTFILES/agents"
+export MISE_SKILLS_DIR="$DOTFILES_AI/skills" # mise settings take no $HOME, and a relative path follows cwd
 
 export KB_NAME="Blasphemy Slate"
 
 export LANG=en_US.UTF-8
-export LC_ALL=en_US.UTF-8
 
-export YAZI_CONFIG_HOME="$DOTFILES_EDITOR/yazi"
-export BAT_CONFIG_DIR="$DOTFILES_EDITOR/bat"
-export STARSHIP_CONFIG="$DOTFILES/starship.toml"
+export YAZI_CONFIG_HOME="$DOTFILES_CONFIG/yazi"
+export BAT_CONFIG_DIR="$DOTFILES_CONFIG/bat"
+export STARSHIP_CONFIG="$DOTFILES_CONFIG/starship.toml"
 
 _prepend_path "$XDG_LOCAL_HOME/bin"
 _prepend_path "$DOTFILES/bin"
 
 [[ -d /opt/cuda/bin ]] && {
   _prepend_path /opt/cuda/bin
-  _prepend_path /opt/cuda/lib64
   export CUDA_PATH=/opt/cuda
 }
 
@@ -65,8 +63,9 @@ export PSYSH_CONFIG="$HIST_DIR/psysh_history"
 export EZA_CONFIG_DIR="$DOTFILES_THEMES/eza"
 export EZA_COLORS="di=1;34:ln=36:ex=1;32"
 
-export RIPGREP_CONFIG_PATH="$DOTFILES/.ripgreprc"
-export ZELLIJ_CONFIG_DIR="$DOTFILES_EDITOR/zellij"
+export RIPGREP_CONFIG_PATH="$DOTFILES/home/.ripgreprc"
+export ZELLIJ_CONFIG_DIR="$DOTFILES_CONFIG/zellij"
+export ATUIN_CONFIG_DIR="$DOTFILES_CONFIG/atuin" # history db stays in ~/.atuin/data
 
 #* C++
 # ---------
@@ -100,9 +99,6 @@ _prepend_path "$CARGO_HOME/bin"
 # ---------
 export PNPM_HOME="$XDG_DATA_HOME/pnpm"
 export BUN_INSTALL="$XDG_CONFIG_HOME/.bun"
-export NVM_DIR="${NVM_DIR:-$XDG_CONFIG_HOME/.nvm}"
-[[ -s "$NVM_DIR/nvm.sh" ]] && . "$NVM_DIR/nvm.sh"
-[ -s "${BUN_INSTALL}/_bun" ] && . "${BUN_INSTALL}/_bun"
 
 _prepend_path "$PNPM_HOME"
 _prepend_path "$BUN_INSTALL/bin"
@@ -122,7 +118,3 @@ export OLLAMA_KEEP_ALIVE=10m
 export CLAUDE_CODE_ENABLE_EXPERIMENTAL_ADVISOR_TOOL=1
 
 _prepend_path "$OPENCODE_CONFIG_DIR/bin"
-_append_path /usr/bin
-
-
-

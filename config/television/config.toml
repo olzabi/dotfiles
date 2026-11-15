@@ -1,0 +1,33 @@
+# Overrides only; tv fills the rest from its built-in defaults.
+default_channel = "paths"
+
+[ui]
+theme = "darkvoid"
+
+[ui.input_bar]
+prompt = "❯"
+
+[shell_integration]
+fallback_channel = "paths"
+
+# One key: alt-t opens tv on the channel the typed command implies (paths otherwise);
+# alt-t again inside tv switches channel. Bound in 60-tools.zsh: `tv init zsh` hard-codes ctrl-t,
+# which herdr-app takes for tab.new. ctrl-r is atuin.
+[keybindings]
+alt-t = "toggle_remote_control"
+[shell_integration.channel_triggers]
+"alias" = ["alias", "unalias"]
+"env" = ["export", "unset"]
+"dirs" = ["cd", "ls", "rmdir", "z", "y", "yy", "eza", "pushd"]
+"paths" = ["cat", "less", "head", "tail", "bat", "nvim", "vim", "cp", "mv", "rm", "touch", "chmod", "chown", "ln", "tar", "unzip", "xdg-open", "hunk diff"]
+"git-diff" = ["git add", "git restore"]
+"git-branch" = ["git checkout", "git switch", "git branch", "git merge", "git rebase", "git pull", "git push"]
+"git-log" = ["git log", "git show"]
+"git-worktrees" = ["wt switch", "wt remove"]
+"podman-images" = ["podman run"]
+"podman-containers" = ["podman exec", "podman logs", "podman stop", "podman rm"]
+"docker-images" = ["docker run"]
+"git-repos" = ["git clone"]
+"systemd-units" = ["systemctl", "journalctl"]
+"pacman-packages" = ["pacman -R", "yay -R"]
+"ssh-hosts" = ["ssh"]

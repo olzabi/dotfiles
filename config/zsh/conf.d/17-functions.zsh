@@ -196,10 +196,6 @@ gobench() {
 }
 
 # ---
-meme() {
-	yt-dlp "$1" -o "/mnt/d/ayaya/%(title)s.%(ext)s"
-}
-
 bak() {
 	for file in "$@"; do
 		cp "$file" "$file".bak
@@ -223,5 +219,19 @@ kill_port() {
   kill -9 $PID && echo "Killed."
 }
 
+# Checkout a PR interactively with fzf
+ghpf() {
+  gh pr list --limit 50 | fzf --height 40% --reverse \
+    | awk '{print $1}' | xargs -r gh pr checkout
+}
 
+# Create a PR and open it in the browser
+ghpcw() {
+  gh pr create --fill "$@" && gh pr view --web
+}
+
+# Watch the latest run on the current branch
+ghwatch() {
+  gh run watch "$(gh run list --branch "$(git branch --show-current)" --limit 1 --json databaseId -q '.[0].databaseId')"
+}
 
