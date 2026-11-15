@@ -9,6 +9,8 @@
 /skills/.mise-skills.json
 /skills/hk-configure
 /skills/hk-debug
+/skills/worktrunk
+/skills/wt-switch-create
 
 !/pi/agent/
 !/pi/agent/.gitignore

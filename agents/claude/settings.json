@@ -3,27 +3,29 @@
   "env": {
     "CLAUDE_CODE_PLUGIN_DIRS": "~/.claude/mods",
     "CLAUDE_CODE_TMPDIR": "/tmp/claude-code",
-    "CLAUDE_CODE_ENABLE_EXPERIMENTAL_ADVISOR_TOOL": "1",
     "DISABLE_ERROR_REPORTING": "1",
     "DISABLE_TELEMETRY": "1",
-    "ECC_GATEGUARD": "off"
+    "ECC_GATEGUARD": "off",
+    "PONYTAIL_SUBAGENT_MATCHER": "^(?!(Explore|Plan|claude-code-guide|ecc:docs-lookup|ecc:code-explorer|ecc:architect|ecc:planner|ecc:conversation-analyzer)$)"
   },
-  "includeCoAuthoredBy": false,
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
   "permissions": {
     "allow": [
       "Bash",
       "Read",
       "Edit",
+      "MultiEdit",
       "WebFetch",
       "WebSearch",
-      "Bash(rm -rf /tmp/*)",
       "mcp__codebase-memory__*"
     ],
     "deny": [
       "Read(./secrets/**)",
-      "Bash(curl *)",
-      "Bash(rm -rf /*:*)",
-      "Bash(rm -rf ~/*:*)",
+      "Bash(rm -rf /*)",
+      "Bash(rm -rf ~/*)",
       "Bash(sudo rm -rf:*)",
       "Bash(mkfs:*)"
     ],
@@ -38,7 +40,6 @@
   },
   "model": "opus",
   "hooks": {
-    "PreToolUse": [],
     "Notification": [
       {
         "hooks": [
@@ -55,17 +56,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"$CLAUDE_CONFIG_DIR\"/hooks/herdr-agent-state.sh session",
+            "command": "$CLAUDE_CONFIG_DIR/hooks/herdr-agent-state.sh session",
             "timeout": 10
           },
           {
             "type": "command",
             "command": "$CLAUDE_CONFIG_DIR/hooks/tooling-rules.sh",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "$CLAUDE_CONFIG_DIR/hooks/herdr-vcs.sh",
             "timeout": 5
           }
         ]
@@ -107,15 +103,15 @@
   },
   "enabledPlugins": {
     "telegram@claude-plugins-official": true,
-    "explanatory-output-style@claude-plugins-official": true,
-    "mattpocock-skills@claude-plugins-official": false,
+    "explanatory-output-style@claude-plugins-official": false,
     "hookify@claude-plugins-official": true,
     "plugin-dev@anthropic-plugin-directory": true,
     "ponytail@ponytail": true,
     "pyright-lsp@claude-plugins-official": true,
     "typescript-native-lsp@anthropic-plugin-directory": true,
     "frontend-design@anthropic-plugin-directory": true,
-    "chrome-devtools-mcp@claude-plugins-official": true
+    "chrome-devtools-mcp@claude-plugins-official": true,
+    "worktrunk@worktrunk": true
   },
   "extraKnownMarketplaces": {
     "ecc": {
@@ -129,8 +125,15 @@
         "source": "github",
         "repo": "DietrichGebert/ponytail"
       }
+    },
+    "worktrunk": {
+      "source": {
+        "source": "github",
+        "repo": "max-sixty/worktrunk"
+      }
     }
   },
+  "outputStyle": "terse",
   "modelSettings": {
     "claude-sonnet-5-5": {
       "effortLevel": "high"
@@ -142,7 +145,7 @@
       "effortLevel": "medium"
     }
   },
-  "advisorModel": "opus",
+  "awaySummaryEnabled": false,
   "pluginConfigs": {
     "ecc@ecc": {
       "options": {
@@ -202,7 +205,7 @@
       "**Protected IaC scopes**: IAM, RBAC, networking, quota, and node-pool resources; anything whose name or tag carries `prod` or `production` as a whole word or name segment",
       "### User-specific",
       "**Primary use of Claude Code**: software development in the user's own repositories, and maintaining the user's own workstation configuration (desktop, editor, terminal and agent setup) kept in a dotfiles repo",
-      "**Trusted workspaces**: any repository under the user's projects directory (/home/chronica/Projects/) that is trusted per Source control, and the user's dotfiles repo (/home/chronica/Dotfiles), including every path that symlinks into it (e.g. ~/.claude, ~/.config entries); caches the user's own scripts generate from those workspaces are treated the same",
+      "**Trusted workspaces**: any repository under the user's projects directory (~/Projects/) that is trusted per Source control, and the user's dotfiles repo (~/Dotfiles), including every path that symlinks into it (e.g. ~/.claude, ~/.config entries); caches the user's own scripts generate from those workspaces are treated the same",
       "**Org-specific CLIs**: None configured — each workspace declares its toolchain in its own config; read it before assuming which tools are available"
     ]
   },
