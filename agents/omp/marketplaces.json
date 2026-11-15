@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "marketplaces": [
+    {
+      "name": "ponytail",
+      "sourceType": "github",
+      "sourceUri": "DietrichGebert/ponytail",
+      "catalogPath": "/home/chronica/.omp/plugins/cache/marketplaces/ponytail/marketplace.json",
+      "addedAt": "2026-10-26T15:15:14.480Z",
+      "updatedAt": "2026-11-01T21:59:50.512Z"
+    },
+    {
+      "name": "worktrunk",
+      "sourceType": "github",
+      "sourceUri": "max-sixty/worktrunk",
+      "catalogPath": "/home/chronica/.omp/plugins/cache/marketplaces/worktrunk/marketplace.json",
+      "addedAt": "2026-10-26T16:51:21.659Z",
+      "updatedAt": "2026-11-01T21:59:52.875Z"
+    },
+    {
+      "name": "superpowers-marketplace",
+      "sourceType": "github",
+      "sourceUri": "obra/superpowers-marketplace",
+      "catalogPath": "/home/chronica/.omp/plugins/cache/marketplaces/superpowers-marketplace/marketplace.json",
+      "addedAt": "2026-10-26T19:37:46.108Z",
+      "updatedAt": "2026-11-01T21:59:53.496Z"
+    }
+  ]
+}

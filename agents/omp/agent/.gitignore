@@ -1,0 +1,10 @@
+# core
+
+!extensions/
+!extensions/**
+!hooks/
+!hooks/**
+
+!AGENTS.md
+!config.yml
+!models.yml
