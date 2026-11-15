@@ -157,25 +157,26 @@ test('a typed prompt draws as a USER call row on one line under a rule; a press 
   await ui.unmount()
 })
 
-test('a failed call shows in the band; a press unfolds it; prompt and thought only while working', async ($, on) => {
+test('a failed call draws no band above the prompt (footer owns it); its row keeps the reason', async ($, on) => {
   on('tool.call', () => ({ result: {}, isError: true, text: 'no' }) as never)
+  on('ui.render', ($, e) => {
+    const { Text } = $.ui.resolve(e)
+    return <Text>engine</Text>
+  })
   await $.tool.call({ tool: 'Bash', tool_use_id: 'f1', command: 'rm -rf x' } as never)
-  await $.prompt.submit({ text: 'do it', origin: { kind: 'composer' } } as never).catch(() => undefined)
 
   const ui = await $.ui.mount({
     plugin: 'hush', component: 'AbovePrompt', requestId: 'band', surface: 'terminal',
     props: { hasSurvey: false, isWorking: false, view: {}, bodyColumns: 80 },
   } as never)
-  expect((await ui.find({ type: 'Text', text: /failed/ }))?.text).toBe('✗ 1 failed ')
-  expect(await ui.find({ type: 'Text', text: /do it/ })).toBeFalsy()
-  await ui.press({ key: 'fail-f1' })
+  expect(await ui.find({ type: 'Text', text: /failed/ })).toBeFalsy()
   await ui.unmount()
 
   const row = await $.ui.mount({
     plugin: 'hush', component: 'ToolResult', requestId: 'f1', surface: 'terminal',
     props: { tool_use_id: 'f1', tool: 'Bash', isErrored: true, output: 'Permission denied.\nmore' },
   } as never)
-  expect((await row.find({ type: 'Text', text: /more/ }))?.text).toBe('  more')
+  expect((await row.find({ type: 'Text', text: /Permission denied/ }))?.text).toBe('  │ Permission denied.')
   await row.unmount()
 })
 

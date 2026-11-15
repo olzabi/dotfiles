@@ -1,6 +1,6 @@
 import { expect, test } from 'claude-code/testing'
 
-import { compactDiff, groupMatches, jsonToToon, mcpPreview, mentions, outline, toToon, touched } from './format'
+import { compactDiff, groupMatches, jsonToToon, mcpPreview, mentions, outline, shellRow, stripLead, toToon, touched } from '../core/format.ts'
 
 test('grep -rn lines group under one filename header per file', () => {
   const out = ['src/a.ts:3:const x = 1', 'src/a.ts:9:x += 1', 'src/b.ts:12:use(x): ok'].join('\n')
@@ -95,4 +95,18 @@ test('a compact diff keeps changed lines alone, numbered, dedented, one gap betw
     { text: '···', kind: 'gap' },
     { text: '121 - b', kind: 'del' },
   ])
+})
+
+test('shell rows skip setup, name heredoc writes and polling loops', () => {
+  const root = '/home/me/Projects/erp'
+  expect(stripLead('S=a/b; cd apps/web; node x.js')).toBe('node x.js')
+  expect(stripLead('export M=$(dirname $PWD); mise trust .')).toBe('mise trust .')
+  expect(stripLead('CI=true mise run x')).toBe('CI=true mise run x')
+  expect(shellRow('S=a/b; head -12 $S/log.txt | cut -c1-200')).toEqual({ label: 'HEAD', what: 'head -12 $S/log.txt | cut -c1-200' })
+  expect(shellRow("S=a; cat > $S/run.sh <<'E'\necho hi\nE")).toEqual({ label: 'WRITE', what: '$S/run.sh' })
+  expect(shellRow(`until grep -q DONE ${root}/r.txt; do sleep 5; done`, root)).toEqual({ label: 'WAIT', what: 'grep -q DONE r.txt' })
+  expect(shellRow(`sleep 45; cat ${root}/r.txt`, root)).toEqual({ label: 'WAIT', what: 'cat r.txt' })
+  expect(shellRow("python3 - <<'E'\nimport re\np='mise/dev.toml'\nE")).toEqual({ label: 'PYTHON3', what: "2 lines: p='mise/dev.toml'" })
+  expect(shellRow("which time; cat > $S/run.sh <<'E'\n#!/bin/bash\nE")).toEqual({ label: 'WHICH', what: 'which time; cat > $S/run.sh … +1 lines' })
+  expect(shellRow('cd /home/me/other && CI=true timeout 300 pnpm build', root)).toEqual({ label: 'PNPM', what: 'CI=true timeout 300 pnpm build' })
 })

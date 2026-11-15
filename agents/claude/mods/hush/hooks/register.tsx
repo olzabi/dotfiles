@@ -2,8 +2,13 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register, ThemeKey } from 'claude-code'
 
 import type { Backgrounds, Mode, Target, Toggle, Toggles } from '../types'
-import { capRows, compactDiff, groupMatches, jsonToToon, mcpPreview, mentions, outline, touched } from './format'
-import type { DiffRow } from './format'
+import { capRows, compactDiff, groupMatches, jsonToToon, mcpPreview, mentions, outline, touched } from '../core/format.ts'
+import { args, base, describe, label, str } from '../core/format.ts'
+import type { Call } from '../core/format.ts'
+import type { DiffRow } from '../core/format.ts'
+import { kb, turnLine } from '../core/agent.ts'
+import { isOn, TOGGLES_INITIAL } from './toggles'
+import { briefSection, recapContext, registerAgent, startAgent, traceCall } from './agent-register'
 
 const MODES: Mode[] = ['cards', 'lines', 'group']
 const PREVIEW_LINES = 5
@@ -15,10 +20,12 @@ const OUTLINE_LINES = 8
 const mode = atom({ plugin: 'hush', key: 'mode' } as const, 'lines', {
   shape: 'mode-1',
 })
-const toggles = atom({ plugin: 'hush', key: 'toggles' } as const, { prompt: true, thinking: true })
+const toggles = atom({ plugin: 'hush', key: 'toggles' } as const, TOGGLES_INITIAL)
+const trace = atom({ plugin: 'hush', key: 'trace' } as const, [])
+const saved = atom({ plugin: 'hush', key: 'saved' } as const, {})
+const lastTurn = atom({ plugin: 'hush', key: 'lastTurn' } as const, null)
 const lastPrompt = atom({ plugin: 'hush', key: 'lastPrompt' } as const, null)
 const thought = atom({ plugin: 'hush', key: 'thought' } as const, null)
-const failures = atom({ plugin: 'hush', key: 'failures' } as const, [])
 const expanded = atom({ plugin: 'hush', key: 'expanded' } as const, [])
 const narration = atom({ plugin: 'hush', key: 'narration' } as const, [])
 const finals = atom({ plugin: 'hush', key: 'finals' } as const, [])
@@ -28,6 +35,8 @@ const OPEN_LINES = 60
 const TAIL_CONTROL_AT = 12
 const KEEP_NARRATION = 200
 // Read by the model: in-between text stays a status line; what matters lands in the reply.
+// Read by the model: Bash rows show the description; without one they fall back to the command.
+const DESCRIBE_RULE = 'Give every Bash call a short `description` in plain words: the user sees it as the tool row instead of the command.'
 const NARRATION_RULE = [
   'Text you write between tool calls is shown to the user folded to one line.',
   'Keep it to one short status sentence, or nothing.',
@@ -37,9 +46,6 @@ const NARRATION_RULE = [
 const backgrounds = atom({ plugin: 'hush', key: 'backgrounds' } as const, {})
 const DIFF_LINES = 12
 
-// Previews start off (a call folds to its row), and the spinner line is hidden. Every other tweak starts on.
-const DEFAULT_OFF: Toggle[] = ['previews', 'spinner', 'tight']
-const isOn = (t: Toggles, k: Toggle) => t[k] ?? !DEFAULT_OFF.includes(k)
 
 // Dark tints; any `#rrggbb` is taken as it is.
 // shortcut: no light-theme variants; upgrade when a light theme is in use.
@@ -54,13 +60,12 @@ const TARGETS: { key: Target; hotkey: string; title: string }[] = [
 const HEX = /^#[0-9a-f]{6}$/i
 const bgOf = (b: Backgrounds, k: Target) => {
   const v = b[k]
-  return v && HEX.test(v) ? v : v ? PRESETS[v] : undefined
+  return v && HEX.test(v) ? v : v && Object.hasOwn(PRESETS, v) ? PRESETS[v] : undefined
 }
 
 const TOGGLES: { key: Toggle; hotkey: string; title: string; hint: string }[] = [
   { key: 'prompt', hotkey: 'p', title: 'Last prompt', hint: '❯ your latest prompt above the editor' },
   { key: 'thinking', hotkey: 't', title: 'Thinking', hint: 'first … last sentence of the latest thought' },
-  { key: 'errors', hotkey: 'e', title: 'Failures', hint: 'failed calls above the prompt; a click jumps to one, unfolded' },
   { key: 'spinner', hotkey: 's', title: 'Spinner', hint: 'the animated working/thinking line above the prompt' },
   { key: 'narration', hotkey: 'n', title: 'Fold narration', hint: 'text between tool calls as one line; findings asked for in the reply' },
   { key: 'tight', hotkey: 'g', title: 'Tight rows', hint: 'experimental: pull tool rows and folded lines over the blank line above' },
@@ -68,6 +73,12 @@ const TOGGLES: { key: Toggle; hotkey: string; title: string; hint: string }[] = 
   { key: 'outlines', hotkey: 'd', title: 'Outlines', hint: 'declarations of reads and writes; what an edit touched' },
   { key: 'toon', hotkey: 'j', title: 'TOON', hint: 'JSON MCP results reach the model as TOON' },
   { key: 'mentions', hotkey: 'm', title: '@@agents', hint: '@@ suggests subagent types; a mention asks to delegate' },
+  { key: 'trim', hotkey: 'r', title: 'Trim output', hint: 'long Bash output reaches the model as head + tail (whole on disk); unchanged re-reads as a pointer' },
+  { key: 'trace', hotkey: 'l', title: 'Call ledger', hint: 'every call logged for mcp__hush__trace; a recap after compaction' },
+  { key: 'guards', hotkey: 'u', title: 'Loop guard', hint: 'the same call failing the same way 3 times gets a note to change approach' },
+  { key: 'route', hotkey: 'w', title: 'Route reads', hint: 'a whole-file Read of a big code file is pointed at an outline first; repeating it passes' },
+  { key: 'brief', hotkey: 'b', title: 'Project brief', hint: 'calls that keep failing in this project (from past sessions) told to the model and its subagents' },
+  { key: 'summary', hotkey: 'y', title: 'Turn summary', hint: 'calls, failures, files edited and characters saved of the last turn, above the prompt' },
 ]
 
 // $.state lives for the session; $.store carries the choices to the next one.
@@ -94,7 +105,7 @@ async function load($: EngineInterface) {
     const next: Backgrounds = {}
     for (const { key } of TARGETS) {
       const v = b[key]
-      if (typeof v === 'string' && (HEX.test(v) || v in PRESETS)) next[key] = v
+      if (typeof v === 'string' && (HEX.test(v) || Object.hasOwn(PRESETS, v))) next[key] = v
     }
     return next
   })
@@ -122,10 +133,6 @@ async function toggleOpen($: EngineInterface, id: string, at: string) {
   await reveal($, at, isOpen ? 'start' : 'nearest')
 }
 
-// The transcript row that holds a call: its group's, once a group drew it, else its own.
-// Plain memory, not state: a render hook may not write state, and a reload redraws it.
-const rowOf = new Map<string, string>()
-
 // Scrolls a transcript row (by the requestId its render saw; a { key } reaches only the
 // mod's own panes and band) into view. Twice: before the redraw a row near the bottom has
 // nothing below it to scroll over, and the unfolded block then grows under a window pinned
@@ -137,12 +144,6 @@ async function reveal($: EngineInterface, at: string, block: 'start' | 'center' 
   await $.clock.sleep(150).catch(() => undefined)
   const deny = await go().catch(err => String(err))
   if (deny) $.ui.toast(`hush: could not scroll (${deny})`)
-}
-
-// A failure from the band: unfolded where it stands, centred so the rows before it show.
-async function jumpTo($: EngineInterface, id: string) {
-  await update($, expanded, ids => (ids.includes(id) ? ids : [...ids, id].slice(-200)))
-  await reveal($, rowOf.get(id) ?? id, 'center')
 }
 
 type Row = { text: string; kind?: DiffRow['kind'] }
@@ -205,30 +206,6 @@ export function excerpt(text: string): string {
 
 const fit = (s: string, cells: number) => (s.length > cells ? `${s.slice(0, Math.max(0, cells - 3))}...` : s)
 
-type Call = { tool: string; input: unknown; isRunning: boolean; isErrored: boolean }
-
-const str = (v: unknown) => (typeof v === 'string' ? v : undefined)
-const base = (p: string) => p.split('/').pop() ?? p
-const args = (c: Call) => (c.input ?? {}) as Record<string, unknown>
-const CD = /^\s*cd\s+[^&;]+(&&|;)\s*/
-
-// Bash rows are named for the program they run, past `cd dir &&`, env assignments and wrappers.
-const WRAPPERS = new Set(['sudo', 'env', 'command', 'exec', 'nohup', 'time'])
-function program(command: string): string {
-  const words = command.replace(CD, '').trim().split(/\s+/)
-  const w = words.find(x => !/^\w+=/.test(x) && !WRAPPERS.has(x)) || 'bash'
-  return base(w)
-}
-
-function label(c: Call): string {
-  const i = args(c)
-  if (c.tool === 'Bash') return program(str(i.command) ?? '').toUpperCase()
-  if (c.tool === 'Skill') return `/${str(i.skill) ?? 'skill'}`
-  if (c.tool.startsWith('mcp__')) return c.tool.split('__').slice(1).join(':').toUpperCase()
-  // A subagent is named for its type, past a plugin prefix (`plugin-dev:agent-creator`).
-  if (c.tool === 'Agent' || c.tool === 'Task') return (str(i.subagent_type)?.split(':').pop() || 'agent').toUpperCase()
-  return c.tool.toUpperCase()
-}
 
 // Theme keys only: a theme fills every one (a built-in theme too); any other name resolves
 // only where a custom theme sets it, and draws as plain text elsewhere.
@@ -249,16 +226,6 @@ function colorOf(c: Call): ThemeKey {
   return COLORS[c.tool] ?? 'text'
 }
 
-// shortcut: per-tool field guesses, no local-model intent line; upgrade by reading `description` from more tools.
-function describe(c: Call): string {
-  const i = args(c)
-  const file = str(i.file_path) ?? str(i.notebook_path) ?? str(i.path)
-  const what =
-    str(i.description) ??
-    (c.tool === 'Bash' ? str(i.command)?.replace(CD, '') : undefined) ??
-    str(i.pattern) ?? str(i.query) ?? str(i.url) ?? str(i.prompt) ?? str(i.args)
-  return [what?.split('\n')[0]?.slice(0, 80), file && base(file)].filter(Boolean).join('  ')
-}
 
 const textOf = (output: unknown): string => {
   if (typeof output === 'string') return output
@@ -320,7 +287,7 @@ async function ensureCommand($: EngineInterface, left = 20): Promise<void> {
   try {
     await $.command.register({
       name: 'hush',
-      description: 'Open the hush panel; or: cards | lines | group | cycle | collapse | bg',
+      description: 'Open the hush panel; or: cards | lines | group | cycle | collapse | stats | bg | wiki | digest | board | tree | trace | analyze | replay | gc',
     })
     isRegistered = true
   } catch {
@@ -332,9 +299,19 @@ async function ensureCommand($: EngineInterface, left = 20): Promise<void> {
 const agents = new Map<string, string>()
 const agentNamed = (name: string) => [...agents.keys()].find(a => a.toLowerCase() === name.toLowerCase())
 
+// `/hush <cmd>` run by the CLI; the rest are the mod's own.
+const CLI = new Set(['wiki', 'digest', 'board', 'tree', 'trace', 'analyze', 'replay', 'gc'])
+const CLI_REPLY = 8000
+const CLI_HELP = [...CLI].join(' | ')
+
+const savedLine = (s: Record<string, number>) =>
+  Object.entries(s).filter(([, n]) => n > 0).map(([k, n]) => `${k} ${kb(n)}`).join(' · ') || 'nothing yet'
+
 export const register: Register = on => {
+  registerAgent(on)
   on('session.start', async ($, e, next) => {
     await ensureCommand($)
+    await startAgent($).catch(() => undefined)
     // Saved choices are a convenience: a failed load keeps the defaults and never costs the command.
     await load($).catch(err => $.ui.log(`hush: settings not restored (${String(err).slice(0, 80)})`, { to: 'debug' }))
     return next(e)
@@ -346,13 +323,29 @@ export const register: Register = on => {
       await $.ui.open({ id: PANE, title: 'Hush' })
       return { text: 'Hush panel opened.' }
     }
+    // The harness-neutral CLI (bin/hush.ts) answers its own commands; its output is the reply.
+    if (CLI.has(arg)) {
+      // trace and tree default to this session, not the last ledger any session touched.
+      const sid = await $.session.id().catch(() => '')
+      const hasTarget = rest.some(x => !x.startsWith('--'))
+      const args = arg === 'trace' && sid && !rest.includes('--session') ? [...rest, '--session', sid] : arg === 'tree' && sid && !hasTarget ? [sid, ...rest] : rest
+      const r = await $.process.run(['node', `${$.plugin.root}/bin/hush.ts`, arg, ...args, '--no-color'], { timeoutMs: 120_000 })
+      const all = r.stdout.trim() || r.stderr.trim()
+      // Long output keeps its head (the summary) and its tail (the newest rows).
+      const out = all.length > CLI_REPLY ? `${all.slice(0, 2000)}\n[… ${all.length - CLI_REPLY} characters …]\n${all.slice(-(CLI_REPLY - 2000))}` : all
+      return { text: out || `hush ${arg}: exit ${r.exitCode}` }
+    }
+    if (arg === 'stats') {
+      const all = await read($, trace)
+      return { text: `Calls logged: ${all.length} (${all.filter(x => !x.ok).length} failed). Kept from the model: ${savedLine(await read($, saved))}.` }
+    }
     if (arg === 'collapse') {
       await update($, expanded, () => [])
       return { text: 'Every unfolded row is folded again.' }
     }
     if (arg === 'bg') {
       const [target, value = 'off'] = rest as [Target | undefined, string?]
-      if (!target || !TARGETS.some(t => t.key === target) || !(value === 'off' || HEX.test(value) || value in PRESETS)) {
+      if (!target || !TARGETS.some(t => t.key === target) || !(value === 'off' || HEX.test(value) || Object.hasOwn(PRESETS, value))) {
         return { text: `Usage: /hush bg assistant|tool ${PRESET_NAMES.join('|')}|#rrggbb` }
       }
       await update($, backgrounds, b => ({ ...b, [target]: value === 'off' ? undefined : value }))
@@ -362,7 +355,7 @@ export const register: Register = on => {
     const now = await read($, mode)
     const want = arg as Mode
     if (!MODES.includes(want) && arg !== 'cycle') {
-      return { text: `Unknown option "${arg}": cards | lines | group | cycle | collapse | bg` }
+      return { text: `Unknown option "${arg}": cards | lines | group | cycle | collapse | stats | bg | ${CLI_HELP}` }
     }
     const next = MODES.includes(want) ? want : MODES[(MODES.indexOf(now) + 1) % MODES.length]
     await update($, mode, () => next)
@@ -435,12 +428,17 @@ export const register: Register = on => {
           )
         })}
         <Text dimColor>Any color: /hush bg assistant|tool #rrggbb</Text>
+        <Text> </Text>
+        <Text bold>Kept from the model</Text>
+        <Text dimColor>{savedLine(await read($, saved))}</Text>
       </Box>
     )
   })
 
   on('prompt.submit', async ($, e, next) => {
     void ensureCommand($, 0)
+    const recap = e.command || e.isMeta ? null : await recapContext($).catch(() => null)
+    if (recap) e = { ...e, context: [...(e.context ?? []), recap] }
     if (e.command || e.isMeta || e.origin.kind !== 'composer' || !e.text.trim()) return next(e)
     await update($, lastPrompt, () => flat(e.text))
     if (!isOn(await read($, toggles), 'mentions')) return next(e)
@@ -472,20 +470,16 @@ export const register: Register = on => {
     return { suggestions: [...r.suggestions, ...mine] }
   })
 
+  // No .catch: a hook that fails after `next` keeps that result, never a second run of the tool.
   // The model reads a JSON MCP result as TOON; text that is not JSON, errors and
   // structured (schema) results pass as they are.
   on('tool.call', async ($, e, next) => {
-    const r = await next(e)
-    // Failures of the main loop, for the band; a subagent's rows are not in this transcript.
-    if ((r.deny !== undefined || r.isError) && !e.agentId) {
-      const c = { tool: e.tool, input: e, isRunning: false, isErrored: true }
-      const f = { id: e.tool_use_id, label: label(c), what: describe(c) }
-      await update($, failures, all => [...all, f].slice(-20)).catch(() => undefined)
-    }
+    const r = await traceCall($, e, next)
     if (!e.tool.startsWith('mcp__') || r.deny !== undefined || r.isError || typeof r.text !== 'string') return r
     if (!isOn(await read($, toggles), 'toon')) return r
     const toon = jsonToToon(r.text)
     if (!toon) return r
+    await update($, saved, s => ({ ...s, toon: (s.toon ?? 0) + (r.text as string).length - toon.length })).catch(() => undefined)
     const out = r.result as unknown
     if (typeof out === 'string') return { result: toon as never, context: r.context }
     const blocks = Array.isArray(out) ? (out as { type?: string }[]) : null
@@ -493,7 +487,7 @@ export const register: Register = on => {
       return { result: [{ type: 'text', text: toon }] as never, context: r.context }
     }
     return r
-  }).catch(($, e, next) => next(e))
+  })
 
   // Thinking streams through each model request of the main loop; the band keeps the last
   // thought until new thinking arrives. A step that ends in tool calls is narration: its
@@ -533,8 +527,12 @@ export const register: Register = on => {
 
   on('prompt.compose', async ($, e, next) => {
     const r = await next(e)
-    if (!isOn(await read($, toggles), 'narration')) return r
-    return { sections: [...r.sections, { id: 'hush:narration', text: NARRATION_RULE, scope: 'session' as const }] }
+    const sections = [...r.sections, { id: 'hush:describe', text: DESCRIBE_RULE, scope: 'session' as const }]
+    const t = await read($, toggles)
+    if (isOn(t, 'narration')) sections.push({ id: 'hush:narration', text: NARRATION_RULE, scope: 'session' as const })
+    const brief = isOn(t, 'brief') ? briefSection() : null
+    if (brief) sections.push({ id: 'hush:brief', text: brief, scope: 'session' as const })
+    return { sections }
   }).catch(($, e, next) => next(e))
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
@@ -544,32 +542,19 @@ export const register: Register = on => {
     // Prompt and thought only while a turn runs: once it ends they repeat the transcript.
     const prompt = isOn(t, 'prompt') && p.isWorking ? await read($, lastPrompt) : null
     const th = isOn(t, 'thinking') && p.isWorking ? await read($, thought) : null
-    const fails = isOn(t, 'errors') ? await read($, failures) : []
-    if (!prompt && !th && !fails.length) return next(e)
+    const turn = isOn(t, 'summary') && !p.isWorking ? await read($, lastTurn) : null
+    if (!prompt && !th && !turn) return next(e)
     const { Box, Button, Text } = $.ui.resolve(e)
     const w = Math.max(20, p.bodyColumns)
     return (
       <Box flexDirection="column">
-        {fails.length ? (
-          <Box>
-            <Text color="error">{`✗ ${fails.length} failed `}</Text>
-            {fails.slice(-3).map(f => (
-              <Button key={`fail-${f.id}`} plain onPress={() => jumpTo($, f.id)}>
-                <Text color="error">{` ${f.label} `}</Text>
-                <Text dimColor>{`${f.what.slice(0, 24)} `}</Text>
-              </Button>
-            ))}
-            <Button key="fail-clear" plain dimColor onPress={() => update($, failures, () => [])}>
-              <Text>{' clear'}</Text>
-            </Button>
-          </Box>
-        ) : null}
         {prompt ? (
           <Text wrap="truncate-end">
             <Text color="suggestion">{'❯ '}</Text>
             <Text dimColor>{fit(prompt, w - 2)}</Text>
           </Text>
         ) : null}
+        {turn ? <Text dimColor wrap="truncate-end">{`∑ last turn: ${turnLine(turn)}`}</Text> : null}
         {th ? <Text dimColor>{'∴ thinking'}</Text> : null}
         {th ? <Text dimColor italic>{fit(th, w * THOUGHT_ROWS)}</Text> : null}
       </Box>
@@ -579,6 +564,20 @@ export const register: Register = on => {
   // A typed prompt as a call row under a rule: `  USER  first line…`, the label in USER_COLOR; a click on the label unfolds the whole prompt under it, as a call's output.
   on('ui.render', { component: 'UserMessage' }, async ($, e, next) => {
     const p = e.props
+    if (p.origin.kind === 'task-notification' && p.task && !p.isExpanded) {
+      const { Box, Text } = $.ui.resolve(e)
+      const call = p.task.toolUseId ? (await read($, trace)).find(x => x.id === p.task?.toolUseId) : undefined
+      const status = p.task.status ?? 'done'
+      const mark = status === 'completed' ? '✓' : status === 'failed' ? '✗' : '■'
+      const secs = p.task.durationMs ? ` · ${Math.round(p.task.durationMs / 1000)}s` : ''
+      const what = call ? `${call.label} ${call.what}` : flat(p.text)
+      return (
+        <Box>
+          <Text color={status === 'failed' ? 'error' : USER_COLOR}>{`  ${'BG'.padEnd(MIN_LABEL)} ${mark} `}</Text>
+          <Text dimColor wrap="truncate-end">{`${what}${secs}`}</Text>
+        </Box>
+      )
+    }
     if (p.origin.kind !== 'composer') return next(e)
     const { Box, Button, Text } = $.ui.resolve(e)
     const id = `user-${e.requestId}`
@@ -675,6 +674,7 @@ export const register: Register = on => {
     const { Box, Button, Text } = $.ui.resolve(e)
     const isOpen = (await read($, expanded)).includes(p.tool_use_id)
     const bg = p.isErrored ? undefined : bgOf(await read($, backgrounds), 'tool')
+    const root = await $.session.cwd().catch(() => '')
     return (
       <Box backgroundColor={bg} marginTop={isOn(await read($, toggles), 'tight') ? -1 : 0}>
         <Text dimColor>{isOpen ? '▾ ' : '  '}</Text>
@@ -682,7 +682,7 @@ export const register: Register = on => {
         <Button key={`row-${p.tool_use_id}`} plain onPress={() => toggleOpen($, p.tool_use_id, p.tool_use_id)}>
           <Text color={colorOf(p)}>{label(p).padEnd(MIN_LABEL)}</Text>
         </Button>
-        <Text dimColor={p.isRunning} italic={p.isRunning}>{` ${describe(p)}`}</Text>
+        <Text dimColor={p.isRunning} italic={p.isRunning} wrap="truncate-end">{` ${describe(p, root)}`}</Text>
       </Box>
     )
   })
@@ -740,19 +740,28 @@ export const register: Register = on => {
     const isTroubled = p.calls.some(c => c.isErrored || c.isInterrupted)
     if (m === 'cards' || p.isExpanded || (!p.isCallsOnly && !isTroubled)) return next(e)
     const { Box, Button, Text } = $.ui.resolve(e)
-    for (const c of p.calls) if (c.tool_use_id) rowOf.set(c.tool_use_id, e.requestId)
     const open = new Set(await read($, expanded))
     const bg = bgOf(await read($, backgrounds), 'tool')
 
     const isSummary = m === 'group' && !p.isActive && !isTroubled
     const failed = p.calls.filter(c => c.isErrored).length
-    let rows: (typeof p.calls)[number][] = [...p.calls]
+    const root = await $.session.cwd().catch(() => '')
+    type GroupCall = (typeof p.calls)[number]
+    // Repeats in a row (a poll run twice) draw once as `×N`, on the latest call.
+    const runs: { c: GroupCall; n: number }[] = []
+    for (const c of p.calls) {
+      const prev = runs[runs.length - 1]
+      const same = prev && !prev.c.isErrored && !c.isErrored && label(prev.c) === label(c) && describe(prev.c, root) === describe(c, root)
+      if (same) runs[runs.length - 1] = { c, n: prev.n + 1 }
+      else runs.push({ c, n: 1 })
+    }
+    let rows = runs
     if (isSummary) {
-      const last = new Map<string, (typeof p.calls)[number]>()
-      for (const c of p.calls) last.set(label(c), c)
+      const last = new Map<string, { c: GroupCall; n: number }>()
+      for (const c of p.calls) last.set(label(c), { c, n: 1 })
       rows = [...last.values()]
     }
-    const width = Math.max(MIN_LABEL, ...rows.map(c => label(c).length))
+    const width = Math.max(MIN_LABEL, ...rows.map(r => label(r.c).length))
     const pad = isSummary ? '  ' : ''
 
     return (
@@ -764,14 +773,19 @@ export const register: Register = on => {
             {failed ? <Text color="error">{` · ${failed} failed`}</Text> : null}
           </Text>
         ) : null}
-        {rows.map((c, n) => {
+        {rows.map(({ c, n: times }, n) => {
           const id = c.tool_use_id
           const isOpen = !!id && open.has(id)
           const head = [
             <Text key="b" dimColor>{`${pad}${isOpen ? '▾ ' : '  '}`}</Text>,
             <Text key="l" color={colorOf(c)}>{label(c).padEnd(width)}</Text>,
           ]
-          const what = <Text dimColor={c.isRunning} italic={c.isRunning}>{` ${describe(c)}`}</Text>
+          const what = (
+            <Text dimColor={c.isRunning} italic={c.isRunning} wrap="truncate-end">
+              {` ${describe(c, root)}`}
+              {times > 1 ? <Text dimColor>{` ×${times}`}</Text> : null}
+            </Text>
+          )
           return (
             <Box key={`call-${id ?? n}`} flexDirection="column">
               <Box>

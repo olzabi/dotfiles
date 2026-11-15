@@ -6,7 +6,8 @@ const HIT = /^([^\s:][^:]*):(\d+):(.*)$/
 export function groupMatches(output: string): string[] | null {
   const lines = output.split('\n').filter(l => l.trim() && l !== '--')
   const hits = lines.map(l => HIT.exec(l))
-  if (lines.length < 2 || hits.some(h => !h)) return null
+  // A path of digits alone is a clock (`10:15:02 started`), not a file.
+  if (lines.length < 2 || hits.some(h => !h || /^\d+$/.test(h[1] ?? ''))) return null
   const rows: string[] = []
   let file = ''
   for (const h of hits) {
@@ -112,6 +113,8 @@ export function toToon(value: unknown): string {
 export function jsonToToon(text: string): string | null {
   const t = text.trim()
   if (!/^[[{]/.test(t)) return null
+  // JSON.parse rounds integers past 2^53: an id like 12345678901234567890 would reach the model changed.
+  if (/[:[,]\s*-?[\d.]{16,}/.test(t)) return null
   try {
     const toon = toToon(JSON.parse(t))
     return toon.length < t.length ? toon : null
@@ -219,4 +222,94 @@ export function compactDiff(path: string, hunks: readonly Hunk[], context = fals
     rows.push({ text: `${String(c.n).padStart(width)} ${c.mark} ${code}`, kind: c.mark === '+' ? 'add' : c.mark === '-' ? 'del' : 'ctx' })
   }
   return rows
+}
+
+// ── Shell rows ──────────────────────────────────────────────────────────────
+// One shell word: quoted, `$(…)`, or plain characters up to a space or separator.
+// The alternatives are disjoint (a plain character is never a quote or `$`), so a failed match
+// backtracks linearly: overlapping ones went exponential on `cd "a""a"…`.
+const WORD = String.raw`(?:"[^"]*"|'[^']*'|\$\([^)]*\)|\$(?!\()|[^\s;&|"'$])+`
+// Setup that leads a command and says nothing about it: `cd dir;`, `VAR=x &&`, `export A=1 B=2;`.
+const LEAD = new RegExp(String.raw`^\s*(?:cd\s+${WORD}|(?:export\s+)?\w+=${WORD}(?:\s+\w+=${WORD})*)\s*(?:&&|;)\s*`)
+const WRAPPERS = new Set(['sudo', 'env', 'command', 'exec', 'nohup', 'time', 'timeout'])
+
+export function stripLead(command: string): string {
+  // Setup is short; a long command's head is all the row shows anyway.
+  let c = command.length > 2000 ? command.slice(0, 2000) : command
+  for (let m = LEAD.exec(c); m; m = LEAD.exec(c)) c = c.slice(m[0].length)
+  return c.trim()
+}
+
+// Absolute paths as the reader knows them: under `root` relative, under the home `~`.
+export function shortPaths(text: string, root = ''): string {
+  const home = /^\/(?:home|Users)\/[^/]+/.exec(root)?.[0]
+  let t = root ? text.split(`${root}/`).join('').split(root).join('.') : text
+  if (home) t = t.split(home).join('~')
+  return t
+}
+
+// A Bash call as `LABEL` + what it does, read from the command when it has no description:
+// setup stripped, heredoc writes named WRITE, polling loops WAIT, inline scripts by their first line.
+export function shellRow(command: string, root = ''): { label: string; what: string } {
+  const [first = '', ...body] = stripLead(command).split('\n')
+  const line = first.trim()
+  const write = /^(?:cat\s+>>?\s*(\S+)\s*<<|cat\s+<<-?\s*\S+\s*>>?\s*(\S+)|tee\s+(?:-a\s+)?(\S+)\s*<<)/.exec(line)
+  if (write) return { label: 'WRITE', what: shortPaths(write[1] ?? write[2] ?? write[3] ?? '', root) }
+  const wait = /^(?:(?:until|while)\s+(.+?);\s*do\b|sleep\s+\d+\w*\s*(?:;|&&)\s*(.+))/.exec(line)
+  if (wait) return { label: 'WAIT', what: shortPaths((wait[1] ?? wait[2] ?? '').trim(), root) }
+  const words = line.split(/\s+/)
+  const prog = words.find(w => !/^\w+=/.test(w) && !WRAPPERS.has(w) && !/^\d+[smh]?$/.test(w)) || 'bash'
+  const name = (prog.replace(/^[({!]+/, '').split('/').pop() || 'bash').toUpperCase()
+  if (/<<-?\s*['"]?\w+/.test(line) && body.length) {
+    const n = body.length - 1
+    // `python3 - <<E` says nothing before its script: show the script's first line instead.
+    const head = line.replace(/\s*<<-?\s*['"]?\w+['"]?.*$/, '')
+    if (!/^\S+(\s+-)?$/.test(head)) return { label: name, what: shortPaths(`${head} … +${n} lines`, root) }
+    const lead = body.find(l => l.trim() && !/^\s*(import|from|#|use |require)\b/.test(l))?.trim() ?? ''
+    return { label: name, what: shortPaths(`${n} lines: ${lead}`, root) }
+  }
+  return { label: name, what: shortPaths(line, root) }
+}
+
+// ── Call rows ───────────────────────────────────────────────────────────────
+// `LABEL  what` for any tool call; shared by the mod and `bin/replay.ts`.
+export type Call = { tool: string; input: unknown; isRunning: boolean; isErrored: boolean }
+
+export const str = (v: unknown) => (typeof v === 'string' ? v : undefined)
+export const base = (p: string) => p.split('/').pop() ?? p
+export const args = (c: Call) => (c.input ?? {}) as Record<string, unknown>
+
+export function label(c: Call): string {
+  const i = args(c)
+  if (c.tool === 'Bash') return shellRow(str(i.command) ?? '').label
+  if (c.tool === 'Skill') return `/${str(i.skill) ?? 'skill'}`
+  if (c.tool.startsWith('mcp__')) return c.tool.split('__').slice(1).join(':').toUpperCase()
+  // A subagent is named for its type, past a plugin prefix (`plugin-dev:agent-creator`).
+  if (c.tool === 'Agent' || c.tool === 'Task') return (str(i.subagent_type)?.split(':').pop() || 'agent').toUpperCase()
+  return c.tool.toUpperCase()
+}
+
+// An MCP call with none of the usual fields: its first short string argument (`function`, `uid`),
+// so two different calls never read as the same row.
+const ENVELOPE = new Set(['tool', 'tool_use_id', 'agentId', 'requestMeta', 'consent'])
+function firstArg(i: Record<string, unknown>): string | undefined {
+  for (const [k, v] of Object.entries(i)) {
+    if (ENVELOPE.has(k)) continue
+    if (typeof v === 'string' && v.trim()) return `${k}=${v.replace(/\s+/g, ' ').trim().slice(0, 60)}`
+    if (typeof v === 'number' || typeof v === 'boolean') return `${k}=${v}`
+  }
+  return undefined
+}
+
+// shortcut: per-tool field guesses, no local-model intent line; upgrade by reading `description` from more tools.
+// The row's Text truncates to the terminal width; only the first line is taken here.
+export function describe(c: Call, root = ''): string {
+  const i = args(c)
+  const file = str(i.file_path) ?? str(i.notebook_path) ?? str(i.path)
+  const what =
+    str(i.description) ??
+    (c.tool === 'Bash' ? shellRow(str(i.command) ?? '', root).what : undefined) ??
+    str(i.pattern) ?? str(i.query) ?? str(i.url) ?? str(i.prompt) ?? str(i.args) ??
+    (c.tool.startsWith('mcp__') ? firstArg(i) : undefined)
+  return [what?.split('\n')[0], file && base(file)].filter(Boolean).join('  ')
 }
