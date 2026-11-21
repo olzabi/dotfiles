@@ -68,6 +68,11 @@
             "type": "command",
             "command": "$CLAUDE_CONFIG_DIR/hooks/tooling-rules.sh",
             "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "$CLAUDE_CONFIG_DIR/hooks/herdr-claude-session.sh set",
+            "timeout": 5
           }
         ]
       }
@@ -121,6 +126,11 @@
           {
             "type": "command",
             "command": "$CLAUDE_CONFIG_DIR/hooks/wt-marker.sh clear",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "$CLAUDE_CONFIG_DIR/hooks/herdr-claude-session.sh clear",
             "timeout": 5
           }
         ]
