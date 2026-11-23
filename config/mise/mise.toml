@@ -45,6 +45,7 @@ glow = "latest"
 tmux = "latest"                                                               # may compile from source, check with `mise install -v tmux`
 yazi = "latest"
 hunk = "latest"
+"github:furkankly/zoetrope" = "latest"                           # zoe: live graph of an agent session (trial, popup.zoe)
 rust = "stable"
 delta = "latest"
 neovim = "latest"

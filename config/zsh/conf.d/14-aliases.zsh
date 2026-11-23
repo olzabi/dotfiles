@@ -15,6 +15,20 @@ if command -v claude >/dev/null 2>&1; then
   alias cc="claude"
 fi
 
+if command -v mise >/dev/null 2>&1; then
+  misei() {
+    MISE_MINIMUM_RELEASE_AGE=0 mise install "$@"
+  }
+
+  # Install and activate globally in one go
+  miseig() {
+    MISE_MINIMUM_RELEASE_AGE=0 mise use -g "$@"
+  }
+  alias m="mise"
+  alias mi="misei"
+  alias mug="miseig"
+fi
+
 alias -- -='cd -'
 alias 1='cd -1'
 alias 2='cd -2'

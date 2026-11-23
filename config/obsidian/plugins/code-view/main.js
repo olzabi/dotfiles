@@ -13,7 +13,8 @@ const fenced = (text, lang) => {
 
 class CodeView extends TextFileView {
   getViewType() { return TYPE; }
-  canAcceptExtension() { return true; }
+  // only claimed extensions: returning true kept .md files in this view when a code tab navigated to them
+  canAcceptExtension(ext) { return this.app.viewRegistry.getTypeByExtension(ext) === TYPE; }
   getViewData() { return this.data; }
   clear() { this.contentEl.empty(); }
   setViewData(data) {

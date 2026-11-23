@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
-# Usage: ob [dir] [file] | ob <file>   — read dir (default: git root of $PWD, else $PWD) in Obsidian with the shared dotfiles
+# Usage: ob [--here] [dir] [file] | ob <file>   — read dir (default: git root of $PWD, else $PWD) in Obsidian with the shared dotfiles
 #                             config; file (relative to dir, e.g. docs/plans/active/x/README.md) is opened in it.
 # Obsidian scans and watches every file in a vault ("Excluded files" only hides them), so instead of opening the
 # project itself we open a mirror vault under ~/.cache/obs holding symlinks to just its markdown and images.
 set -euo pipefail
+# --here: open dir itself as the vault (a notes vault you write in, e.g. ~/wiki), linking the shared config into its .obsidian.
+here=; [ "${1:-}" = --here ] && { here=1; shift; }
 
 # ob <file>: open that file, in its git root (else its folder) as the vault.
 if [ $# -eq 1 ] && [ -f "$1" ]; then
@@ -20,6 +22,7 @@ shared=$(realpath "$(dirname "$(readlink -f "$0")")/../config/obsidian")
 reg="${XDG_CONFIG_HOME:-$HOME/.config}/obsidian/obsidian.json"
 sock="${XDG_RUNTIME_DIR:-$HOME}/.obsidian-cli.sock"
 vault="${XDG_CACHE_HOME:-$HOME/.cache}/obs/$(printf %s "$root" | sha1sum | cut -c1-8)/$(basename "$root")"
+[ -z "$here" ] || vault=$root
 
 list_docs() {
   if git -C "$root" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
@@ -34,13 +37,13 @@ list_docs() {
 # drop links whose target is gone, prune emptied dirs.
 # Dot-folders (.claude/, .agents/) are mirrored as-is; the shared "unhide" plugin makes Obsidian show them.
 mkdir -p "$vault/.obsidian"
-while IFS= read -r -d '' rel; do
+[ -n "$here" ] || while IFS= read -r -d '' rel; do
   dst="$vault/$rel"
   [ -L "$dst" ] && continue
   mkdir -p "$(dirname "$dst")" && ln -s "$root/$rel" "$dst"
 done < <(list_docs; list_docs | grep -zaiE '\.(md|markdown)$' | "$(dirname "$(readlink -f "$0")")/md-link-targets" "$root")
-find "$vault" -xtype l -delete
-find "$vault" -mindepth 1 -type d -empty -not -path "$vault/.obsidian" -delete
+[ -n "$here" ] || find "$vault" -xtype l -delete
+[ -n "$here" ] || find "$vault" -mindepth 1 -type d -empty -not -path "$vault/.obsidian" -delete
 
 # Config: project's own real .obsidian files win, shared dotfiles config fills the rest; workspace.json stays per-vault.
 # Plugins always come from dotfiles: community plugins get auto-enabled below, so never run JS a repo ships.
@@ -57,7 +60,7 @@ done
 # Edits to link targets fire no watcher events inside the vault; touching the link does. Poll the ~hundreds of
 # targets (cheap) and stop once Obsidian quits. One poller per vault.
 pidf="$(dirname "$vault")/poll.pid"
-[ -f "$pidf" ] && kill "$(cat "$pidf")" 2>/dev/null || true
+[ -n "$here" ] || { [ -f "$pidf" ] && kill "$(cat "$pidf")" 2>/dev/null || true
 ( trap '' HUP  # survive the terminal closing
   stamp="$(dirname "$vault")/poll.stamp"; touch "$stamp"
   while sleep 2 && pgrep -f '/obsidian/app.asar' >/dev/null; do
@@ -66,15 +69,21 @@ pidf="$(dirname "$vault")/poll.pid"
     mv "$stamp.next" "$stamp"
   done
 ) >/dev/null 2>&1 &
-echo $! >"$pidf"
+echo $! >"$pidf"; }
 
 # Open + verify runs detached so the shell returns at once; errors arrive as desktop notifications.
 fail() { notify-send -a ob "ob" "$1" 2>/dev/null || echo "ob: $1" >&2; return 1; }
+# A mirror vault's plugins are the dotfiles' own (linked above, never a repo's), so trust it up front instead of
+# Obsidian asking "Do you trust the author of this vault?" for every new one (each worktree is a new vault).
+# Obsidian keeps that answer in its localStorage as enable-plugin-<vault id>, shared by all its windows.
+trust_js=""
+[ -n "$here" ] || trust_js="for (const [id, v] of Object.entries(window.electron.ipcRenderer.sendSync('vault-list'))) if (v.path === $(jq -n --arg p "$vault" '$p')) localStorage.setItem('enable-plugin-' + id, 'true');"
 open_vault() {
   if [ -S "$sock" ]; then
     # Running app keeps its vault list in memory and ignores obsidian.json edits, so register through it:
     # "vault-open" is the same IPC as "Open folder as vault" (adds the vault if new, then opens it).
-    out=$(obsidian eval "code=window.electron.ipcRenderer.sendSync('vault-open', $(jq -n --arg p "$vault" '$p'), false)" 2>&1) || true
+    # trust before opening (a known vault) and right after (a new one gets its id here; its window is still loading)
+    out=$(obsidian eval "code=$trust_js const r = window.electron.ipcRenderer.sendSync('vault-open', $(jq -n --arg p "$vault" '$p'), false); $trust_js r" 2>&1) || true
     case "$out" in *"not enabled"*)
       fail "enable Settings > General > Advanced > Command line interface, then rerun" ;;
     esac
@@ -94,6 +103,8 @@ open_vault() {
   live() { [ -S "$sock" ] && obsidian vaults verbose 2>/dev/null | cut -f2- | grep -qxF "$vault"; }
   for _ in $(seq 40); do
     if live; then
+      # cold start (no app to trust it through first): it opened asking; trust it and reload, which drops the question
+      [ -n "$here" ] || obsidian vault="$(basename "$vault")" eval code="if (!app.plugins.isEnabled()) { localStorage.setItem('enable-plugin-' + app.appId, 'true'); location.reload(); }" >/dev/null 2>&1
       if [ -n "$open_file" ]; then
         xdg-open "obsidian://open?path=$(jq -rn --arg p "$vault/$open_file" '$p | @uri')"
         # once it is the active file: collapse the file explorer, then expand just the folders leading to it
