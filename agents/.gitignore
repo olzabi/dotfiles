@@ -31,6 +31,8 @@
 !/claude/CLAUDE.md
 !/claude/mods/
 !/claude/mods/**
+!/claude/marketplace/
+!/claude/marketplace/**
 
 # Anywhere above: installed packages.
 node_modules/

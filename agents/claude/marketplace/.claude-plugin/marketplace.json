@@ -1,0 +1,22 @@
+{
+  "name": "dotfiles",
+  "description": "Upstream plugins narrowed to the parts this setup uses, so their skills aren't copied into agents/skills",
+  "owner": { "name": "olzabi" },
+  "plugins": [
+    {
+      "name": "matt",
+      "description": "A few skills from mattpocock/skills, tracked upstream",
+      "source": { "source": "git-subdir", "url": "https://github.com/mattpocock/skills.git", "path": "skills" },
+      "skills": [
+        "./engineering/codebase-design",
+        "./engineering/domain-modeling",
+        "./engineering/prototype",
+        "./productivity/grilling",
+        "./productivity/handoff",
+        "./productivity/to-questionnaire",
+        "./productivity/wait-what",
+        "./productivity/writing-for-agents"
+      ]
+    }
+  ]
+}

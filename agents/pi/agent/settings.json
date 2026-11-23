@@ -38,7 +38,23 @@
     "npm:pi-minimalist",
     "npm:pi-vim",
     "./extensions/.packages/pi-atelier-local",
-    "npm:@juicesharp/rpiv-ask-user-question"
+    "npm:@juicesharp/rpiv-ask-user-question",
+    {
+      "source": "git:github.com/mattpocock/skills",
+      "extensions": [],
+      "prompts": [],
+      "themes": [],
+      "skills": [
+        "skills/engineering/codebase-design",
+        "skills/engineering/domain-modeling",
+        "skills/engineering/prototype",
+        "skills/productivity/grilling",
+        "skills/productivity/handoff",
+        "skills/productivity/to-questionnaire",
+        "skills/productivity/wait-what",
+        "skills/productivity/writing-for-agents"
+      ]
+    }
   ],
   "tuiMode": "regular",
   "outputPad": 1,

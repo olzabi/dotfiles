@@ -154,9 +154,18 @@
     "worktrunk@worktrunk": false,
     "superpowers@anthropic-plugin-directory": true,
     "claude-md-management@anthropic-plugin-directory": true,
-    "ralph-loop@anthropic-plugin-directory": true
+    "ralph-loop@anthropic-plugin-directory": true,
+    "matt@dotfiles": true
   },
   "extraKnownMarketplaces": {
+    "dotfiles": {
+      "source": {
+        "source": "github",
+        "repo": "olzabi/dotfiles",
+        "path": "agents/claude/marketplace/.claude-plugin/marketplace.json",
+        "sparsePaths": ["agents/claude/marketplace"]
+      }
+    },
     "ecc": {
       "source": {
         "source": "git",
