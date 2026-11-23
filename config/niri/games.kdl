@@ -1,0 +1,11 @@
+// Blish HUD (bin/gw2-blish) draws inside GW2 through the dx11 overlay, but Wine still maps its own window:
+// an untitled 196x20 float with GW2's app-id that shows over everything when GW2 loses focus. Keep it invisible.
+window-rule {
+    match app-id="^steam_app_1284210$" title="^$" is-floating=true
+    opacity 0.0
+    open-focused false
+    focus-ring { off; }
+    border { off; }
+    shadow { off; }
+    default-floating-position x=0 y=0 relative-to="bottom-right"
+}

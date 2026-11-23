@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+# gw2-fix [-n] [dpi]: fix a tiny UI and shaders recompiling at every start for Guild Wars 2 on Steam + Proton (app 1284210).
+#   -n    dry run: show what it detects and the diff it would apply, change nothing
+#   dpi   Wine DPI for the game's prefix; default auto, from the tallest monitor's native mode (kernel DRM): 1440p or less 96 (100%), 4K 144 (150%), 5K 192 (200%)
+# It finds Steam (native, ~/.steam, Flatpak; or STEAM_DIR) and the library holding the game.
+# UI: Wine reports 96 DPI whatever the screen, so GW2's "Use DPI scaling" never scales up; it sets the prefix's LogPixels.
+# Shaders: the driver caches GW2's shaders under a 1 GB cap it soon outgrows, then evicts and recompiles them.
+#   With Steam closed it adds the GPU's cap override to the launch options: NVIDIA __GL_SHADER_DISK_CACHE_SKIP_CLEANUP=1, Mesa MESA_SHADER_CACHE_MAX_SIZE=10G.
+#   Steam's Shader Pre-caching (Settings > Downloads) replays each session's new pipelines at the next launch; turn it off by hand.
+# Run it again any time; it only changes what differs. Backups: <file>.bak-gw2-fix.
+set -euo pipefail
+app=1284210 dry=
+[[ ${1:-} == -n ]] && { dry=1; shift; }
+dpi=${1:-auto}
+[[ $dpi == auto || $dpi =~ ^[0-9]+$ ]] || { sed -n '2,10s/^# \{0,1\}//p' "$0" >&2; exit 2; }
+die() { echo "gw2-fix: $*" >&2; exit 1; }
+
+# Write $2 over $1 (with a backup), or show the diff on a dry run.
+apply() {
+  if cmp -s "$1" "$2"; then rm "$2"; echo "  unchanged"
+  elif [[ -n $dry ]]; then { diff -u "$1" "$2" || true; } | sed 's/^/  /'; rm "$2"
+  else cp "$1" "$1.bak-gw2-fix"; cat "$2" > "$1"; rm "$2"; echo "  updated (backup $1.bak-gw2-fix)"; fi
+}
+
+steam=
+for d in "${STEAM_DIR:-}" ~/.local/share/Steam ~/.steam/steam ~/.var/app/com.valvesoftware.Steam/data/Steam; do
+  [[ -n $d && -f $d/steamapps/libraryfolders.vdf ]] && { steam=$d; break; }
+done
+[[ -n $steam ]] || die "no Steam install found; set STEAM_DIR"
+# The prefix (compatdata) sits in the same library as the game's appmanifest.
+lib=
+while read -r p; do
+  [[ -f $p/steamapps/appmanifest_$app.acf ]] && { lib=$p; break; }
+done < <(grep -oP '^\s*"path"\s*"\K[^"]+' "$steam/steamapps/libraryfolders.vdf"; echo "$steam")
+[[ -n $lib ]] || die "Guild Wars 2 is not installed in any Steam library of $steam"
+reg=$lib/steamapps/compatdata/$app/pfx/user.reg
+[[ -f $reg ]] || die "no Proton prefix at $reg; launch the game once first"
+[[ -z $dry ]] && pgrep -fi 'gw2-64\.exe' >/dev/null && die "quit Guild Wars 2 first (Wine rewrites user.reg on exit)"
+echo "steam: $steam"; echo "prefix: ${reg%/user.reg}"
+
+if [[ $dpi == auto ]]; then
+  # Tallest connected monitor's native mode, from the kernel (first line of each DRM connector's modes): same on any desktop.
+  h=$(for c in /sys/class/drm/card*-*; do
+        if [[ $(cat "$c/status" 2>/dev/null) == connected ]]; then head -1 "$c/modes"; fi
+      done | grep -oP '^\d+x\K\d+' | sort -n | tail -1 || true)
+  [[ -n $h ]] || { h=1440; echo "screen: not detected in /sys/class/drm; assuming 1440p"; }
+  # 96 per 1440 lines, in Windows' 25% steps, never below 100%.
+  dpi=$(( (h * 96 / 1440 + 12) / 24 * 24 )); (( dpi < 96 )) && dpi=96
+  echo "screen: ${h}p tall -> dpi $dpi"
+fi
+
+# Wine reads HKCU\Control Panel\Desktop\LogPixels, then Software\Wine\Fonts\LogPixels; set both, adding a missing one at its section end.
+echo "prefix dpi $dpi ($((dpi * 100 / 96))%):"
+tmp=$(mktemp)
+awk -v v="$(printf '"LogPixels"=dword:%08x' "$dpi")" '
+  /^\[/ { sec = ($0 ~ /^\[Control Panel\\\\Desktop\]/ || $0 ~ /^\[Software\\\\Wine\\\\Fonts\]/); done = 0; print; next }
+  sec && /^"LogPixels"=/ { print v; done = 1; next }
+  sec && !done && /^$/ { print v; done = 1 }
+  { print }
+' "$reg" > "$tmp"
+apply "$reg" "$tmp"
+
+opts=()
+[[ -d /proc/driver/nvidia ]] && opts+=(__GL_SHADER_DISK_CACHE_SKIP_CLEANUP=1)
+# Mesa drivers (AMD, Intel); a hybrid laptop gets both, the unused one is ignored.
+for drv in /sys/class/drm/card*/device/driver; do
+  case $(basename "$(readlink "$drv")") in amdgpu | radeon | i915 | xe) opts+=(MESA_SHADER_CACHE_MAX_SIZE=10G); break ;; esac
+done
+echo "gpu launch options: ${opts[*]:-none (no NVIDIA or Mesa GPU found)}"
+# localconfig.vdf is rewritten by Steam on exit, so only edit it while Steam is closed.
+if (( ${#opts[@]} )); then
+  if pgrep -x steam >/dev/null && [[ -z $dry ]]; then
+    echo "  Steam is running; close it and rerun, or add before %command%: ${opts[*]}"
+  else
+    for cfg in "$steam"/userdata/*/config/localconfig.vdf; do
+      [[ -f $cfg ]] || continue
+      echo " $cfg:"
+      tmp=$(mktemp)
+      # The app's block under "apps" holds LaunchOptions and ends at the "}" indented like its key.
+      # Prepend the options it lacks, or add the key before that "}" when there is none.
+      awk -v app="\"$app\"" -v opts="${opts[*]}" '
+        function missing(cur,   n, a, i, out) { n = split(opts, a, " "); for (i = 1; i <= n; i++) { split(a[i], kv, "="); if (index(cur, kv[1] "=") == 0) out = out a[i] " " } return out }
+        /^\t*"apps"$/ { aind = $0; sub(/"apps"/, "", aind) }
+        !done && aind != "" && $0 == aind "\t" app { ind = aind "\t"; inapp = 1 }
+        inapp && $0 ~ "^" ind "\t\"LaunchOptions\"" {
+          add = missing($0); sub(/"LaunchOptions"\t\t"/, "&" add)
+          if ($0 !~ /%command%/) sub(/"$/, " %command%\"")
+          inapp = 0; done = 1 }
+        inapp && $0 == ind "}" { print ind "\t\"LaunchOptions\"\t\t\"" opts " %command%\""; inapp = 0; done = 1 }
+        { print }
+      ' "$cfg" > "$tmp"
+      apply "$cfg" "$tmp"
+    done
+  fi
+fi
+echo "by hand: Steam > Settings > Downloads > turn off Shader Pre-caching"

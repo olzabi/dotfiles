@@ -1,0 +1,4 @@
+# Blish HUD also writes logs, module .bhm files and module data here; only its settings are tracked.
+/*
+!/.gitignore
+!/settings.json

@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+# gw2-blish [-n]: install Blish HUD for Guild Wars 2 on Steam + Proton (app 1284210), settings kept in Dotfiles.
+#   -n    dry run: show what it would do, change nothing
+# A plain Blish HUD window needs a click-through transparent overlay, which Wayland compositors (niri included)
+# don't give Wine. So it uses SorryQuick's external-dx11-overlay: a loader starts GW2 and a Blish HUD 1.3.0 build
+# that draws into the game's own DX11 frames. Steam keeps launching GW2 (same prefix, Proton, login); the launch
+# option only swaps Gw2-64.exe for the loader.
+# Steps, each skipped when already done:
+#   1. the pinned release (sha256-checked) into <game>/addons/LOADER_public
+#   2. the prefix's Documents/Guild Wars 2/addons/blishhud -> $DOTFILES/config/blishhud (settings.json tracked, rest ignored)
+#   3. Blish HUD's own audio off (it crashes on Wine audio; the game's sound is untouched)
+#   4. frame limiter "Match Monitor Refresh Rate" once settings.json exists (avoids a Pathing crash); needs jq
+#   5. with Steam closed, the launch option: %command% -> bash -c 'exec "${@/%Gw2-64.exe/<loader>}"' -- %command%
+# Ideas and values from AsuraGate (github.com/bofnald/AsuraGate). Run again after a GW2 update if Blish stops loading.
+set -euo pipefail
+app=1284210 dry=
+tag=release-0.96 sha=f6d04b4a3e325b5f8121bb100c0974f0d259724c3efb731a39839fdcfe4de57d
+url=https://github.com/SorryQuick/external-dx11-overlay/releases/download/$tag/external-dx11-overlay.zip
+loader=addons/LOADER_public/Gw2-Simple-Addon-Loader.exe
+[[ ${1:-} == -n ]] && { dry=1; shift; }
+(( $# == 0 )) || { sed -n '2,3s/^# \{0,1\}//p' "$0" >&2; exit 2; }
+die() { echo "gw2-blish: $*" >&2; exit 1; }
+do_() { if [[ -n $dry ]]; then echo "  would: $*"; else "$@"; fi; }
+dotfiles=${DOTFILES:-$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)}
+store=$dotfiles/config/blishhud
+
+steam=
+for d in "${STEAM_DIR:-}" ~/.local/share/Steam ~/.steam/steam ~/.var/app/com.valvesoftware.Steam/data/Steam; do
+  [[ -n $d && -f $d/steamapps/libraryfolders.vdf ]] && { steam=$d; break; }
+done
+[[ -n $steam ]] || die "no Steam install found; set STEAM_DIR"
+lib=
+while read -r p; do
+  [[ -f $p/steamapps/appmanifest_$app.acf ]] && { lib=$p; break; }
+done < <(grep -oP '^\s*"path"\s*"\K[^"]+' "$steam/steamapps/libraryfolders.vdf"; echo "$steam")
+[[ -n $lib ]] || die "Guild Wars 2 is not installed in any Steam library of $steam"
+game=$lib/steamapps/common/$(grep -oP '"installdir"\s*"\K[^"]+' "$lib/steamapps/appmanifest_$app.acf")
+pfx=$lib/steamapps/compatdata/$app/pfx
+[[ -f $pfx/user.reg ]] || die "no Proton prefix at $pfx; launch the game once first"
+[[ -z $dry ]] && pgrep -fi 'gw2-64\.exe|Gw2-Simple-Addon-Loader|Blish HUD\.exe' >/dev/null && die "quit Guild Wars 2 first"
+echo "game: $game"; echo "prefix: $pfx"
+
+echo "1. overlay $tag:"
+if grep -qxF "$tag" "$game/addons/LOADER_public/.gw2-blish-release" 2>/dev/null; then echo "  installed"
+else
+  tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
+  do_ curl -fsSL -o "$tmp/o.zip" "$url"
+  if [[ -z $dry ]]; then
+    echo "$sha  $tmp/o.zip" | sha256sum -c --quiet - || die "checksum mismatch for $url"
+    unzip -q -o "$tmp/o.zip" -d "$game"   # the zip holds addons/LOADER_public/...
+    echo "$tag" > "$game/addons/LOADER_public/.gw2-blish-release"
+    echo "  installed into $game/addons/LOADER_public"
+  fi
+fi
+# The loader resolves dlls.txt/exes.txt entries from its working directory, which under Steam is the game
+# folder, not its own; so make them absolute Wine paths (Z: is /).
+p=$game/addons/LOADER_public/; base=Z:${p//\//\\}
+for l in dlls.txt exes.txt; do
+  f=$game/addons/LOADER_public/$l
+  if [[ ! -f $f ]] || ! grep -qv '^[A-Za-z]:' "$f"; then continue; fi
+  if [[ -n $dry ]]; then echo "  would make $l paths absolute"
+  else B=$base awk '/^[A-Za-z]:/ || !NF { print; next } { gsub("/", "\\"); print ENVIRON["B"] $0 }' "$f" > "$f.tmp" && mv "$f.tmp" "$f"; echo "  $l: $(head -1 "$f")"; fi
+done
+
+echo "2. settings -> $store:"
+link="$pfx/drive_c/users/steamuser/Documents/Guild Wars 2/addons/blishhud"
+if [[ $(readlink "$link" 2>/dev/null) == "$store" ]]; then echo "  linked"
+else
+  do_ mkdir -p "$store" "${link%/*}"
+  # A blishhud folder from an earlier run: its files move into Dotfiles (settings.json there wins).
+  if [[ -d $link && ! -L $link ]]; then do_ cp -rn "$link/." "$store/"; do_ mv "$link" "$link.bak-gw2-blish"; fi
+  do_ ln -sfn "$store" "$link"
+fi
+
+echo "3. Blish HUD audio off:"
+sec='[Software\\Wine\\AppDefaults\\Blish HUD.exe\\DllOverrides]'
+if grep -qF "$sec" "$pfx/user.reg"; then echo "  done"
+elif [[ -n $dry ]]; then echo "  would add $sec winepulse.drv, winealsa.drv = disabled"
+else
+  cp "$pfx/user.reg" "$pfx/user.reg.bak-gw2-blish"
+  printf '\n%s %s\n"winealsa.drv"="disabled"\n"winepulse.drv"="disabled"\n' "$sec" "$(date +%s)" >> "$pfx/user.reg"
+  echo "  added (backup user.reg.bak-gw2-blish)"
+fi
+
+echo "4. frame limiter:"
+s=$store/settings.json
+if [[ ! -f $s ]]; then echo "  no settings.json yet; rerun after Blish HUD's first start"
+elif ! command -v jq >/dev/null; then echo "  no jq; set Settings > Graphics > Frame Limiter to Match Monitor Refresh Rate by hand"
+else
+  # Graphics entries live at Entries[Key=GraphicsConfiguration].Value.Entries; 4 = Match Monitor Refresh Rate.
+  f='(.Entries[] | select(.Key == "GraphicsConfiguration") | .Value.Entries) |= (map(select(.Key != "FramerateLimiter")) + [{"T": "Blish_HUD.Graphics.FramerateMethod, Blish HUD", "Key": "FramerateLimiter", "Value": 4}])'
+  if [[ $(jq '[.. | objects | select(.Key? == "FramerateLimiter") | .Value] | first' "$s") == 4 ]]; then echo "  set"
+  elif [[ -n $dry ]]; then echo "  would set FramerateLimiter = 4"
+  else jq "$f" "$s" > "$s.tmp" && mv "$s.tmp" "$s"; echo "  set to Match Monitor Refresh Rate"; fi
+fi
+
+echo "5. launch option:"
+swap="bash -c 'exec \\\"\${@/%Gw2-64.exe/$loader}\\\"' --"   # as stored in the vdf: inner quotes escaped
+if pgrep -x steam >/dev/null; then
+  echo "  Steam is running; close it and rerun, or in GW2 > Properties > Launch Options put before %command%:"
+  echo "  bash -c 'exec \"\${@/%Gw2-64.exe/$loader}\"' --"
+else
+  for cfg in "$steam"/userdata/*/config/localconfig.vdf; do
+    [[ -f $cfg ]] || continue
+    tmp2=$(mktemp)
+    # The app's block under "apps" ends at the "}" indented like its key; add the swap before %command% (or the key itself).
+    SWAP=$swap awk -v app="\"$app\"" 'BEGIN { swap = ENVIRON["SWAP"] }
+      /^\t*"apps"$/ { aind = $0; sub(/"apps"/, "", aind) }
+      !done && aind != "" && $0 == aind "\t" app { ind = aind "\t"; inapp = 1 }
+      inapp && $0 ~ "^" ind "\t\"LaunchOptions\"" {
+        if (index($0, "Gw2-Simple-Addon-Loader") == 0) {
+          if ($0 ~ /%command%/) { i = index($0, "%command%"); $0 = substr($0, 1, i - 1) swap " " substr($0, i) }
+          else sub(/"$/, " " swap " %command%\"")
+        }
+        inapp = 0; done = 1 }
+      inapp && $0 == ind "}" { print ind "\t\"LaunchOptions\"\t\t\"" swap " %command% -provider Portal\""; inapp = 0; done = 1 }
+      { print }
+    ' "$cfg" > "$tmp2"
+    if cmp -s "$cfg" "$tmp2"; then echo "  set in $cfg"; rm "$tmp2"
+    elif [[ -n $dry ]]; then { diff "$cfg" "$tmp2" || true; } | sed 's/^/  /'; rm "$tmp2"
+    else cp "$cfg" "$cfg.bak-gw2-blish"; cat "$tmp2" > "$cfg"; rm "$tmp2"; echo "  updated $cfg"; fi
+  done
+fi
+echo "Steam-account login (not ArenaNet): add USE_STEAM_LOGIN=1 and drop -provider Portal from the launch options."
