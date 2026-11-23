@@ -1,12 +1,13 @@
 import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Events, Register } from 'claude-code'
 
-import { cleanOutput, hash, isBounded, isReadLike, loopNote, queryTrace, recapOf, repeatNote, routeRead, tidyOutput, TRIM, TRIM_READ, trimOutput, turnStats } from '../core/agent.ts'
-import type { CallEntry } from '../core/agent.ts'
+import { cleanOutput, compactFacts, conflictNote, hash, isBounded, isReadLike, loopNote, queryTrace, recapOf, repeatNote, reportsNote, routeRead, runawayNote, tidyOutput, TRIM, TRIM_READ, trimOutput, turnStats } from '../core/agent.ts'
+import type { CallEntry, EditClaim } from '../core/agent.ts'
 import { describe, label, str } from '../core/format.ts'
 import { capByLoop, LEDGER_VERSION, ledgerRoot, loopFile } from '../core/ledger.ts'
 import type { LedgerEntry } from '../core/ledger.ts'
 import { isOn, TOGGLES_INITIAL } from './toggles'
+import type { Toggle, Toggles } from '../types'
 
 type On = Parameters<Register>[0]
 type ToolCallHook = Events['tool.call']
@@ -22,6 +23,7 @@ export const TRACE_TOOL = 'mcp__hush__trace'
 const DESCRIBE_NOTE = 'hush: give Bash calls a short `description`; the user sees it as the tool row instead of the raw command.'
 
 // Envelope and prose keys a call's identity leaves out: the same command with a new description is the same call.
+const EDIT_TOOLS = new Set(['Edit', 'Write', 'NotebookEdit', 'MultiEdit'])
 const SIG_SKIP = new Set(['tool', 'tool_use_id', 'agentId', 'requestMeta', 'consent', 'description'])
 
 // Reads already in the model's context: path+range → content fingerprint and when.
@@ -37,7 +39,44 @@ const pendingSub = new Set<string>()
 // the main loop gets it in its prompt, each subagent with its first call.
 let briefText: string | null = null
 const briefed = new Set<string>()
-export const briefSection = () => briefText
+export const briefSection = () => (heldOut === 'brief' ? null : briefText)
+
+// To measure hush (`hush effect`), one session in five runs with one of these off, named in meta.json.
+const HOLDOUT: Toggle[] = ['trim', 'guards', 'route', 'brief']
+let heldOut: Toggle | null = null
+const pickHoldout = (t: Toggles): Toggle | null =>
+  isOn(t, 'holdout') && Math.random() < 0.2 ? (HOLDOUT[Math.floor(Math.random() * HOLDOUT.length)] ?? null) : null
+// A toggle as this session runs it: on, and not the one held out.
+const live = (t: Toggles, k: Toggle) => k !== heldOut && isOn(t, k)
+
+// A reload or resume keeps the session's holdout; a new session draws one. A meta.json from before
+// holdouts existed means none was drawn.
+async function settleHoldout($: EngineInterface) {
+  heldOut = null
+  // No ledger, nothing would record the holdout: run everything.
+  const dir = await ledgerDirOf($)
+  if (!dir) return
+  const old = await $.fs.read(`${dir}/meta.json`).then(t => JSON.parse(String(t)) as { heldOut?: Toggle | null }, () => null)
+  heldOut = old ? (old.heldOut ?? null) : pickHoldout(await read($, toggles))
+}
+
+// Calls per loop since its run began ('' main: since the turn began), and whether it was warned.
+const runs = new Map<string, { n: number; first: number; warned: boolean }>()
+
+// The last editor of each file, across sessions: ~/.local/state/hush-editing/<hash>.json.
+// `hush gc` drops records older than the trimmed-output keep (14 days).
+async function claimEdit($: EngineInterface, path: string, owner: string): Promise<string | null> {
+  const dir = await ledgerDirOf($)
+  if (!dir) return null
+  const f = `${dir.slice(0, dir.lastIndexOf('/'))}-editing/${hash(path).replace(/[^\w-]/g, '_')}.json`
+  const prev = await $.fs.read(f).then(t => JSON.parse(String(t)) as EditClaim, () => null)
+  const now = Date.now()
+  await $.fs.write(f, JSON.stringify({ owner, at: now, path } satisfies EditClaim)).catch(() => undefined)
+  return conflictNote(prev, owner, now)
+}
+
+// Subagent reports this process saw, by agent id: the task (from its Agent call) and the whole report on disk.
+const reports = new Map<string, { what?: string; path: string }>()
 
 async function loadBrief($: EngineInterface) {
   briefText = null
@@ -143,9 +182,37 @@ async function writeMeta($: EngineInterface) {
   const dir = await ledgerDirOf($)
   if (!dir) return
   const cwd = await $.session.cwd().catch(() => '')
-  const meta = { v: LEDGER_VERSION, session: await sessionIdOf($), harness: 'claude', cwd, startedAt: Date.now() }
+  const meta = { v: LEDGER_VERSION, session: await sessionIdOf($), harness: 'claude', cwd, startedAt: Date.now(), heldOut }
   const old = await $.fs.read(`${dir}/meta.json`).then(t => (typeof t === 'string' ? t : ''), () => '')
   if (!old) await $.fs.write(`${dir}/meta.json`, `${JSON.stringify(meta)}\n`).catch(() => undefined)
+}
+
+// Each turn's tokens added to meta.json, chained so turns ending together never lose one.
+let usageChain: Promise<void> = Promise.resolve()
+type TokenCounts = { input_tokens: number; output_tokens: number; cache_read_input_tokens: number; cache_creation_input_tokens: number }
+async function addUsage($: EngineInterface, u: TokenCounts) {
+  const dir = await ledgerDirOf($)
+  if (!dir) return
+  usageChain = usageChain.then(async () => {
+    metaDirs.add(dir)
+    await writeMeta($)
+    const m = JSON.parse(String(await $.fs.read(`${dir}/meta.json`))) as { usage?: { input: number; output: number; cacheRead: number; cacheWrite: number } }
+    const o = m.usage ?? { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }
+    m.usage = { input: o.input + (u.input_tokens || 0), output: o.output + (u.output_tokens || 0), cacheRead: o.cacheRead + (u.cache_read_input_tokens || 0), cacheWrite: o.cacheWrite + (u.cache_creation_input_tokens || 0) }
+    await $.fs.write(`${dir}/meta.json`, `${JSON.stringify(m)}\n`)
+  }).catch(() => undefined)
+  await usageChain
+}
+
+// A turn's end: its tokens into meta.json and, for a subagent, its report kept whole on disk.
+async function recordTurn($: EngineInterface, e: { agentId?: string; answer?: string; usage?: TokenCounts }) {
+  if (!isOn(await read($, toggles), 'trace')) return
+  if (e.usage) await addUsage($, e.usage)
+  if (!e.agentId || !e.answer?.trim()) return
+  const home = await homeOf($)
+  if (!home) return
+  const path = `${home}/.cache/hush/${await sessionIdOf($)}/agent-${e.agentId.replace(/[^\w.-]/g, '_')}.md`
+  if (await $.fs.write(path, e.answer).then(() => true, () => false)) reports.set(e.agentId, { ...reports.get(e.agentId), path })
 }
 
 // Characters saved when the main turn started, so a turn reports its own.
@@ -154,7 +221,8 @@ const total = (s: Record<string, number>) => Object.values(s).reduce((a, b) => a
 // The line that says what went wrong: past a bare `Exit code N`, which every failing command shares.
 function errLine(r: { text?: string; result?: unknown; deny?: string }): string | undefined {
   const text = r.deny ?? r.text ?? (typeof r.result === 'string' ? r.result : JSON.stringify(r.result ?? ''))
-  const lines = text.split('\n').map(l => l.trim()).filter(Boolean)
+  // Tags and rules (a front matter's `---`) say nothing about what went wrong.
+  const lines = text.split('\n').map(l => l.replace(/<\/?tool_use_error>/g, '').trim()).filter(l => l && !/^[-=*_#~`]+$/.test(l))
   const said = lines.find(l => !/^Exit code \d+$/.test(l)) ?? lines[0]
   return said?.slice(0, 200)
 }
@@ -221,6 +289,9 @@ export async function startAgent($: EngineInterface) {
   routedReads.clear()
   pendingSub.clear()
   briefed.clear()
+  reports.clear()
+  runs.clear()
+  await settleHoldout($).catch(() => undefined)
   await ensureTraceTool($)
   // The brief is a convenience: no ledger, no node, a slow disk all leave the session without one.
   await loadBrief($).catch(() => undefined)
@@ -230,7 +301,7 @@ export async function startAgent($: EngineInterface) {
 export async function recapContext($: EngineInterface): Promise<string | null> {
   if (!(await read($, pendingRecap))) return null
   await update($, pendingRecap, () => false)
-  return recapOf(await read($, trace))
+  return [recapOf(await read($, trace)), reportsNote([...reports.values()])].filter(Boolean).join('\n\n') || null
 }
 
 // Whole-file reads of big files already pointed at an outline once (loop|path): the repeat passes.
@@ -238,7 +309,7 @@ const routedReads = new Set<string>()
 
 // A call worth redirecting before it runs: a refusal naming the cheaper way, once per target.
 async function routeFirst($: EngineInterface, e: Parameters<ToolCallHook>[1]): Promise<string | null> {
-  if (e.tool !== 'Read' || !isOn(await read($, toggles), 'route')) return null
+  if (e.tool !== 'Read' || !live(await read($, toggles), 'route')) return null
   const i = e as unknown as Record<string, unknown>
   const path = str(i.file_path)
   if (!path) return null
@@ -272,6 +343,9 @@ type CallResult = Awaited<ReturnType<Parameters<ToolCallHook>[2]>>
 // A result with notes added: `ref` dropped, since core takes a result carrying it verbatim
 // and would send the model the original without the notes.
 function withNotes(r: CallResult, context: readonly string[] | undefined): CallResult {
+  // An errored result's `result` is the error text: without `ref` core validates it against the tool's output schema
+  // and the model gets "does not match its output shape" in place of the command's output. Keep it whole.
+  if (r.isError) return { ...r, context } as CallResult
   const { ref: _ref, ...rest } = r as CallResult & { ref?: number }
   void _ref
   return { ...rest, context } as CallResult
@@ -302,6 +376,7 @@ async function afterCall($: EngineInterface, e: Parameters<ToolCallHook>[1], r: 
     if (isOn(t, 'trace')) {
       await update($, trace, now => (all = capByLoop([...now, entry]))).catch(() => undefined)
       const spawned = e.tool === 'Agent' ? str((r.result as Record<string, unknown> | undefined)?.agentId) : undefined
+      if (spawned) reports.set(spawned, { path: '', ...reports.get(spawned), what: entry.what })
       const turn = e.agentId ? undefined : ((await read($, turnState)).id ?? undefined)
       const line: LedgerEntry = { v: LEDGER_VERSION, session: await sessionIdOf($), ...(turn ? { turn } : {}), ...entry, ...(spawned ? { spawned } : {}) }
       await appendLedger($, line).catch(() => undefined)
@@ -314,25 +389,40 @@ async function afterCall($: EngineInterface, e: Parameters<ToolCallHook>[1], r: 
       nudged.add(loop)
       notes.push(DESCRIBE_NOTE)
     }
-    if (isOn(t, 'guards') && all.length) {
+    if (live(t, 'guards') && all.length) {
       const note = loopNote(all, entry) ?? repeatNote(all, entry, (await read($, compacted))[loop] ?? 0)
       if (note) notes.push(note)
+    }
+    if (live(t, 'guards')) {
+      const c = runs.get(loop) ?? { n: 0, first: t0, warned: false }
+      c.n++
+      runs.set(loop, c)
+      const note = c.warned ? null : runawayNote(c.n, Date.now() - c.first, !!e.agentId)
+      if (note) {
+        c.warned = true
+        notes.push(note)
+      }
+      const file = entry.ok && EDIT_TOOLS.has(e.tool) ? entry.files[0] : undefined
+      const clash = file ? await claimEdit($, file, `${await sessionIdOf($)}|${loop}`).catch(() => null) : null
+      if (clash) notes.push(clash)
     }
     if (!e.agentId && (await read($, pendingRecap))) {
       await update($, pendingRecap, () => false)
       const recap = recapOf(all.length ? all : await read($, trace))
       if (recap) notes.push(recap)
+      const kept = reportsNote([...reports.values()])
+      if (kept) notes.push(kept)
     }
     if (e.agentId && pendingSub.delete(e.agentId)) {
       const recap = recapOf(all.length ? all : await read($, trace), e.agentId)
       if (recap) notes.push(recap)
     }
-    if (e.agentId && briefText && !briefed.has(e.agentId) && isOn(t, 'brief')) {
+    if (e.agentId && briefText && !briefed.has(e.agentId) && live(t, 'brief')) {
       briefed.add(e.agentId)
       notes.push(briefText)
     }
     const context = notes.length ? [...(r.context ?? []), ...notes] : r.context
-    if (r.isError || !isOn(t, 'trim')) return notes.length ? withNotes(r, context) : r
+    if (r.isError || !live(t, 'trim')) return notes.length ? withNotes(r, context) : r
 
     // A Bash result too long for its use: tidied, then head and tail with the whole on disk.
     if (e.tool === 'Bash') {
@@ -404,6 +494,9 @@ export function registerAgent(on: On) {
       nudged.clear()
       pendingSub.clear()
       briefed.clear()
+      reports.clear()
+      runs.clear()
+      heldOut = pickHoldout(await read($, toggles).catch(() => TOGGLES_INITIAL))
       ledgerFiles.clear()
       ledgerChains.clear()
       metaDirs.clear()
@@ -417,7 +510,9 @@ export function registerAgent(on: On) {
 
   // A compaction drops the reads the model saw and the history it kept in mind.
   on('session.compact', async ($, e, next) => {
-    const r = await next(e)
+    // The summary is told what the ledger knows, so less depends on the recap afterwards.
+    const facts = isOn(await read($, toggles), 'trace') ? compactFacts(await read($, trace), e.agentId, [...reports.values()]) : null
+    const r = await next(facts ? { ...e, instructions: [e.instructions, facts].filter(Boolean).join('\n\n') } : e)
     // `precompute` prepares a summary ahead of time; nothing is dropped until a real one.
     if (e.trigger === 'precompute' || !r.messages) return r
     const loop = e.agentId ?? ''
@@ -433,6 +528,7 @@ export function registerAgent(on: On) {
   // Main-loop turns only: a subagent's turn would restamp the main loop's ledger lines and stats.
   on('turn.start', async ($, e, next) => {
     if ((e as { agentId?: string }).agentId) return next(e)
+    runs.delete('')
     await update($, turnFrom, () => Date.now()).catch(() => undefined)
     const savedAtStart = total(await read($, saved))
     await update($, turnState, () => ({ id: e.turnId, savedAtStart })).catch(() => undefined)
@@ -440,6 +536,7 @@ export function registerAgent(on: On) {
   })
 
   on('turn.complete', async ($, e, next) => {
+    await recordTurn($, e).catch(() => undefined)
     if ((e as { agentId?: string }).agentId) return next(e)
     const from = await read($, turnFrom)
     const mine = (await read($, trace)).filter(x => x.at >= from)

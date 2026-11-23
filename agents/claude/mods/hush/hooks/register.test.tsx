@@ -28,6 +28,7 @@ test('a press on a row label unfolds its output in place; ▾ marks it', async (
   expect((await ui.find({ type: 'Text', text: /GIT/ }))?.text).toBe('GIT  ')
   expect((await ui.find({ type: 'Text', text: /Show last commit/ }))?.text).toBe(' Show last commit')
   expect(await ui.find({ type: 'Text', text: /▾/ })).toBeFalsy()
+  expect((await ui.find({ type: 'Text', text: /✓/ }))?.props.color).toBe('success')
   await ui.press({ key: 'row-t1' })
   expect((await ui.find({ type: 'Text', text: /▾/ }))?.text).toBe('▾ ')
   await ui.unmount()
@@ -36,7 +37,8 @@ test('a press on a row label unfolds its output in place; ▾ marks it', async (
     plugin: 'hush', component: 'ToolResult', requestId: 't1', surface: 'terminal',
     props: { tool_use_id: 't1', tool: 'Bash', isErrored: false, output },
   } as never)
-  expect((await result.find({ type: 'Text', text: /c0ddb1f/ }))?.text).toBe('  c0ddb1f fix')
+  expect((await result.find({ type: 'Text', text: /c0ddb1f/ }))?.text).toBe('c0ddb1f fix')
+  expect((await result.find({ type: 'Text', text: /│/ }))?.text).toBe('  │ ')
   await result.unmount()
 })
 
@@ -261,4 +263,23 @@ test('the answer after a turn\'s tool calls gets a rule; a first answer does not
   expect(await last.find({ type: 'Text', text: /^─+$/ })).toBeTruthy()
   expect(await last.find({ type: 'Text', text: /p\.text/ })).toBeFalsy()
   await last.unmount()
+})
+
+test('an unfolded call shows its input whole above its output; stderr is red, a Read is highlighted code', async $ => {
+  const calls = [
+    { tool_use_id: 'u1', tool: 'Bash', input: { command: 'pnpm build\n  --filter web', description: 'Build' }, isRunning: false, isErrored: false, isInterrupted: false, output: { stdout: 'built', stderr: 'warn: slow' } },
+    { tool_use_id: 'u2', tool: 'Read', input: { file_path: '/r/a.ts' }, isRunning: false, isErrored: false, isInterrupted: false, output: { type: 'text', file: { filePath: '/r/a.ts', content: 'const a = 1', startLine: 3 } } },
+  ]
+  const ui = await $.ui.mount({
+    plugin: 'hush', component: 'ToolGroup', requestId: 'g2', surface: 'terminal',
+    props: { calls, isActive: true, isExpanded: false, isCallsOnly: true },
+  } as never)
+  await ui.press({ key: 'row-u1' })
+  expect((await ui.find({ type: 'Text', text: /^\$ pnpm build$/ }))?.text).toBe('$ pnpm build')
+  expect((await ui.find({ type: 'Text', text: /--filter web/ }))?.text).toBe('    --filter web')
+  expect((await ui.find({ type: 'Text', text: /^built$/ }))?.props.color).toBeUndefined()
+  expect((await ui.find({ type: 'Text', text: /warn: slow/ }))?.props.color).toBe('error')
+  await ui.press({ key: 'row-u2' })
+  expect((await ui.find({ type: 'Code' }))?.props).toMatchObject({ source: 'const a = 1', path: '/r/a.ts', startLine: 3 })
+  await ui.unmount()
 })

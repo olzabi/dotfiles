@@ -12,6 +12,11 @@
 //   hush wiki init                                           scaffold $HUSH_WIKI (default ~/wiki)
 //   hush mcp                                                 stdio MCP server: trace, tree, board, analyze
 //   hush brief [--project DIR] [--days N]                    calls that keep failing in a project (the mod feeds it to agents)
+//   hush lessons [--project DIR] [--days N] [--accept 1,3]   recurring failures as rules; --accept adds them to DIR/CLAUDE.md
+//   hush effect [--project DIR] [--days N]                   sessions with a feature held out vs all on: tokens, failures, handoffs
+//   hush context [--recent N] [--project DIR]                first-call context, and which plugins/MCP servers/skills get used
+//   hush corrections [--recent N] [--project DIR]            your prompts that corrected the agent (material for rules/memories)
+//   hush refusals [--project DIR] [--days N]                 policy/classifier refusals by reason, to decide each kind once
 //   hush log '<json>'                                        append one call to the ledger (pi/OMP hooks call this)
 //   hush gc [--cache-days N] [--ledger-days N]               drop trimmed outputs (14d) and ledgers (90d); digest runs it
 import { appendFileSync, closeSync, existsSync, mkdirSync, openSync, readdirSync, readFileSync, readSync, rmSync, statSync, writeFileSync } from 'node:fs';
@@ -24,7 +29,7 @@ import { LEDGER_VERSION, ledgerRoot, loopFile, parseLedger } from '../core/ledge
 import type { LedgerEntry, LedgerMeta } from '../core/ledger.ts';
 import { parseTranscript, PI_TOOLS } from '../core/readers.ts';
 import type { Item, Transcript } from '../core/readers.ts';
-import { boardRow, brief, digestNote, habits, habitsText, project, savings, suggestions, tree } from '../core/report.ts';
+import { boardRow, brief, contextAudit, corrections, digestNote, effectText, refusals, habits, habitsText, lessons, project, savings, sessionFacts, suggestions, tree } from '../core/report.ts';
 
 const HOME = homedir();
 const CLAUDE = join(process.env.CLAUDE_CONFIG_DIR || join(HOME, '.claude'), 'projects');
@@ -52,6 +57,7 @@ const VALUED = new Set([
   '--agent',
   '--cache-days',
   '--ledger-days',
+  '--accept',
 ]);
 const positional = rest.filter((a, i) => !a.startsWith('--') && !VALUED.has(rest[i - 1] ?? ''));
 
@@ -291,17 +297,73 @@ function traceText(q: Record<string, unknown>): string {
   );
 }
 
-// Recurring failures of the sessions that ran in a project (the current directory by default).
-function briefText(): string {
-  const dir = projectDir() ?? process.cwd();
-  const since = Date.now() - (Number(opt('--days')) || 7) * 86_400_000;
-  const all: LedgerEntry[] = [];
+// Ledgers of the sessions touched in the last `days` that ran in `dir` (every project when null).
+function ledgersSince(dir: string | null | undefined, days: number): { meta: LedgerMeta; loops: Map<string, LedgerEntry[]> }[] {
+  const since = Date.now() - days * 86_400_000;
+  const out: { meta: LedgerMeta; loops: Map<string, LedgerEntry[]> }[] = [];
   for (const { dir: d, mtime } of ledgerSessions()) {
     if (mtime < since) break;
     const { meta, loops } = readLedger(d);
-    if (meta && isIn(meta.cwd, dir)) all.push(...[...loops.values()].flat().filter((e) => e.at >= since));
+    if (meta && (!dir || isIn(meta.cwd, dir))) out.push({ meta, loops });
   }
-  return brief(all) ?? '';
+  return out;
+}
+const entriesOf = (ls: { loops: Map<string, LedgerEntry[]> }[], days: number) => {
+  const since = Date.now() - days * 86_400_000;
+  return ls.flatMap((l) => [...l.loops.values()].flat().filter((e) => e.at >= since));
+};
+const claudeMd = (dir: string) => join(dir, 'CLAUDE.md');
+const knownOf = (dir: string) => (existsSync(claudeMd(dir)) ? readFileSync(claudeMd(dir), 'utf8') : '');
+
+// Recurring failures of the sessions that ran in a project (the current directory by default),
+// less those its CLAUDE.md already holds as accepted lessons.
+function briefText(): string {
+  const dir = projectDir() ?? process.cwd();
+  const days = Number(opt('--days')) || 7;
+  return brief(entriesOf(ledgersSince(dir, days), days), 3, 5, knownOf(dir)) ?? '';
+}
+
+// Failures that recur across sessions, numbered; `--accept 1,3` appends those rules to the project's CLAUDE.md
+// (which also drops them from the brief), so the fix is told once rather than warned about every session.
+const LESSONS_HEAD = '## Lessons from hush';
+function lessonsText(): string {
+  const dir = projectDir() ?? process.cwd();
+  const days = Number(opt('--days')) || 30;
+  const known = knownOf(dir);
+  const ls = lessons(entriesOf(ledgersSince(dir, days), days), 2, 3, known);
+  const accept = (opt('--accept') ?? '').split(',').map(Number).filter((n) => n >= 1 && n <= ls.length);
+  if (accept.length) {
+    const lines = accept.map((n) => `- ${ls[n - 1]?.rule}`);
+    const head = known.includes(LESSONS_HEAD) ? '' : `${known && !known.endsWith('\n') ? '\n' : ''}\n${LESSONS_HEAD}\n\n`;
+    appendFileSync(claudeMd(dir), `${head}${lines.join('\n')}\n`);
+    return `added ${lines.length} to ${claudeMd(dir)}:\n${lines.join('\n')}`;
+  }
+  if (!ls.length) return `no failure recurred in 2+ sessions in ${dir} over ${days} days`;
+  return [
+    `failures recurring in ${dir} over ${days} days (accept with: hush lessons --project ${dir} --accept N[,N])`,
+    ...ls.map((l, i) => `${i + 1}. ${l.rule} (×${l.n} in ${l.sessions} sessions)`),
+  ].join('\n');
+}
+
+const CONFIG = process.env.CLAUDE_CONFIG_DIR || join(HOME, '.claude');
+const jsonAt = (f: string): Record<string, unknown> => {
+  try {
+    return JSON.parse(readFileSync(f, 'utf8'));
+  } catch {
+    return {};
+  }
+};
+function contextReport(): string {
+  const settings = jsonAt(join(CONFIG, 'settings.json'));
+  const plugins = Object.entries((settings.enabledPlugins ?? {}) as Record<string, boolean>).filter(([, on]) => on).map(([k]) => k.split('@')[0] ?? k);
+  const servers = Object.keys((jsonAt(join(CONFIG, '.claude.json')).mcpServers ?? {}) as Record<string, unknown>);
+  const skillsDir = join(CONFIG, 'skills');
+  const skills = existsSync(skillsDir) ? readdirSync(skillsDir).filter((d) => existsSync(join(skillsDir, d, 'SKILL.md'))) : [];
+  return contextAudit(pick(), { plugins, servers, skills });
+}
+
+function effectReport(): string {
+  return effectText(ledgersSince(projectDir(), Number(opt('--days')) || 30).map((l) => sessionFacts(l.meta, l.loops)));
 }
 
 // One call from a harness with no ledger writer of its own (pi, OMP): the hook hands over what it saw,
@@ -453,6 +515,7 @@ function digest() {
     p,
     s: savings(ts),
     ideas: suggestions(h, p),
+    lessons: lessons(entriesOf(ledgersSince(dir, days), days), 2, 3, dir ? knownOf(dir) : ''),
   });
   // A second run in a week rewrites the note; the log names it once.
   const isNew = !existsSync(join(WIKI, 'raw/hush', name));
@@ -481,6 +544,10 @@ function gc() {
       }
     }
   }
+  // Who-edited-what records (the mod's edit-clash note): only the last weeks matter.
+  const editing = `${LEDGER}-editing`;
+  if (existsSync(editing))
+    for (const f of readdirSync(editing)) if (mtimeOf(join(editing, f)) < Date.now() - cacheDays * 86_400_000) rmSync(join(editing, f), { force: true });
   console.log(`hush gc: ${n} old session folder${n === 1 ? '' : 's'} removed`);
 }
 
@@ -560,7 +627,7 @@ function mcp() {
         reply({
           protocolVersion: msg.params?.protocolVersion ?? '2025-06-18',
           capabilities: { tools: {} },
-          serverInfo: { name: 'hush', version: '0.5.0' },
+          serverInfo: { name: 'hush', version: '0.8.0' },
         });
       else if (msg.method === 'tools/list') reply({ tools: MCP_TOOLS });
       else if (msg.method === 'tools/call') {
@@ -632,6 +699,24 @@ switch (cmd) {
   case 'brief': {
     const text = briefText();
     if (text) console.log(text);
+    break;
+  }
+  case 'lessons':
+    console.log(lessonsText());
+    break;
+  case 'effect':
+    console.log(effectReport());
+    break;
+  case 'context':
+    console.log(contextReport());
+    break;
+  case 'corrections':
+    console.log(corrections(pick()).join('\n') || 'no corrections in these sessions');
+    break;
+  case 'refusals': {
+    const days = Number(opt('--days')) || 30;
+    const rows = refusals(entriesOf(ledgersSince(projectDir(), days), days));
+    console.log(rows.length ? [...rows, '', 'Read-only commands you keep approving by hand: run /fewer-permission-prompts in Claude Code.'].join('\n') : 'no refusals');
     break;
   }
   case 'log':

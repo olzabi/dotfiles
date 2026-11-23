@@ -1,5 +1,5 @@
 export type Mode = 'cards' | 'lines' | 'group'
-export type Toggle = 'prompt' | 'thinking' | 'mentions' | 'toon' | 'outlines' | 'previews' | 'spinner' | 'narration' | 'tight' | 'trim' | 'trace' | 'guards' | 'summary' | 'route' | 'brief'
+export type Toggle = 'prompt' | 'thinking' | 'mentions' | 'toon' | 'outlines' | 'previews' | 'spinner' | 'narration' | 'tight' | 'trim' | 'trace' | 'guards' | 'summary' | 'route' | 'brief' | 'holdout'
 // Partial: a toggle missing from an older saved value reads as its default.
 export type Toggles = Partial<Record<Toggle, boolean>>
 export type Target = 'assistant' | 'tool'

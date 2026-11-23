@@ -24,11 +24,19 @@ One pure core, adapters around it:
 - Review round 3 (2026-11-12): trim cuts long lines by characters past 100 lines too; a limiter bounds its own pipeline only (`jq`, `cut` are none); open failures close on a later success of the same row and never hold refusals; a search after an edit is not a repeat; `--project` picks files before the newest-N cut and matches whole directories; the CLI survives vanished transcripts; gc leaves unreadable folders; the savings estimate runs the mod's own trim; meta is written with the first call only.
 - Seamless (2026-11-12): `hush brief` (recurring failures of a project) reaches the main loop's prompt and each subagent's first call; subagents get their own recap after a compaction; pi and OMP write the ledger live (`hush log`); the digest unit carries a PATH with node.
 
+- Measure and learn (2026-11-16): a per-session holdout (`h`, 1 in 5) and per-session tokens in `meta.json`, compared by `hush effect`; `hush lessons` turns failures recurring across sessions into rules (a refusal gets "ask the user", a fix only when seen twice on the same file), `--accept` appends them to the project's CLAUDE.md and the brief stops repeating them; the digest lists them; subagent reports kept on disk and pointed at in the main recap; auto-mode classifier denials count as refusals.
+
+- Context and coordination (2026-11-16): `hush context` (first-call context: median 33k tokens over 71 sessions; telegram, hookify, plugin-dev, frontend-design and the headroom, memory, sequential-thinking servers showed 0 uses in the last 30), `hush corrections`, `hush refusals`; compaction instructions carry the ledger's facts; runaway note; cross-session edit-clash note.
+
+- Readable unfold (2026-11-16): an unfolded call shows its input whole (the command, the agent's task, other inputs as key: value) above its output, behind a dim `│` gutter, wrapped and in normal colour; Bash stderr red, a Read as highlighted `Code`, Agent and web results as `Markdown`, other JSON as TOON.
+
 ## Measured 2026-11-10
 
 - 120 transcripts: trim would cut 8.3% of tool-result text; ~1.5% of cache-read tokens over later calls. Average context per call ~171k tokens: fewer calls and a smaller base context matter more. Re-run: `hush stats --recent N`.
 
 ## Next
+
+- Read `hush effect` once ~10 sessions per holdout exist (about 50 sessions with Measure on); drop or retune what shows no gain.
 
 - footer: its Trace pane reads the ledger instead of its own `trail` (footer is being changed in another session; not touched here).
 - pi/OMP ledger writers were tested against a fake host only: check one real session of each with `hush board`.

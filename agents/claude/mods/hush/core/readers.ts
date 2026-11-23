@@ -23,7 +23,8 @@ export type Item =
   | { kind: 'interrupt'; at?: number }
   | CallItem;
 
-export type Transcript = { harness: 'claude' | 'pi'; cwd: string; items: Item[]; modelCalls: number };
+// firstContext: tokens the first model call carried (input + cache), i.e. what every turn starts from.
+export type Transcript = { harness: 'claude' | 'pi'; cwd: string; items: Item[]; modelCalls: number; firstContext?: number };
 
 type Block = {
   type: string;
@@ -89,6 +90,7 @@ export function parseClaude(text: string): Transcript {
   const calls = new Map<string, CallItem>();
   let cwd = '';
   let modelCalls = 0;
+  let firstContext: number | undefined;
   for (const e of lines(text)) {
     cwd ||= typeof e.cwd === 'string' ? e.cwd : '';
     const m = (e.message ?? {}) as { content?: unknown; usage?: unknown };
@@ -97,6 +99,10 @@ export function parseClaude(text: string): Transcript {
     const mid = (m as { id?: unknown }).id;
     if (e.type === 'assistant' && m.usage && !(typeof mid === 'string' && seenIds.has(mid))) {
       modelCalls++;
+      if (firstContext === undefined && !e.isSidechain) {
+        const u = m.usage as Record<string, number>;
+        firstContext = (u.input_tokens ?? 0) + (u.cache_read_input_tokens ?? 0) + (u.cache_creation_input_tokens ?? 0);
+      }
       if (typeof mid === 'string') seenIds.add(mid);
     }
     const content = m.content;
@@ -126,7 +132,7 @@ export function parseClaude(text: string): Transcript {
       }
     }
   }
-  return { harness: 'claude', cwd, items, modelCalls };
+  return { harness: 'claude', cwd, items, modelCalls, ...(firstContext !== undefined ? { firstContext } : {}) };
 }
 
 // pi and OMP: `{type:"message", message:{role, content:[{type:"toolCall", id, name, arguments, intent}]}}`,

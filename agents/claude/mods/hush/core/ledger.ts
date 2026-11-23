@@ -1,6 +1,6 @@
 // The call ledger on disk, schema v1: one JSONL file per loop of a session, written by any
 // harness adapter and read by the CLI, the MCP server and other surfaces (herdr, digests).
-//   $XDG_STATE_HOME/hush/<session>/meta.json      { v, session, harness, cwd, startedAt }
+//   $XDG_STATE_HOME/hush/<session>/meta.json      { v, session, harness, cwd, startedAt, heldOut?, usage? }
 //   $XDG_STATE_HOME/hush/<session>/main.jsonl     the main loop's calls
 //   $XDG_STATE_HOME/hush/<session>/<agentId>.jsonl one subagent's calls
 import type { CallEntry } from '../types'
@@ -15,7 +15,14 @@ export type LedgerEntry = CallEntry & {
   spawned?: string
 }
 
-export type LedgerMeta = { v: number; session: string; harness: string; cwd: string; startedAt: number }
+export type Usage = { input: number; output: number; cacheRead: number; cacheWrite: number }
+export type LedgerMeta = {
+  v: number; session: string; harness: string; cwd: string; startedAt: number
+  // The feature switched off for this session to measure it (`hush effect`); null: none; absent: not recorded.
+  heldOut?: string | null
+  // Tokens of every turn of the session, subagents' included (Claude only).
+  usage?: Usage
+}
 
 export const ledgerRoot = (home: string, xdgState?: string) => `${xdgState || `${home}/.local/state`}/hush`
 export const loopFile = (agentId?: string) => `${agentId ? agentId.replace(/[^\w.-]/g, '_') : 'main'}.jsonl`

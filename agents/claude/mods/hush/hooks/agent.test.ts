@@ -4,8 +4,9 @@ import { isBounded, loopNote, openFailures, queryTrace, recapOf, tidyOutput, tri
 import type { CallEntry } from '../core/agent.ts'
 import { capByLoop } from '../core/ledger.ts'
 import { groupMatches } from '../core/format.ts'
-import { brief } from '../core/report.ts'
-import { repeatNote } from '../core/agent.ts'
+import { brief, contextAudit, effectText, lessons, refusals, sessionFacts } from '../core/report.ts'
+import type { LedgerEntry } from '../core/ledger.ts'
+import { compactFacts, conflictNote, repeatNote, reportsNote, runawayNote } from '../core/agent.ts'
 
 const entry = (o: Partial<CallEntry>): CallEntry => ({ id: 'i', tool: 'Bash', label: 'GIT', what: 'git status', at: 0, ms: 5, ok: true, bytes: 10, files: [], ...o })
 
@@ -144,4 +145,79 @@ test('the brief names what failed three times or more, refusals as one row, neve
 
 test('clock lines are not grep hits', () => {
   expect(groupMatches('10:15:02 started\n10:15:03 done')).toBeNull()
+})
+
+const led = (o: Partial<LedgerEntry>): LedgerEntry => ({ v: 1, session: 's1', ...entry(o), ...o })
+
+test('a failure recurring across sessions becomes a rule naming what worked next; an accepted one is not repeated', () => {
+  const fail = (session: string, at: number) => led({ session, at, ok: false, label: 'PNPM', what: 'pnpm test', err: 'ERR_PNPM_NO_SCRIPT Missing script: test' })
+  const fixed = (session: string, at: number) => led({ session, at, label: 'PNPM', what: 'pnpm run test:unit' })
+  const all = [fail('s1', 1), fixed('s1', 2), fail('s1', 3), fail('s2', 1), fixed('s2', 2)]
+  const [l] = lessons(all)
+  expect(l?.rule).toBe('`pnpm test` (PNPM) fails with "ERR_PNPM_NO_SCRIPT Missing script: test"; what worked next: `pnpm run test:unit`.')
+  expect(lessons(all.filter(e => e.session === 's1'))).toEqual([])
+  expect(lessons(all, 2, 3, `## Lessons from hush\n\n- ${l?.rule}\n`)).toEqual([])
+  expect(brief(all, 3, 5, `- ${l?.rule}`)).toBeNull()
+  // one success after it is chance, not a fix; a refusal gets no workaround
+  expect(lessons(all.slice(0, 4))[0]?.fix).toBeNull()
+  const refused = (session: string) => led({ session, ok: false, denied: true, err: 'Permission for this action was denied. Reason: [Merge Without Review]' })
+  expect(lessons([refused('a'), refused('b'), refused('c')])[0]?.rule).toContain('ask the user instead of retrying')
+})
+
+test('session facts count repeated failures and subagent re-reads of what the main loop read; effect groups by holdout', () => {
+  const loops = new Map([
+    ['main', [led({ tool: 'Read', label: 'Read', files: ['/r/a.ts'], at: 1 }), led({ ok: false, err: 'x', sig: 'k', at: 2 }), led({ ok: false, err: 'x', sig: 'k', at: 3 })]],
+    ['a1', [led({ agentId: 'a1', tool: 'Read', label: 'Read', files: ['/r/a.ts'], at: 4 })]],
+  ])
+  const f = sessionFacts({ v: 1, session: 's1', harness: 'claude', cwd: '/r', startedAt: 0, heldOut: 'trim', usage: { input: 100, output: 50, cacheRead: 1000, cacheWrite: 50 } }, loops)
+  expect(f).toEqual({ session: 's1', heldOut: 'trim', calls: 4, failed: 2, repeated: 1, tokens: 300, handoffRereads: 1, subagents: 1 })
+  const g = { ...f, calls: 5 }
+  const text = effectText([g, { ...g, session: 's2', heldOut: null }, { ...g, session: 's3', heldOut: undefined }, { ...f, session: 's4', calls: 4 }])
+  expect(text).toContain('4 sessions, 2 with a recorded holdout')
+  expect(text).toMatch(/none \(all on\)\s+1\s+60\s+40\.0\s+50\.0\s+1\.0/)
+  expect(text).toMatch(/\ntrim/)
+})
+
+test('the recap lists kept subagent reports, skipping ones with no file yet', () => {
+  expect(reportsNote([{ what: 'Explore: find callers', path: '/c/agent-a1.md' }, { what: 'pending', path: '' }])).toContain('- Explore: find callers → /c/agent-a1.md')
+  expect(reportsNote([{ path: '' }])).toBeNull()
+})
+
+test('the compaction is told the edited files, open failures and kept reports', () => {
+  const all = [entry({ tool: 'Edit', label: 'Edit', files: ['/r/a.ts'] }), entry({ ok: false, err: 'boom', at: 1 }), entry({ agentId: 'a1', tool: 'Edit', files: ['/r/b.ts'] })]
+  const f = compactFacts(all, undefined, [{ what: 'Explore: callers', path: '/c/agent-a1.md' }]) ?? ''
+  expect(f).toContain('- files edited: /r/a.ts\n')
+  expect(f).toContain('- still failing: GIT git status: boom')
+  expect(f).toContain('saved whole at /c/agent-a1.md')
+  expect(compactFacts(all, 'a1')).toBe('Facts from the hush call ledger; keep them in the summary as written:\n- files edited: /r/b.ts')
+  expect(compactFacts([])).toBeNull()
+})
+
+test('runaway and edit-clash notes fire past their bounds only', () => {
+  expect(runawayNote(119, 60_000, true)).toBeNull()
+  expect(runawayNote(120, 60_000, true)).toContain('120 calls over 1m in this subagent run')
+  expect(runawayNote(10, 31 * 60_000, true)).toContain('31m')
+  expect(runawayNote(249, 0, false)).toBeNull()
+  const at = 1_000_000
+  const prev = { owner: 's1|', at, path: '/r/a.ts' }
+  expect(conflictNote(prev, 's2|', at + 60_000)).toContain('another session (s1')
+  expect(conflictNote(prev, 's2|', at + 16 * 60_000)).toBeNull()
+  expect(conflictNote(prev, 's1|a1', at)).toBeNull()
+  expect(conflictNote({ ...prev, owner: 's1|a1' }, 's1|a2', at)).toContain('a parallel subagent (a1)')
+  expect(conflictNote(null, 's1|', at)).toBeNull()
+})
+
+test('the context audit counts plugin, server and skill use; refusals group by reason', () => {
+  const t = { harness: 'claude' as const, cwd: '/r', modelCalls: 1, firstContext: 30_000, items: [
+    { kind: 'call' as const, id: '1', tool: 'mcp__chrome-devtools__click', label: '', what: '', input: {}, isErrored: false, result: '', modelCall: 1 },
+    { kind: 'call' as const, id: '2', tool: 'Skill', label: '', what: '', input: { skill: 'ponytail:ponytail' }, isErrored: false, result: '', modelCall: 1 },
+  ] }
+  const text = contextAudit([t as never], { plugins: ['chrome-devtools-mcp', 'ponytail', 'telegram'], servers: ['memory'], skills: ['ast-grep'] })
+  expect(text).toContain('median 30k tokens')
+  expect(text).toMatch(/0 {2}telegram[\s\S]*1 {2}chrome-devtools-mcp/)
+  expect(text).toMatch(/1 {2}ponytail/)
+  expect(text).toMatch(/0 {2}memory/)
+  const deny = (err: string, what: string) => led({ ok: false, denied: true, err, what })
+  expect(refusals([deny('denied. Reason: [Merge Without Review]', 'merge'), deny('Reason: [Merge Without Review]', 'merge 2'), deny('was rejected', 'x')]))
+    .toEqual(['    2  Merge Without Review  e.g. merge | merge 2'])
 })

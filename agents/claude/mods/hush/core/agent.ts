@@ -112,7 +112,7 @@ export function queryTrace(all: readonly CallEntry[], q: TraceQuery, now: number
 const EDITS = new Set(['Edit', 'Write', 'NotebookEdit', 'MultiEdit']);
 
 // A refusal (permission, policy, the user's no): nothing to retry, so never an open failure.
-export const DENIED = /doesn't want to proceed|was rejected|Permission to use .* (was )?denied|user denied|isolated in the worktree|^(?:<tool_use_error>)?Blocked:/i;
+export const DENIED = /doesn't want to proceed|was rejected|Permission to use .* (was )?denied|Permission for this action was denied|auto mode classifier|user denied|isolated in the worktree|^(?:<tool_use_error>)?Blocked:/i;
 export const isDenial = (e: Pick<CallEntry, 'denied' | 'err'>) => !!e.denied || DENIED.test(e.err ?? '');
 
 // Calls that failed and were not followed by a success of the same row (loop, tool, label, file):
@@ -202,4 +202,51 @@ export function repeatNote(all: readonly CallEntry[], e: CallEntry, since = 0): 
   const same = all.filter(x => x.at >= from && callKey(x) === callKey(e))
   if (same.length < 3) return null
   return `hush: this exact ${e.tool} ran ${same.length} times in this loop; its earlier result is still in your context (mcp__hush__trace lists them).`
+}
+
+// Subagent reports kept on disk, for the main loop's recap after a compaction: the reports left its
+// context, the files did not. Newest last, at most `n`.
+export function reportsNote(reports: readonly { what?: string; path: string }[], n = 8): string | null {
+  const kept = reports.filter(r => r.path).slice(-n)
+  if (!kept.length) return null
+  return [
+    'hush: subagent reports from before the compaction, whole on disk. Read the one you need instead of running that agent again (check it against the code if files changed since):',
+    ...kept.map(r => `- ${r.what || 'subagent'} → ${r.path}`),
+  ].join('\n')
+}
+
+// What a compaction's summary must keep, from the ledger rather than the model's memory of it.
+export function compactFacts(all: readonly CallEntry[], agentId?: string, reports: readonly { what?: string; path: string }[] = []): string | null {
+  const mine = all.filter(e => (agentId ? e.agentId === agentId : !e.agentId))
+  const edited = [...new Set(mine.filter(e => EDITS.has(e.tool)).flatMap(e => e.files))].slice(-20)
+  const fails = openFailures(mine).slice(-5)
+  const kept = agentId ? [] : reports.filter(r => r.path).slice(-8)
+  if (!edited.length && !fails.length && !kept.length) return null
+  return [
+    'Facts from the hush call ledger; keep them in the summary as written:',
+    ...(edited.length ? [`- files edited: ${edited.join(', ')}`] : []),
+    ...fails.map(f => `- still failing: ${f.label} ${f.what.slice(0, 80)}: ${(f.err ?? 'failed').slice(0, 100)}`),
+    ...kept.map(r => `- subagent report "${r.what || 'subagent'}" saved whole at ${r.path}`),
+  ].join('\n')
+}
+
+// A loop past its budget: one note asking it to stop and report if it is not converging.
+export const RUNAWAY = { subCalls: 120, subMs: 30 * 60_000, turnCalls: 250 }
+export function runawayNote(calls: number, ms: number, isSub: boolean): string | null {
+  const over = isSub ? calls >= RUNAWAY.subCalls || ms >= RUNAWAY.subMs : calls >= RUNAWAY.turnCalls
+  if (!over) return null
+  return `hush: ${calls} calls over ${Math.max(1, Math.round(ms / 60000))}m in this ${isSub ? 'subagent run' : 'turn'}. If you are not converging, stop and report what you have and what blocks you instead of trying more variations.`
+}
+
+// Who last edited a file, as `session|agentId` ('' main). Another session, or a parallel subagent of
+// this one, within the window: a note to re-read before going on. A main loop following its own
+// subagents' edits is the normal handoff, not a clash.
+export type EditClaim = { owner: string; at: number; path: string }
+export function conflictNote(prev: EditClaim | null, owner: string, now: number, windowMs = 15 * 60_000): string | null {
+  if (!prev || prev.owner === owner || now - prev.at > windowMs) return null
+  const [ps, pa = ''] = prev.owner.split('|')
+  const [s, a = ''] = owner.split('|')
+  if (ps === s && (!pa || !a)) return null
+  const who = ps === s ? `a parallel subagent (${pa.slice(0, 12)})` : `another session (${(ps ?? '').slice(0, 8)}${pa ? `, subagent ${pa.slice(0, 12)}` : ''})`
+  return `hush: ${who} edited ${prev.path} ${Math.max(1, Math.round((now - prev.at) / 60000))}m ago. Re-read it and check \`git diff\` before editing further, so neither overwrites the other's work.`
 }

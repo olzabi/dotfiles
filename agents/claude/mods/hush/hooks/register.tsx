@@ -2,7 +2,7 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register, ThemeKey } from 'claude-code'
 
 import type { Backgrounds, Mode, Target, Toggle, Toggles } from '../types'
-import { capRows, compactDiff, groupMatches, jsonToToon, mcpPreview, mentions, outline, touched } from '../core/format.ts'
+import { capRows, compactDiff, groupMatches, jsonToToon, mcpPreview, mentions, outline, toToon, touched } from '../core/format.ts'
 import { args, base, describe, label, str } from '../core/format.ts'
 import type { Call } from '../core/format.ts'
 import type { DiffRow } from '../core/format.ts'
@@ -78,6 +78,7 @@ const TOGGLES: { key: Toggle; hotkey: string; title: string; hint: string }[] = 
   { key: 'guards', hotkey: 'u', title: 'Loop guard', hint: 'the same call failing the same way 3 times gets a note to change approach' },
   { key: 'route', hotkey: 'w', title: 'Route reads', hint: 'a whole-file Read of a big code file is pointed at an outline first; repeating it passes' },
   { key: 'brief', hotkey: 'b', title: 'Project brief', hint: 'calls that keep failing in this project (from past sessions) told to the model and its subagents' },
+  { key: 'holdout', hotkey: 'h', title: 'Measure', hint: 'one session in five runs with trim, guards, route or brief off, so `hush effect` can compare' },
   { key: 'summary', hotkey: 'y', title: 'Turn summary', hint: 'calls, failures, files edited and characters saved of the last turn, above the prompt' },
 ]
 
@@ -146,35 +147,95 @@ async function reveal($: EngineInterface, at: string, block: 'start' | 'center' 
   if (deny) $.ui.toast(`hush: could not scroll (${deny})`)
 }
 
-type Row = { text: string; kind?: DiffRow['kind'] }
+type Row = { text: string; kind?: DiffRow['kind'] | 'in' | 'err' }
+// What an unfolded call shows: rows, or a block the engine draws better (highlighted code, markdown).
+type Body = { rows: Row[] } | { code: { source: string; path?: string; startLine?: number } } | { md: string }
 const cap = (rows: Row[]): Row[] =>
   rows.length > OPEN_LINES ? [...rows.slice(0, OPEN_LINES), { text: `[... ${rows.length - OPEN_LINES} more rows]`, kind: 'gap' }] : rows
+const capText = (s: string) => {
+  const l = s.split('\n')
+  return l.length > OPEN_LINES ? `${l.slice(0, OPEN_LINES).join('\n')}\n[... ${l.length - OPEN_LINES} more lines]` : s
+}
+const toRows = (text: string, kind?: Row['kind']): Row[] =>
+  text.split('\n').map(clean).filter((l, n, all) => l.trim() || n < all.length - 1).map(t => ({ text: t, ...(kind ? { kind } : {}) }))
+// Prose results read as markdown: a subagent's report, a fetched page.
+const MD_TOOLS = new Set(['Agent', 'Task', 'WebFetch', 'WebSearch'])
+// Input keys an unfolded call leaves out: the envelope, the row's own description, what the diff shows.
+const SKIP_INPUT = new Set(['tool', 'tool_use_id', 'agentId', 'requestMeta', 'description', 'old_string', 'new_string', 'content', 'prompt'])
 
-// A call's whole output as rows: an edit's diff with context, else its text.
-function rowsOf(c: Call & { output?: unknown }): Row[] {
+// The call as asked, whole (the row cuts it): the command, the agent's task, the pattern and path.
+function inputRows(c: Call): Row[] {
+  const i = (c.input ?? {}) as Record<string, unknown>
+  const s = (k: string) => str(i[k]) ?? ''
+  const lines =
+    c.tool === 'Bash' ? s('command').split('\n').map((l, n) => `${n ? '  ' : '$ '}${l}`)
+    : c.tool === 'Agent' || c.tool === 'Task' ? [`${s('subagent_type') || 'agent'}${s('model') ? ` (${s('model')})` : ''}: ${s('description')}`, ...s('prompt').split('\n').slice(0, 8)]
+    : Object.entries(i).filter(([k, v]) => !SKIP_INPUT.has(k) && ['string', 'number', 'boolean'].includes(typeof v)).map(([k, v]) => `${k}: ${String(v).replace(/\s+/g, ' ').slice(0, 300)}`)
+  return lines.filter(l => l.trim()).map(text => ({ text: clean(text), kind: 'in' as const }))
+}
+
+// A call's whole output: an edit's diff, a read as highlighted code, prose as markdown,
+// Bash as stdout then stderr (red), anything else as text (JSON as TOON).
+function bodyOf(c: Call & { output?: unknown }): Body {
   const o = (c.output ?? {}) as Record<string, unknown>
   if ((c.tool === 'Edit' || c.tool === 'Write') && o.type !== 'create' && Array.isArray(o.structuredPatch)) {
-    return cap(compactDiff(base(str(o.filePath) ?? ''), o.structuredPatch as never, true))
+    return { rows: cap(compactDiff(base(str(o.filePath) ?? ''), o.structuredPatch as never, true)) }
   }
-  const text = c.isErrored && typeof c.output === 'string' ? c.output : fullText(c.tool, c.output)
-  const rows = text.split('\n').map(clean).filter((l, n, all) => l.trim() || n < all.length - 1)
-  return rows.length ? cap(rows.map(t => ({ text: t }))) : [{ text: '(no output yet)', kind: 'gap' }]
+  if (c.isErrored) {
+    const text = typeof c.output === 'string' ? c.output : fullText(c.tool, c.output)
+    return { rows: cap(toRows(text, 'err')) }
+  }
+  const f = (o.file ?? {}) as Record<string, unknown>
+  if (c.tool === 'Read' && o.type === 'text' && typeof f.content === 'string' && f.content) {
+    return { code: { source: capText(f.content), ...(str(f.filePath) ? { path: str(f.filePath) } : {}), startLine: Number(f.startLine) || 1 } }
+  }
+  if (c.tool === 'Bash' && typeof c.output === 'object') {
+    const rows = [...toRows(str(o.stdout) ?? ''), ...toRows(str(o.stderr) ?? '', 'err')].filter(r => r.text.trim() || r.kind !== 'err')
+    return { rows: rows.length ? cap(rows) : [{ text: '(no output)', kind: 'gap' }] }
+  }
+  const text = fullText(c.tool, c.output)
+  if (MD_TOOLS.has(c.tool) && text.trim()) return { md: capText(text) }
+  const rows = toRows(text)
+  return { rows: rows.length ? cap(rows) : [{ text: '(no output yet)', kind: 'gap' }] }
 }
 
 type Elements = ReturnType<EngineInterface['ui']['resolve']>
+type Els = Pick<Elements, 'Box' | 'Button' | 'Code' | 'Markdown' | 'Text'>
 
-// An unfolded call's rows, one line each, diff rows on the theme's diff backgrounds; a
-// long block ends in a second fold control, so it can be folded from where it ends.
-function unfolded($: EngineInterface, el: Pick<Elements, 'Button' | 'Text'>, id: string, at: string, rows: Row[], indent: string) {
-  const { Button, Text } = el
-  return [
-    ...rows.map((r, n) => (
-      <Text key={`out-${id}-${n}`} wrap="truncate-end" dimColor={!r.kind || r.kind === 'gap' || r.kind === 'ctx'}
-        backgroundColor={r.kind ? DIFF_BG[r.kind] : undefined} bold={r.kind === 'head'}>
-        {`${indent}${r.text}`}
+// One row of an unfolded block: a dim gutter, the text wrapped beside it in its own colour.
+function gutterRow(el: Pick<Elements, 'Box' | 'Text'>, r: Row, key: string, indent: string) {
+  const { Box, Text } = el
+  const bg = r.kind === 'add' || r.kind === 'del' ? DIFF_BG[r.kind] : undefined
+  return (
+    <Box key={key}>
+      <Text dimColor>{`${indent}│ `}</Text>
+      <Text wrap="wrap" color={r.kind === 'err' ? 'error' : undefined} dimColor={r.kind === 'gap' || r.kind === 'ctx'} bold={r.kind === 'head'} backgroundColor={bg}>
+        {r.text || ' '}
       </Text>
-    )),
-    rows.length >= TAIL_CONTROL_AT ? (
+    </Box>
+  )
+}
+// An unfolded block opens on a line of its own, apart from the row it unfolds.
+const gapLine = (el: Pick<Elements, 'Text'>, id: string) => <el.Text key={`gap-${id}`}> </el.Text>
+// The input above the output, parted by a short rule.
+function inputBlock(el: Pick<Elements, 'Box' | 'Text'>, id: string, rows: Row[], indent: string) {
+  const { Text } = el
+  return [gapLine(el, id), ...rows.map((r, n) => gutterRow(el, r, `in-${id}-${n}`, indent)), ...(rows.length ? [<Text key={`sep-${id}`} dimColor>{`${indent}├${'─'.repeat(24)}`}</Text>] : [])]
+}
+
+// An unfolded call: its input (when the caller has it), then its output; a long block ends
+// in a second fold control, so it can be folded from where it ends.
+// `input` null: the row above drew the input (and the opening gap) itself.
+function unfolded($: EngineInterface, el: Els, id: string, at: string, body: Body, indent: string, input: Row[] | null = []) {
+  const { Box, Button, Code, Markdown, Text } = el
+  const out =
+    'rows' in body ? body.rows.map((r, n) => gutterRow(el, r, `out-${id}-${n}`, indent))
+    : [<Box key={`out-${id}`} paddingLeft={indent.length + 2}>{'code' in body ? <Code {...body.code} /> : <Markdown text={body.md} />}</Box>]
+  const tall = 'rows' in body ? body.rows.length : ('code' in body ? body.code.source : body.md).split('\n').length
+  return [
+    ...(input ? inputBlock(el, id, input, indent) : []),
+    ...out,
+    tall >= TAIL_CONTROL_AT ? (
       <Button key={`tail-${id}`} plain dimColor onPress={() => toggleOpen($, id, at)}>
         <Text>{`${indent}▴ fold`}</Text>
       </Button>
@@ -219,6 +280,16 @@ const COLORS: Record<string, ThemeKey> = {
 const USER_COLOR: ThemeKey = 'ide'
 const BASH_COLORS: Record<string, ThemeKey> = { GIT: 'warning', RG: 'warning', GREP: 'warning' }
 
+// A call's state ahead of its label: ✓ done, ✗ failed, ■ cut, · running; ▾ while unfolded.
+type Mark = { isRunning: boolean; isErrored: boolean; isInterrupted?: boolean }
+function markOf(el: Pick<Elements, 'Text'>, c: Mark, isOpen: boolean, pad = '') {
+  const [m, color]: [string, ThemeKey | undefined] = isOpen ? ['▾', undefined] : c.isRunning ? ['·', undefined] : c.isErrored ? ['✗', 'error'] : c.isInterrupted ? ['■', undefined] : ['✓', 'success']
+  return <el.Text key="m" color={color} dimColor={!color}>{`${pad}${m} `}</el.Text>
+}
+// The call's start time from the ledger, right-aligned on its row (none with the ledger off).
+const clockOf = (at?: number) => (at ? ` ${new Date(at).toTimeString().slice(0, 8)}` : '')
+const startsOf = async ($: EngineInterface) => new Map((await read($, trace)).map(x => [x.id, x.at]))
+
 function colorOf(c: Call): ThemeKey {
   if (c.isErrored) return 'error'
   if (c.tool === 'Bash') return BASH_COLORS[label(c)] ?? 'text'
@@ -242,7 +313,9 @@ function fullText(tool: string, output: unknown): string {
   if (tool === 'Read') return str((o.file as Record<string, unknown> | undefined)?.content) ?? ''
   if (tool.startsWith('mcp__')) return (mcpPreview(output, Infinity) ?? []).join('\n')
   const files = Array.isArray(o.filenames) ? (o.filenames as unknown[]).join('\n') : undefined
-  return str(o.content) ?? files ?? JSON.stringify(output, null, 2)
+  // A subagent's or a tool's content blocks: their text, not the JSON around it.
+  const blocks = Array.isArray(o.content) ? (o.content as unknown[]).map(b => str((b as Record<string, unknown> | null)?.text) ?? '').filter(Boolean).join('\n\n') : undefined
+  return str(o.content) ?? (blocks || undefined) ?? files ?? (str(o.result) || toToon(output))
 }
 
 // Rows a result preview draws in place of the engine's; null leaves the engine's.
@@ -675,16 +748,23 @@ export const register: Register = on => {
     const isOpen = (await read($, expanded)).includes(p.tool_use_id)
     const bg = p.isErrored ? undefined : bgOf(await read($, backgrounds), 'tool')
     const root = await $.session.cwd().catch(() => '')
-    return (
+    const at = (await startsOf($)).get(p.tool_use_id)
+    const row = (
       <Box backgroundColor={bg} marginTop={isOn(await read($, toggles), 'tight') ? -1 : 0}>
-        <Text dimColor>{isOpen ? '▾ ' : '  '}</Text>
+        {markOf({ Text }, p, isOpen)}
         {/* Only the label takes the pointer: a hover inverts what it covers. */}
         <Button key={`row-${p.tool_use_id}`} plain onPress={() => toggleOpen($, p.tool_use_id, p.tool_use_id)}>
           <Text color={colorOf(p)}>{label(p).padEnd(MIN_LABEL)}</Text>
         </Button>
-        <Text dimColor={p.isRunning} italic={p.isRunning} wrap="truncate-end">{` ${describe(p, root)}`}</Text>
+        <Box flexGrow={1}>
+          <Text dimColor={p.isRunning} italic={p.isRunning} wrap="truncate-end">{` ${describe(p, root)}`}</Text>
+        </Box>
+        <Text dimColor>{clockOf(at)}</Text>
       </Box>
     )
+    // Unfolded, the call's input sits under its row; its ToolResult draws the output below.
+    const input = isOpen ? inputBlock({ Box, Text }, p.tool_use_id, inputRows(p), '  ') : []
+    return isOpen ? <Box flexDirection="column">{row}{input}</Box> : row
   })
 
   // Folded by default: the row alone, errors kept. With previews on: an edit's compact diff,
@@ -693,12 +773,12 @@ export const register: Register = on => {
     const p = e.props
     if (p.isExpanded || (await read($, mode)) === 'cards') return next(e)
     const t = await read($, toggles)
-    const { Box, Button, Text } = $.ui.resolve(e)
+    const { Box, Button, Code, Markdown, Text } = $.ui.resolve(e)
     if (p.isErrored && !(await read($, expanded)).includes(p.tool_use_id)) {
       return <Text color="error" wrap="truncate-end">{`  │ ${reasonOf(p.output)}`}</Text>
     }
     if ((await read($, expanded)).includes(p.tool_use_id)) {
-      return <Box flexDirection="column">{unfolded($, { Button, Text }, p.tool_use_id, p.tool_use_id, rowsOf({ tool: p.tool, input: {}, isRunning: false, isErrored: false, output: p.output }), '  ')}</Box>
+      return <Box flexDirection="column">{unfolded($, { Box, Button, Code, Markdown, Text }, p.tool_use_id, p.tool_use_id, bodyOf({ tool: p.tool, input: {}, isRunning: false, isErrored: p.isErrored, output: p.output }), '  ', null)}</Box>
     }
     const diff = isOn(t, 'previews') ? diffOf(p.tool, p.output) : undefined
     if (diff?.length) {
@@ -739,13 +819,14 @@ export const register: Register = on => {
     // every call on its row, the failure red with its reason under it.
     const isTroubled = p.calls.some(c => c.isErrored || c.isInterrupted)
     if (m === 'cards' || p.isExpanded || (!p.isCallsOnly && !isTroubled)) return next(e)
-    const { Box, Button, Text } = $.ui.resolve(e)
+    const { Box, Button, Code, Markdown, Text } = $.ui.resolve(e)
     const open = new Set(await read($, expanded))
     const bg = bgOf(await read($, backgrounds), 'tool')
 
     const isSummary = m === 'group' && !p.isActive && !isTroubled
     const failed = p.calls.filter(c => c.isErrored).length
     const root = await $.session.cwd().catch(() => '')
+    const starts = await startsOf($)
     type GroupCall = (typeof p.calls)[number]
     // Repeats in a row (a poll run twice) draw once as `×N`, on the latest call.
     const runs: { c: GroupCall; n: number }[] = []
@@ -777,15 +858,18 @@ export const register: Register = on => {
           const id = c.tool_use_id
           const isOpen = !!id && open.has(id)
           const head = [
-            <Text key="b" dimColor>{`${pad}${isOpen ? '▾ ' : '  '}`}</Text>,
+            markOf({ Text }, c, isOpen, pad),
             <Text key="l" color={colorOf(c)}>{label(c).padEnd(width)}</Text>,
           ]
-          const what = (
-            <Text dimColor={c.isRunning} italic={c.isRunning} wrap="truncate-end">
-              {` ${describe(c, root)}`}
-              {times > 1 ? <Text dimColor>{` ×${times}`}</Text> : null}
-            </Text>
-          )
+          const what = [
+            <Box key="w" flexGrow={1}>
+              <Text dimColor={c.isRunning} italic={c.isRunning} wrap="truncate-end">
+                {` ${describe(c, root)}`}
+                {times > 1 ? <Text dimColor>{` ×${times}`}</Text> : null}
+              </Text>
+            </Box>,
+            <Text key="t" dimColor>{clockOf(id ? starts.get(id) : undefined)}</Text>,
+          ]
           return (
             <Box key={`call-${id ?? n}`} flexDirection="column">
               <Box>
@@ -798,7 +882,7 @@ export const register: Register = on => {
                 )}
                 {what}
               </Box>
-              {isOpen && id ? unfolded($, { Button, Text }, id, e.requestId, rowsOf(c), `${pad}  `) : null}
+              {isOpen && id ? unfolded($, { Box, Button, Code, Markdown, Text }, id, e.requestId, bodyOf(c), `${pad}  `, inputRows(c)) : null}
               {!isOpen && c.isErrored ? (
                 <Text color="error" wrap="truncate-end">{`${pad}  │ ${reasonOf(c.output)}`}</Text>
               ) : null}
