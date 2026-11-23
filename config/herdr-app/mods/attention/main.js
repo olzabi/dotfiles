@@ -1,29 +1,28 @@
-// What needs you, most urgent first (port of herdr-side's 00-attention). Always shown (a hidden block never starts),
-// so its header (search, new tab, new space) stays reachable.
-//   ▲ agent blocked   ✕ agent exited   ? plan decision waiting for you   ◆ agent done, not seen yet
-//   ⚑ plan blocker you do outside the code
-// Plan blockers come from herdr-side's plans section ($XDG_RUNTIME_DIR/herdr-side/blockers.tsv).
-//   ✓ agent ready for review (it ran `herdr-ready "summary"`, bin/herdr-ready; label herdr.ready)
-//   ⌫ worktree whose branch is merged into its base (or whose upstream is gone): click twice to `git worktree remove`
-// An agent's `herdr-ready --status` line (label herdr.status) replaces its title on its rows.
-// Click: go to it (an exited row is dismissed once visited, a ready one cleared); a blocker opens its plan in Obsidian.
-// Inbox parts (after T3 Code's): an idle agent stays listed (○) until you settle it; ✓ on an agent row settles its tab
-// (Herdr's own tab.settle, ctrl-shift-s for the shown one: lists and tab.next skip it, and it comes back when shown or
-// when an agent in it needs you). Below, folded: Working (busy agents) and Settled (↺ brings one back). The header's
-// buttons search the rows, open a new tab and start a new space.
+// Inbox: only what needs a decision from you and that the Agents list doesn't already say (it shows every agent's
+// blocked/done/working/idle state, so those aren't repeated here). Most urgent first:
+//   ✕ a Claude subagent or workflow agent that failed (bin/claude-live): click follows it in zoe
+//   ✕ an agent that exited with an error
+//   ✓ ready for review (the agent ran `herdr-ready "summary"`): click reviews its worktree's branch in hunk
+//   ✎ hunk notes you left on a worktree: click sends them to the agent working there (no agent: opens the review)
+//   ? plan decision / ⚑ plan blocker (herdr-side's blockers.tsv): opens the plan in Obsidian
+//   ⌫ worktree whose branch is merged (or upstream gone): click twice to `git worktree remove`
+// Click dismisses a ✕ row. Below, folded: Settled tabs (↺ brings one back). Header: search, new tab, new space.
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input } from "gpui-base";
-import { agents, terminals, panes, spaces, run, theme, exec, hc, notify, openOverlay } from "herdr";
+import { agents, terminals, panes, spaces, run, theme, exec, hc, notify, openOverlay, setShared } from "herdr";
 
 const AGENTS = new Set(["claude", "claude-code", "codex", "pi", "omp", "opencode", "gemini", "amp", "cursor-agent"]);
-// A shell's exit code is just its last command's: never news.
-const SHELLS = new Set(["zsh", "bash", "fish", "sh", "dash", "nu", "xonsh"]);
+// The branch since it left the default branch, uncommitted work included, in hunk (same as my-agents' ⧉).
+const REVIEW = 'b=$(git merge-base HEAD origin/HEAD 2>/dev/null || git merge-base HEAD origin/dev 2>/dev/null || echo HEAD); exec hunk diff "$b" --watch';
+const popup = (title, argv, cwd, modal = false) => { setShared("popup.next", { title, argv, cwd, modal }); run("popup.run"); };
 
 export default class Attention extends View {
   init(_props, cx) {
     this.blockers = [];
     this.finished = [];
     this.merged = [];
+    this.live = []; // claude-live sessions
+    this.notes = []; // [{ dir, comments }] from open hunk reviews
     this.arm = null;
     cx.timer.every(60000, (cx) => this.worktrees(cx));
     this.worktrees(cx);
@@ -45,6 +44,16 @@ export default class Attention extends View {
       // terminals() lists live ones only; finished ones need --all.
       const all = await exec("hc", ["ls", "--all", "--json"]).catch(() => null);
       try { this.finished = JSON.parse(all?.stdout ?? "{}").terminals?.filter((x) => x.state !== "live") ?? []; } catch { this.finished = []; }
+      const live = await exec("claude-live", []).catch(() => null);
+      try { this.live = JSON.parse(live?.stdout ?? "{}").sessions ?? []; } catch { this.live = []; }
+      const notes = [];
+      const open = await exec("hunk", ["session", "list", "--json"]).catch(() => null);
+      for (const h of open?.code === 0 ? JSON.parse(open.stdout).sessions ?? [] : []) {
+        const c = await exec("hunk", ["session", "comment", "list", h.sessionId, "--type", "user", "--json"]).catch(() => null);
+        const comments = c?.code === 0 ? JSON.parse(c.stdout).comments ?? [] : [];
+        if (comments.length) notes.push({ dir: h.repoRoot, comments });
+      }
+      this.notes = notes;
       // Working again: the old "ready" no longer holds.
       const labels = this.labels();
       for (const a of agents()) if (a.status === "working" && labels[a.address]?.["herdr.ready"]) hc(["label", a.address, "herdr.ready="]);
@@ -95,31 +104,39 @@ export default class Attention extends View {
     const t = theme();
     const out = [];
     const labels = this.labels();
-    const focus = (a) => () => run("pane.focus", { pane: a.pane });
-    const settled = this.settledTabs(), shownTab = new Set(spaces().filter((s) => s.active).flatMap((s) => s.tabs.filter((x) => x.active).map((x) => x.id)));
+    // Where an agent works now: Claude's own folder (it follows cd into a worktree), else its pane's.
+    const cwdOf = (a) => this.live.find((x) => x.kind !== "bg" && x.terminal === a.address)?.cwd ?? panes().find((p) => p.pane === a.pane)?.cwd;
     for (const a of agents()) {
-      if (settled.has(a.tab) && a.status !== "blocked") continue;
-      const where = this.context(a);
       const l = labels[a.address] ?? {};
-      const what = l["herdr.status"] || a.title;
-      if (a.status === "blocked") out.push({ rank: 0, icon: "▲", color: t.blocked, text: "blocked", where, what, go: focus(a) });
-      else if (l["herdr.ready"] && a.status !== "working") out.push({ rank: 0.5, icon: "✓", color: t.done, text: "ready", where, what: l["herdr.ready"], go: () => {
-        run("pane.focus", { pane: a.pane });
+      if (!l["herdr.ready"] || a.status === "working") continue;
+      const dir = cwdOf(a);
+      out.push({ rank: 1, icon: "✓", color: t.done, text: "review", where: this.context(a), what: l["herdr.ready"], key: a.address, go: () => {
         hc(["label", a.address, "herdr.ready="]);
+        if (dir) popup(`hunk · ${dir.split("/").pop()}`, ["sh", "-c", REVIEW], dir, true);
+        else run("pane.focus", { pane: a.pane });
       } });
-      else if (a.status === "done") out.push({ rank: 3, icon: "◆", color: t.done, text: "done", where, what, go: focus(a) });
-      else if (a.status === "idle" && !shownTab.has(a.tab)) out.push({ rank: 4, icon: "○", color: t.muted, text: "idle", where, what, go: focus(a) });
-      else continue;
-      Object.assign(out[out.length - 1], { tab: a.tab, key: a.address });
+    }
+    for (const x of this.live) for (const k of x.kids) {
+      const key = `${x.id}:${k.id}`;
+      if (k.state !== "failed" || this.dismissed.has(key)) continue;
+      out.push({ rank: 0, icon: "✕", color: t.blocked, text: "failed", what: k.label, where: [x.name, k.workflow, k.phase].filter(Boolean).join(" · "), key, go: () => {
+        popup(`zoe · ${k.label}`, ["zoe", k.log, "--follow"]);
+        this.dismiss(key);
+      } });
     }
     for (const x of this.finished) {
-      // Only agents, or a program that failed: a tool you quit (lazygit, a shell, Ctrl-C/hangup) isn't news.
-      const failed = x.exit_code != null && ![0, 129, 130].includes(x.exit_code) && !SHELLS.has(x.agent);
-      if (!x.agent || this.dismissed.has(x.address) || !(AGENTS.has(x.agent) || failed)) continue;
-      out.push({ rank: 1, icon: "✕", color: t.blocked, text: `${x.agent} ${x.exit_code ? `failed (${x.exit_code})` : "exited"}`, where: x.where ?? "", what: x.cwd ?? "", go: () => {
+      // Agents only, and only an error: a clean exit or Ctrl-C isn't news, nor is any other program's exit.
+      if (!AGENTS.has(x.agent) || this.dismissed.has(x.address) || x.exit_code == null || [0, 129, 130].includes(x.exit_code)) continue;
+      out.push({ rank: 0, icon: "✕", color: t.blocked, text: `${x.agent} failed (${x.exit_code})`, where: x.where ?? "", what: x.cwd ?? "", go: () => {
         run("pane.focus", { terminal: x.address });
-        this.dismissed.add(x.address);
-        localStorage.setItem("dismissed", JSON.stringify([...this.dismissed].slice(-200)));
+        this.dismiss(x.address);
+      } });
+    }
+    for (const n of this.notes) {
+      const agent = agents().find((a) => cwdOf(a)?.startsWith(n.dir));
+      out.push({ rank: 2, icon: "✎", color: t.accent, text: `${n.comments.length} notes`, what: n.dir.split("/").pop(), where: agent ? `send to ${this.context(agent)}` : "no agent there: open the review", key: `notes-${n.dir}`, go: () => {
+        if (!agent) return popup(`hunk · ${n.dir.split("/").pop()}`, ["sh", "-c", REVIEW], n.dir, true);
+        this.sendNotes(n, agent);
       } });
     }
     for (const w of this.merged) {
@@ -143,6 +160,21 @@ export default class Attention extends View {
     return out.sort((a, b) => a.rank - b.rank);
   }
 
+  dismiss(key) {
+    this.dismissed.add(key);
+    localStorage.setItem("dismissed", JSON.stringify([...this.dismissed].slice(-200)));
+  }
+
+  // Your hunk notes on a worktree, as one prompt to the agent there; sent notes leave hunk.
+  async sendNotes(n, agent) {
+    const text = "Review notes on your changes, fix each one:\n" + n.comments.map((c) => `- ${c.filePath}:${c.line}: ${c.summary}${c.rationale ? ` (${c.rationale})` : ""}`).join("\n");
+    const sent = await hc(["send", agent.address, text]);
+    if (sent.code !== 0) return notify({ title: "Send review notes", body: sent.stderr.trim() || "hc send failed", level: "error" });
+    for (const c of n.comments) await exec("hunk", ["session", "comment", "rm", "--repo", n.dir, c.commentId], { cwd: n.dir });
+    this.notes = this.notes.filter((x) => x !== n);
+    notify({ title: "Review notes sent", body: `${n.comments.length} to ${agent.address}` });
+  }
+
   settledTabs() {
     return new Set(spaces().flatMap((s) => s.tabs.filter((x) => x.settled).map((x) => x.id)));
   }
@@ -151,12 +183,6 @@ export default class Attention extends View {
   context(a) {
     const branch = panes().find((p) => p.pane === a.pane)?.branch;
     return [a.space_name, a.tab_name, branch && `⎇ ${branch}`].filter(Boolean).join(" · ");
-  }
-
-  working() {
-    const settled = this.settledTabs(), labels = this.labels(), t = theme();
-    return agents().filter((a) => a.status === "working" && !settled.has(a.tab)).map((a) => ({ icon: "●", color: t.working,
-      text: "working", where: this.context(a), what: labels[a.address]?.["herdr.status"] || a.title, tab: a.tab, key: a.address, go: () => run("pane.focus", { pane: a.pane }) }));
   }
 
   settled() {
@@ -212,11 +238,10 @@ export default class Attention extends View {
   render(cx) {
     const t = theme();
     const rows = this.rows().filter((r) => this.match(r));
-    const working = this.working().filter((r) => this.match(r)), settled = this.settled().filter((r) => this.match(r));
+    const settled = this.settled().filter((r) => this.match(r));
     return v_flex().id("attention").size_full().px(8).pt(6).gap(1).text_size(12).overflow_y_scrollbar()
       .child(h_flex().h(22).flex_none().pl(8).gap(2).items_center()
         .child(div().flex_1().text_color(t.muted).child("Inbox"))
-        .child(this.fold("working", "●", t.working, this.working().length, t))
         .child(this.fold("settled", "✓", t.muted, this.settled().length, t))
         .child(this.tool("att-search", "search", (cx) => {
           this.searching = !this.searching;
@@ -231,7 +256,7 @@ export default class Attention extends View {
         })
         .child(Input.new(this.search).h_full().text_size(12).text_color(t.foreground))))
       .children(rows.map((r, i) => this.row(r, `att-${r.key ?? `${r.icon}${r.text}${r.where}${i}`}`, t)))
-      .children(this.section("working", "Working", working, t))
+      .when(!rows.length && !this.query, (el) => el.child(div().px(8).py(4).text_size(11.5).text_color(t.dim).child("Nothing needs you")))
       .children(this.section("settled", "Settled", settled, t));
   }
 }

@@ -2,7 +2,8 @@
 
 import { View, div, image, svg } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
-import { agents, terminals, panes, focused, spaces, run, theme, shared, setShared, setAgentOrder, openOverlay, closeOverlay, props, window, layout, exec, nextCommand } from "herdr";
+import * as my from "./extras.js"; // my:
+import { agents, terminals, panes, focused, spaces, run, theme, shared, setShared, setAgentOrder, openOverlay, closeOverlay, props, window, layout } from "herdr";
 
 function find(node, id) {
   if (node?.id === id) return node;
@@ -25,7 +26,10 @@ function toggleSidebar() {
   run("layout.resize", { id: "sidebar", px: narrow() ? (shared("sidebar.width") ?? 268) : window()?.platform === "macos" ? 76 : 44 });
 }
 
-const clean = (s) => (s ?? "").replace(/^[^\p{L}\p{N}]+/u, "").trim();
+// Drops what an agent puts before its title: a status glyph or spinner and the separator
+// after it ("✦  Working", "⠋ - Thinking"), and Codex's blinking "[ ! ] " / "[ . ] " mark.
+// Stops at an opening bracket or quote, so a title that starts with one ("[web] login") keeps it.
+const clean = (s) => (s ?? "").replace(/^[^\p{L}\p{N}\p{Ps}\p{Pi}]+/u, "").replace(/^\[ [!.] \] /, "").trim();
 
 function leadPanes(all) {
   const leads = new Map();
@@ -43,7 +47,7 @@ function title(tab, l) {
   const live = clean(l?.title);
   // clean() would strip a path's leading ~ or /: test the title with only its status glyph gone.
   const path = /^[~/]|^[A-Za-z]:\\/.test((l?.title ?? "").replace(/^[^\p{L}\p{N}~/]+/u, ""));
-  const telling = live && live !== prog && !path && !live.includes("@") && live.toLowerCase() !== l?.program?.key;
+  const telling = live && live !== (l?.terminal ?? l?.address) && live !== prog && !path && !live.includes("@") && live.toLowerCase() !== l?.program?.key;
   return (tab.name === prog || !tab.named) && telling ? live : tab.name;
 }
 const RANK = { blocked: 4, done: 3, working: 2, idle: 1 };
@@ -56,6 +60,7 @@ const kidStatus = (k, listed) => {
 const SORTS = [
   { id: "priority", label: "Priority", icon: "clock" },
   { id: "grouped", label: "Grouped by space", icon: "layers" },
+  my.SORT, // my:
 ];
 const sortOf = () => SORTS.find((s) => s.id === shared("agents.sort")) ?? SORTS[0];
 const SECTION = { 4: "Needs you", 3: "Done", 2: "Working", 1: "Idle" };
@@ -77,42 +82,20 @@ function icon(p, size, color) {
 
 export default class Agents extends View {
   init(_props, cx) {
-    if (props()?.sortMenu) return;
+    if (props()?.sortMenu || props()?.menu) return; // my: menu
+    if (props()?.prs) return my.init(this, cx); // my: the Pull requests panel
     this.folded = new Set();
     // Each agent's last state and when it changed (ms), kept across restarts.
-    this.changed = JSON.parse(localStorage.getItem("changed") ?? "{}");
-    this.pendingPins = JSON.parse(localStorage.getItem("pins") ?? "[]");
+    try { this.changed = JSON.parse(localStorage.getItem("changed") ?? "{}"); } catch { this.changed = {}; }
+    if (!this.changed || typeof this.changed !== "object" || Array.isArray(this.changed)) this.changed = {};
+    try { this.pendingPins = JSON.parse(localStorage.getItem("pins") ?? "[]"); } catch { this.pendingPins = []; }
+    if (!Array.isArray(this.pendingPins)) this.pendingPins = [];
     if (!this.pendingPins.length) localStorage.removeItem("pins");
     this.migratingPins = new Set();
-    // my-agents: linked-worktree name per cwd ("" = main checkout), from git, refreshed gently.
-    this.wt = {};
-    cx.timer.every(20000, (cx) => this.worktrees(cx));
-    this.worktrees(cx);
-    // my-agents: keys.json "my-agents.worktree-new|open|remove" open the worktree dialog (my-worktree: via wt).
-    cx.spawn(async (cx) => {
-      for (;;) {
-        const c = await nextCommand();
-        const action = String(c).replace(/^worktree-/, "");
-        if (!["new", "open", "remove"].includes(action)) continue;
-        const pane = panes().find((p) => p.focused);
-        const space = spaces().find((s) => s.tabs.some((t) => t.id === pane?.tab));
-        openOverlay({ mod: "my-worktree", kind: "dialog", width: action === "open" ? 560 : 460, height: action === "open" ? 480 : 280,
-          props: { space: space?.id, folder: pane?.cwd, action } });
-      }
-    });
+    try { this.order = JSON.parse(localStorage.getItem("order") ?? "{}"); } catch { this.order = {}; } // my: sections' order per view
+    if (!this.order || typeof this.order !== "object" || Array.isArray(this.order)) this.order = {};
     cx.timer.every(30000, (cx) => cx.notify());
-  }
-
-  worktrees(cx) {
-    const cwds = [...new Set(panes().filter((p) => p.status && p.cwd).map((p) => p.cwd))];
-    cx.spawn(async (cx) => {
-      for (const cwd of cwds) {
-        const r = await exec("git", ["rev-parse", "--path-format=absolute", "--git-dir", "--git-common-dir", "--show-toplevel"], { cwd }).catch(() => null);
-        const [dir, common, top] = (r?.stdout ?? "").trim().split("\n");
-        this.wt[cwd] = dir && common && dir !== common ? top.split("/").pop() : "";
-      }
-      cx.notify();
-    });
+    my.init(this, cx); // my:
   }
 
   // Stamps agents whose state changed. Done and idle count as one: looking at a
@@ -242,6 +225,8 @@ export default class Agents extends View {
   render(cx) {
     const t = theme();
     if (props()?.sortMenu) return this.sortMenu(t);
+    if (props()?.menu) return my.menuView(t); // my:
+    if (props()?.prs) return my.prPanel(this, t); // my:
     const collapsed = narrow();
     const sort = sortOf();
     let list = agents();
@@ -258,24 +243,29 @@ export default class Agents extends View {
     const tabCounts = new Map();
     for (const a of list) tabCounts.set(a.tab, (tabCounts.get(a.tab) ?? 0) + 1);
     const byPriority = sort.id === "priority";
-    const urgency = new Map(list.map((a) => [a.address, Math.max(this.rank(a), ...this.tree(all, a.address).map((s) => RANK[kidStatus(s.t, this.listed)] ?? 0))]));
-    const rankOf = (a) => urgency.get(a.address);
+    const kidRank = (ks) => ks.map((k) => RANK[my.kidStatus(k)] ?? 0); // my: Claude's subagents and tasks count too
+    const urgency = new Map(list.map((a) => [a.address, Math.max(this.rank(a), ...this.tree(all, a.address).map((s) => RANK[kidStatus(s.t, this.listed)] ?? 0), ...kidRank(my.kidsOf(this, a.address)))]));
+    // my: a `--bg` job ranks by its own state and its kids'
+    const rankOf = (a) => (a.job ? Math.max(RANK[my.bgStatus(a)], ...kidRank(my.kidsHere(this, a))) : urgency.get(a.address));
     if (byPriority) list = [...list].sort((x, y) => rankOf(y) - rankOf(x) || this.since(y) - this.since(x) || y.seq - x.seq);
     const pinned = list.filter((a) => a.pinned);
-    const rest = list.filter((a) => !a.pinned);
+    let rest = list.filter((a) => !a.pinned);
     list = [...pinned, ...rest];
     setAgentOrder(list.map((a) => a.address));
+    // my: in Priority, `--bg` jobs sit in the sections with the agents (a stable sort keeps the agents' order).
+    if (byPriority && !collapsed) rest = [...rest, ...my.bgSessions(this).map((s) => ({ ...s, status: my.bgStatus(s) }))].sort((x, y) => rankOf(y) - rankOf(x));
 
     const withKids = (a, i) => {
       const subs = collapsed ? [] : this.tree(all, a.address);
-      const r = row(a, i, subs);
+      const kids = collapsed ? [] : my.kidsOf(this, a.address); // my:
+      const r = row(a, i, subs, kids);
       if (this.folded.has(a.address)) return [r];
-      return [r, ...subs.map((s) => this.subRow(t, s, shown, byPriority))];
+      return [r, ...subs.map((s) => this.subRow(t, s, shown, byPriority)), ...kids.flatMap((k) => my.kidRows(this, t, k, 39))];
     };
 
     // The fold chevron; folded, the count too, colored by the most urgent one.
-    const fold = (a, subs) => {
-      const sts = subs.map((s) => kidStatus(s.t, this.listed));
+    const fold = (a, subs, kids = []) => {
+      const sts = [...subs.map((s) => kidStatus(s.t, this.listed)), ...kids.map(my.kidStatus)]; // my: kids
       const top = sts.reduce((m, s) => ((RANK[s] ?? 0) > (RANK[m] ?? 0) ? s : m), null);
       const open = !this.folded.has(a.address);
       return div()
@@ -296,7 +286,7 @@ export default class Agents extends View {
           cx.notify();
         })
         .child(svg(`mods/workspace-chrome/chevron-${open ? "down" : "right"}.svg`).size(11).flex_none())
-        .when(!open, (el) => el.child(String(subs.length)));
+        .when(!open, (el) => el.child(String(sts.length)));
     };
 
     // A row reads "space \u00b7 detail": the detail is a tab someone named or the
@@ -305,14 +295,8 @@ export default class Agents extends View {
     // Read the pane snapshot once: every host read copies the whole list into JS.
     const allPanes = panes();
     const leads = leadPanes(allPanes);
-    const paneOf = new Map(allPanes.map((p) => [p.pane, p]));
-    // "⎇ branch · worktree" under the name; the worktree only for a linked checkout.
-    const where = (a) => {
-      const p = paneOf.get(a.pane);
-      if (!p?.branch) return null;
-      const wt = this.wt[p.cwd];
-      return `\u2387 ${p.branch}${wt ? ` \u00b7 ${wt}` : ""}`;
-    };
+    const paneCwd = new Map(allPanes.map((p) => [p.pane, p.cwd])); // my:
+    const cwdOf = (a) => my.sessionCwd(this, a.address) ?? paneCwd.get(a.pane);
     const tabs = new Map(spaces().flatMap(s => s.tabs).map(tab => [tab.id, tab]));
     const labels = new Map(list.map(a => {
       const tab = tabs.get(a.tab);
@@ -327,7 +311,7 @@ export default class Agents extends View {
       if (detail.get(a.address) == null && seen[`${a.space_name}\u0000`] > 1) detail.set(a.address, label(a));
     }
 
-    const row = (a, i, subs = []) => {
+    const row = (a, i, subs = [], kids = []) => {
       const pic = icon(a.program, 16, t.foreground);
       const more = detail.get(a.address);
       // An agent on another machine (`vps/t7`) says which.
@@ -372,7 +356,7 @@ export default class Agents extends View {
       return h_flex()
         .id(`ag-${a.address}`)
         .px(8)
-        .h(where(a) ? 40 : 30)
+        .h(my.hasLine(this, cwdOf(a)) ? 40 : 30) // my: branch line
         .flex_none()
         .rounded(8)
         .items_center()
@@ -386,19 +370,21 @@ export default class Agents extends View {
           cx.notify();
         })
         .on_click(() => run("pane.focus", { pane: a.pane }))
+        .when(true, (el) => my.onMenu(el, { kind: "agent", terminal: a.address, pane: a.pane, pinned: a.pinned, cwd: cwdOf(a), tree: my.treeOf(this, cwdOf(a)), notes: this.notes[my.treeOf(this, cwdOf(a))], log: this.live.find((x) => x.terminal === a.address && x.kind !== "bg")?.log })) // my:
         .when(Boolean(pic), el => el.child(div().id(`agent-fold-${a.address}`)
-          .when(subs.length > 0, el => el.on_click((_e, cx) => {
+          .when(subs.length + kids.length > 0, el => el.on_click((_e, cx) => {
             cx.stop_propagation();
             this.folded.has(a.address) ? this.folded.delete(a.address) : this.folded.add(a.address);
             cx.notify();
           })).child(pic)))
-        .child(v_flex().flex_1().min_w(0)
+        .child(v_flex().flex_1().min_w(0) // my: branch line
           .child(h_flex().min_w(0).gap(5).items_center()
             .child(div().min_w(0).max_w(full && more ? 120 : 200).truncate().text_color(idle ? t.muted : t.foreground).child(name))
             .when(full && Boolean(more), el => el.child(div().flex_1().min_w(0).truncate().text_color(t.dim).child(`\u00b7 ${more}`))))
-          .when(Boolean(where(a)), el => el.child(div().min_w(0).truncate().text_size(11).text_color(t.dim).child(where(a)))))
+          .when(Boolean(my.where(this, cwdOf(a))), el => el.child(div().min_w(0).truncate().text_size(11).text_color(t.dim).child(my.where(this, cwdOf(a))))))
         .when(Boolean(machine), el => el.child(div().text_size(10).text_color(t.dim).child(machine)))
-        .when(subs.length > 0, el => el.child(fold(a, subs)))
+        .when(subs.length + kids.length > 0, el => el.child(fold(a, subs, kids)))
+        .when(this.hovered === a.address && Boolean(cwdOf(a)), el => el.child(my.actions(this, t, a.address, cwdOf(a), a.address))) // my:
         .when(this.hovered === a.address, el => el.child(pin))
         .when(this.hovered !== a.address && Boolean(when), el => el.child(div().flex_none().text_size(11).text_color(t.dim).child(duration(now - when))))
         .child(this.status(t, a, byPriority && !isPinned));
@@ -415,11 +401,14 @@ export default class Agents extends View {
     }
 
     // A group's header; it folds the group. Folded, it says how many and the most urgent state.
-    const header = (g) => {
+    // my: drag a header onto another to move its section there (ids: the sections' order as shown).
+    const header = (g, ids = []) => {
       const open = !this.folded.has(g.id);
       const top = g.members.reduce((m, a) => ((RANK[a.status] ?? 0) > (RANK[m] ?? 0) ? a.status : m), null);
+      const from = ids.indexOf(this.dragSec), to = ids.indexOf(g.id);
       return h_flex()
         .id(g.id)
+        .relative() // my: drop line
         .px(8)
         .pt(8)
         .h(30)
@@ -430,8 +419,23 @@ export default class Agents extends View {
         .font_medium()
         .cursor_pointer()
         .hover((s) => s.text_color(t.foreground))
-        .on_click((_e, cx) => {
-          open ? this.folded.add(g.id) : this.folded.delete(g.id);
+        .when(this.dragSec === g.id && this.overSec !== g.id, (el) => el.opacity(0.5))
+        .when(from >= 0 && this.overSec === g.id && from !== to, (el) => el.child(div().absolute().left(0).right(0).h(2).bg(t.accent)
+          .when(from < to, (l) => l.bottom(0)).when(from > to, (l) => l.top(0))))
+        .on_mouse_down("left", () => { this.dragSec = g.id; this.overSec = g.id; })
+        .on_mouse_move((_e, cx) => {
+          if (this.dragSec && this.overSec !== g.id) { this.overSec = g.id; cx.notify(); }
+        })
+        .on_mouse_up("left", (_e, cx) => {
+          const dragged = this.dragSec;
+          this.dragSec = this.overSec = null;
+          if (dragged === g.id) open ? this.folded.add(g.id) : this.folded.delete(g.id);
+          else if (ids.includes(dragged)) {
+            const next = ids.filter((id) => id !== dragged);
+            next.splice(to, 0, dragged);
+            this.order[sort.id] = next;
+            localStorage.setItem("order", JSON.stringify(this.order));
+          }
           cx.notify();
         })
         .child(div().truncate().text_color(t[g.status] ?? t.dim).child(g.label))
@@ -441,9 +445,43 @@ export default class Agents extends View {
           .when(!byPriority && top && top !== "idle", (el) => el.child(this.status(t, { status: top }, true)))
           .child(svg("mods/workspace-chrome/chevron-right.svg").size(11).flex_none().text_color(t.dim)));
     };
+    // my: `--bg` jobs (with their kids) and tasks placed in their worktree are members too.
+    const hover = (id, on, cx) => { if (on) this.hovered = id; else if (this.hovered === id) this.hovered = null; cx.notify(); };
+    const mark = (a) => this.status(t, a, true);
+    const member = (m, i) => (m.kid ? my.kidRows(this, t, m, 20)
+      : m.job ? [my.bgRow(this, t, m, mark, this.hovered, hover), ...my.kidsHere(this, m).flatMap((k) => my.kidRows(this, t, k, 20))] : withKids(m, i));
+    const state = (m) => (m.kid ? { status: my.kidStatus(m) } : m.job ? { status: my.bgStatus(m) } : m);
+    // my: sections as [group, its rows], put in the order dragged into (sec() collects, ordered below).
+    const secs = [];
+    const sec = (g, body) => secs.push({ g, body });
+    if (sort.id !== my.SORT.id) for (const g of groups) sec(g, () => g.members.flatMap(member));
+    // my: `--bg` jobs by repo below the agents (grouped by space), or everything by repo → worktree.
+    if (!collapsed && sort.id === my.SORT.id) {
+      for (const [repo, trees] of my.byWorktree(this, list, cwdOf)) {
+        const members = [...trees.values()].flat();
+        sec({ id: `repo-${repo}`, label: repo.split("/").pop(), status: null, members: members.map(state) },
+          () => [...trees].flatMap(([path, ms]) => [my.treeRow(this, t, path, this.trees[path], ms, this.hovered, hover), ...ms.flatMap(member)]));
+      }
+    } else if (!collapsed && !byPriority) {
+      const bg = new Map();
+      for (const s of my.bgSessions(this)) {
+        const repo = (this.git[s.cwd]?.repo ?? s.cwd).split("/").pop();
+        bg.set(repo, [...(bg.get(repo) ?? []), s]);
+      }
+      for (const [repo, ms] of bg) {
+        const g = { id: `bg-${repo}`, label: `${repo} \u00b7 background`, status: null, members: ms.map(state) };
+        sec(g, () => ms.flatMap(member));
+      }
+    }
+    // my: a dragged order per view; a section not in it yet stays right after the one it came after.
+    const saved = this.order[sort.id] ?? [];
+    let last = -1;
+    const ordered = secs.map((s, n) => { const i = saved.indexOf(s.g.id); if (i >= 0) last = i; return { ...s, k: i >= 0 ? i : last + 0.5, n }; })
+      .sort((x, y) => x.k - y.k || x.n - y.n);
+    const ids = ordered.map((s) => s.g.id);
     const rows = collapsed
       ? list.flatMap(withKids)
-      : groups.flatMap((g) => [header(g), ...(this.folded.has(g.id) ? [] : g.members.flatMap(withKids))]);
+      : ordered.flatMap((s) => [header(s.g, ids), ...(this.folded.has(s.g.id) ? [] : s.body())]);
 
     return v_flex()
       .size_full()
@@ -469,16 +507,19 @@ export default class Agents extends View {
                 .text_size(11)
                 .text_color(t.dim)
                 .hover((s) => s.text_color(t.foreground))
-                .on_click(() => openOverlay({ mod: "my-agents", kind: "popup", width: 200, height: 140, props: { sortMenu: true } }))
+                .on_click(() => openOverlay({ mod: "my-agents", kind: "popup", width: 200, height: 170, props: { sortMenu: true } })) // my: 3 sorts
                 .tooltip(`Sort agents: ${sort.label}`)
                 .child(svg(`mods/workspace-chrome/${sort.icon}.svg`).size(14)),
             ),
         ),
       )
-      .when(list.length === 0 && !collapsed, (el) =>
+      .when(list.length === 0 && !my.bgSessions(this).length && !collapsed, (el) =>
         el.child(div().px(12).text_size(12).text_color(t.dim).child("No agent status yet. Agents show up here when they report their status. Older versions and agents inside tmux may not.")),
       )
-      .child(v_flex().id("ag-list").flex_1().min_h(0).px(collapsed ? 0 : 8).overflow_y_scrollbar().mode("always").children(rows))
+      .child(v_flex().id("ag-list").flex_1().min_h(0).px(collapsed ? 0 : 8).overflow_y_scrollbar().mode("always").children(rows)
+        // my: a section dropped anywhere but a header goes back
+        .on_mouse_up("left", (_e, cx) => { if (this.dragSec) { this.dragSec = this.overSec = null; cx.notify(); } })
+        .on_mouse_down_out((_e, cx) => { if (this.dragSec) { this.dragSec = this.overSec = null; cx.notify(); } }))
       .when(collapsed, (el) =>
         el.child(
           h_flex()

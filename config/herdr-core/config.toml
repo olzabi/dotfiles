@@ -1,0 +1,3 @@
+# show a lost program's last screen above the recovered shell (after reboot/crash)
+restore_screen = true
+shell = ["/usr/bin/zsh"]

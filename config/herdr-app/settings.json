@@ -1,13 +1,19 @@
 {
-  "zoom": 1.0,
+  "zoom": 1,
   "sounds": {
     "enabled": true
   },
   "font": "Iosevka Nerd Font",
-  "font_size": 16.555555,
+  "font_size": 16.55555534362793,
   "font_ligatures": true,
+  "terminal_line_height": 0.8999999761581421,
+  "terminal_cell_width": 1,
+  "terminal_scroll_speed": 1,
+  "ui_font": "JetBrainsMono Nerd Font Mono",
   "telemetry": false,
-  "minimum_contrast": 1.0,
-  "appearance": "dark",
-  "theme": "darkvoid"
+  "minimum_contrast": 1,
+  "theme": {
+    "light": "darkvoid-light",
+    "dark": "darkvoid"
+  }
 }

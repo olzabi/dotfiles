@@ -1,0 +1,152 @@
+#!/usr/bin/env node
+// claude-live: live Claude Code sessions and what runs under them, as JSON, for herdr-app's my-agents sidebar.
+//   Sessions: ~/.claude/sessions/<pid>.json whose pid is alive (interactive and `claude --bg` jobs alike).
+//   terminal: the herdr-core terminal it runs in (HC_TERMINAL_ID in its environment), null outside herdr.
+//   kids: its subagents and workflow agents touched in the last 30 min, from projects/*/<session>/subagents.
+//     A workflow agent's state comes from the run's live journal.jsonl (started/result/failed), never the final
+//     workflows/wf_*.json, which reports failed agents as "done". A plain subagent counts as running while its
+//     log changed in the last 90 s. A runner's `<task>:<step>` agents come as one kid per task (tasks()), placed in
+//     the folder a step worked in. state: a `--bg` job's own (working, blocked, failed, done, stopped).
+// Usage: claude-live [--selftest]
+import fs from "node:fs";
+import path from "node:path";
+import os from "node:os";
+import assert from "node:assert";
+
+const HOME = process.env.CLAUDE_CONFIG_DIR || path.join(os.homedir(), ".claude");
+const RECENT = 30 * 60e3, ACTIVE = 90e3;
+
+const readJson = (f) => { try { return JSON.parse(fs.readFileSync(f, "utf8")); } catch { return null; } };
+const ls = (d) => { try { return fs.readdirSync(d); } catch { return []; } };
+const mtime = (f) => { try { return fs.statSync(f).mtimeMs; } catch { return 0; } };
+
+// Journal lines → agentId → {label, phase, state}.
+export function journalAgents(text) {
+  const out = new Map();
+  for (const line of text.split("\n")) {
+    let e; try { e = JSON.parse(line); } catch { continue; }
+    if (e.type === "started") out.set(e.agentId, { label: e.label, phase: e.phase, state: "running" });
+    else if ((e.type === "result" || e.type === "failed") && out.has(e.agentId)) out.get(e.agentId).state = e.type === "failed" ? "failed" : "done";
+  }
+  return out;
+}
+
+// Where the session works now: Claude records its cwd on every transcript line, and it follows `cd` into a worktree
+// while the process (and sessions/<pid>.json) stay where it started.
+export function lastCwd(text) {
+  for (const m of [...text.matchAll(/"cwd":"((?:[^"\\]|\\.)*)"/g)].reverse()) return JSON.parse(`"${m[1]}"`);
+  return null;
+}
+
+function tail(f, n = 65536) {
+  try {
+    const fd = fs.openSync(f, "r"), size = fs.fstatSync(fd).size, buf = Buffer.alloc(Math.min(n, size));
+    fs.readSync(fd, buf, 0, buf.length, size - buf.length);
+    fs.closeSync(fd);
+    return buf.toString("utf8");
+  } catch { return ""; }
+}
+
+function terminalOf(pid) {
+  try { return /(?:^|\0)HC_TERMINAL_ID=([^\0]*)/.exec(fs.readFileSync(`/proc/${pid}/environ`, "latin1"))?.[1] || null; } catch { return null; }
+}
+
+function kids(dir, now) {
+  const subs = path.join(dir, "subagents"), out = [];
+  for (const f of ls(subs)) {
+    if (!f.endsWith(".meta.json")) continue;
+    const log = path.join(subs, f.replace(".meta.json", ".jsonl")), m = mtime(log);
+    if (now - m > RECENT) continue;
+    const meta = readJson(path.join(subs, f)) ?? {};
+    out.push({ id: f.slice(6, -10), label: meta.description || meta.agentType || "subagent", kind: meta.agentType, state: now - m < ACTIVE ? "running" : "done", log });
+  }
+  for (const run of ls(path.join(subs, "workflows"))) {
+    const rdir = path.join(subs, "workflows", run);
+    if (now - mtime(rdir) > RECENT && now - mtime(path.join(rdir, "journal.jsonl")) > RECENT) continue;
+    const finished = fs.existsSync(path.join(dir, "workflows", `${run}.json`));
+    const name = ls(path.join(dir, "workflows", "scripts")).find((s) => s.endsWith(`-${run}.js`))?.slice(0, -(run.length + 4)) || run;
+    let journal = ""; try { journal = fs.readFileSync(path.join(rdir, "journal.jsonl"), "utf8"); } catch {}
+    for (const [id, a] of journalAgents(journal)) {
+      // A run that ended with an agent still "started" lost it: that's a failure too.
+      const state = finished && a.state === "running" ? "failed" : a.state;
+      out.push({ id, label: a.label || id, phase: a.phase, workflow: name, run, state, log: path.join(rdir, `agent-${id}.jsonl`) });
+    }
+  }
+  for (const k of out) k.cwd = lastCwd(tail(k.log, 16384));
+  return out;
+}
+
+const RANK = { failed: 0, running: 1, done: 2 };
+const byRank = (x, y) => RANK[x.state] - RANK[y.state];
+
+// Workflow agents labelled `<task>:<step>` (a runner's) become one row per task: its state is its worst step's, now
+// is that step, cwd is where a step left the host's folder (the task's worktree). A lone step stays a plain kid.
+export function tasks(kids, hostCwd) {
+  const out = [], by = new Map();
+  for (const k of kids) {
+    const [name, ...step] = (k.label ?? "").split(":");
+    if (!k.workflow || !step.length) { out.push(k); continue; }
+    const key = `${k.run}:${name}`;
+    if (!by.has(key)) { const g = { id: key, label: name, workflow: k.workflow, run: k.run, steps: [] }; by.set(key, g); out.push(g); }
+    by.get(key).steps.push({ ...k, step: step.join(":") });
+  }
+  for (const g of by.values()) {
+    if (g.steps.length === 1) { out[out.indexOf(g)] = g.steps[0]; continue; }
+    g.steps.sort(byRank);
+    g.state = g.steps[0].state;
+    g.now = g.state === "done" ? null : g.steps[0].step;
+    g.cwd = g.steps.find((s) => s.cwd && s.cwd !== hostCwd)?.cwd ?? hostCwd;
+  }
+  return out.sort(byRank);
+}
+
+// Claude's daemon keeps a finished `--bg` job's process alive so it can be attached again: a done or stopped job
+// leaves the list 30 min after its last activity, or at once when its folder is gone (a removed worktree).
+// A failed or blocked one stays: it needs you, and "Stop job" ends it.
+export function finished(state, updatedAt, cwd, now) {
+  if (!["done", "stopped"].includes(state)) return false;
+  return now - (updatedAt ?? 0) > RECENT || !fs.existsSync(cwd);
+}
+
+function sessions() {
+  const now = Date.now(), projects = path.join(HOME, "projects");
+  const dirs = new Map();
+  for (const p of ls(projects)) for (const s of ls(path.join(projects, p))) if (!s.includes(".")) dirs.set(s, path.join(projects, p, s));
+  const out = [];
+  for (const f of ls(path.join(HOME, "sessions"))) {
+    if (!f.endsWith(".json")) continue;
+    const s = readJson(path.join(HOME, "sessions", f));
+    if (!s?.pid || !fs.existsSync(`/proc/${s.pid}`)) continue;
+    const dir = dirs.get(s.sessionId);
+    const job = s.jobId ? readJson(path.join(HOME, "jobs", s.jobId, "state.json")) : null;
+    if (s.kind === "bg" && finished(job?.state, s.updatedAt, s.cwd, now)) continue;
+    const cwd = (dir && lastCwd(tail(`${dir}.jsonl`))) || s.cwd;
+    out.push({
+      pid: s.pid, id: s.sessionId, kind: s.kind, status: s.status, name: s.name, job: s.jobId ?? null,
+      cwd, started: s.cwd,
+      state: job?.state ?? null, detail: job?.detail ?? null, terminal: terminalOf(s.pid),
+      log: dir ? `${dir}.jsonl` : null, kids: dir ? tasks(kids(dir, now), cwd) : [],
+    });
+  }
+  return out;
+}
+
+if (process.argv[2] === "--selftest") {
+  const j = journalAgents(['{"type":"launched"}', '{"type":"started","agentId":"a","label":"x","phase":"P"}',
+    '{"type":"started","agentId":"b","label":"y"}', '{"type":"failed","agentId":"b"}', '{"type":"result","agentId":"a"}', "junk"].join("\n"));
+  assert(j.get("a").state === "done" && j.get("a").phase === "P", "result → done");
+  assert(j.get("b").state === "failed", "failed → failed");
+  assert(lastCwd('{"cwd":"/a"}\n{"x":1,"cwd":"/r/.claude/worktrees/w"}\n{"y":2}') === "/r/.claude/worktrees/w", "last cwd wins");
+  const w = { workflow: "deliver", run: "r1" };
+  const g = tasks([{ ...w, label: "T1:start", state: "done", cwd: "/h" }, { ...w, label: "T1:implement", state: "running", cwd: "/t1" },
+    { ...w, label: "T2:ship", state: "failed", cwd: "/h" }, { label: "plain", state: "done" }], "/h");
+  assert(g[0].label === "T2:ship" && !g[0].steps, "lone step stays a kid, failed first");
+  const t1 = g.find((x) => x.label === "T1");
+  assert(t1.state === "running" && t1.now === "implement" && t1.cwd === "/t1" && t1.steps.length === 2, "task row: worst step, its worktree");
+  const now = Date.now();
+  assert(finished("done", now - RECENT - 1, "/", now) && finished("done", now, "/no/such/dir", now), "old or homeless done job hides");
+  assert(!finished("done", now, "/", now) && !finished("failed", 0, "/no/such/dir", now) && !finished(undefined, 0, "/", now), "recent, failed, interactive stay");
+  console.log("ok");
+} else {
+  process.stdout.write(JSON.stringify({ sessions: sessions() }));
+}

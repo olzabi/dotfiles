@@ -1,12 +1,13 @@
 import { View, div } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input, Scrollbar, v_virtual_list } from "gpui-base";
-import { spaces, panes, focused, exec, readTextFile, watchFolder, theme, settings, run, setShared } from "herdr";
+import { spaces, panes, agents, focused, exec, notify, readTextFile, watchFolder, theme, settings, run, setShared } from "herdr";
 
 // my-changes: the shipped Changes panel, plus
 //   Branch mode (everything since this branch left origin's default branch, what the PR will hold) beside Uncommitted;
 //   files grouped by folder, foldable; generated files (lockfiles, builds, `-diff` in .gitattributes) folded apart;
 //   word diff for prose (.md tables, docs); groups start folded, one button folds or opens them all; per-file stage / revert / nvim / delta (a popup, see mods/popup);
 //   big diffs say so and offer delta. Commit commits what's staged, else everything.
+//   ⧉ reviews the mode's diff in hunk (popup); ➤ sends your hunk notes to this tab's agent, then clears them (idea: herdr-hunk-diff).
 const GENERATED = /(^|\/)(pnpm-lock\.yaml|package-lock\.json|yarn\.lock|bun\.lockb?|Cargo\.lock|poetry\.lock|uv\.lock|go\.sum|composer\.lock|mise\.lock)$|(^|\/)(dist|build|out|coverage|\.angular)\/|\.(min\.js|map|snap)$/;
 const PROSE = /\.(md|mdx|markdown|txt|rst|adoc)$/i;
 const BIG = 1500; // diff lines shown; past this, delta
@@ -237,8 +238,28 @@ export default class Changes extends View {
   }
 
   popup(title, cmd) {
-    setShared("popup.next", { title, argv: ["sh", "-c", cmd], cwd: this.root });
+    setShared("popup.next", { title, argv: ["sh", "-c", cmd], cwd: this.root, modal: title === "hunk" }); // hunk holds review notes: only ✕ closes it
     run("popup.run");
+  }
+
+  // Your notes from the hunk review of this repo, as one prompt for the tab's agent; sent notes leave hunk.
+  sendNotes(cx) {
+    const root = this.root, tab = focused()?.tab;
+    cx.spawn(async (cx) => {
+      const list = await exec("hunk", ["session", "comment", "list", "--repo", root, "--type", "user", "--json"], { cwd: root });
+      const notes = list.code === 0 ? JSON.parse(list.stdout).comments ?? [] : [];
+      const agent = agents().filter((a) => a.tab === tab).sort((a, b) => (b.focused ? 1 : 0) - (a.focused ? 1 : 0))[0];
+      if (!notes.length || !agent) {
+        notify({ title: "Send review notes", body: !notes.length ? (list.code === 0 ? "No notes in hunk for this repo" : "No hunk review open for this repo (⧉ opens one)") : "No agent in this tab", level: "warning" });
+        return;
+      }
+      const text = "Review notes on your changes, fix each one:\n" + notes.map((n) => `- ${n.filePath}:${n.line}: ${n.summary}${n.rationale ? ` (${n.rationale})` : ""}`).join("\n");
+      const sent = await exec("hc", ["send", agent.address, text]);
+      if (sent.code !== 0) { notify({ title: "Send review notes", body: sent.stderr.trim() || "hc send failed", level: "error" }); return; }
+      for (const n of notes) await exec("hunk", ["session", "comment", "rm", "--repo", root, n.commentId], { cwd: root });
+      notify({ title: "Review notes sent", body: `${notes.length} to ${agent.program?.name ?? agent.address}` });
+      cx.notify();
+    });
   }
 
   actions(f, t, cx) {
@@ -298,6 +319,10 @@ export default class Changes extends View {
             .when(this.mode === m, (e) => e.bg(t.selected).text_color(t.foreground)).when(this.mode !== m, (e) => e.text_color(t.dim).hover((s) => s.text_color(t.foreground)))
             .on_click((_e, cx) => { this.mode = m; localStorage.setItem("mode", m); this.context = null; this.refresh(cx); cx.notify(); }).child(label))))
         .child(div().flex_1())
+        .when(Boolean(this.root), (e) => e.children([
+          ["hunk", "⧉", "Review in hunk (leave notes with c)", () => this.popup("hunk", `hunk diff${this.base ? " " + sh(this.base) : ""} --watch`)],
+          ["send-notes", "➤", "Send your hunk notes to this tab's agent", (cx) => this.sendNotes(cx)],
+        ].map(([id, label, tip, fn]) => div().id(id).px(5).rounded(4).text_size(12).text_color(t.dim).cursor_pointer().hover((s) => s.bg(t.hover).text_color(t.foreground)).tooltip(tip).on_click((_e, cx) => fn(cx)).child(label))))
         .child(div().id("fold-all").px(5).rounded(4).text_size(12).text_color(t.dim).cursor_pointer().hover((s) => s.bg(t.hover).text_color(t.foreground))
           .tooltip(this.folded.size ? "Open all folders" : "Fold all folders")
           .on_click((_e, cx) => { this.folded = this.folded.size ? new Set() : new Set(this.listRows().filter((x) => x.group).map((x) => x.group)); cx.notify(); })

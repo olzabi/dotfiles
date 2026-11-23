@@ -104,7 +104,11 @@
     "ctrl-shift-s": "tab.settle",
     "ctrl-shift-m": "layout.toggle:tasks-bar",
     "ctrl-alt-a": "layout.switch:mine",
-    "ctrl-alt-r": "layout.switch:review"
+    "ctrl-alt-r": "layout.switch:review",
+    "ctrl-alt-e": "mod.open:herdr-nvim",
+    "ctrl-alt-o": "herdr-nvim.pick",
+    "ctrl-alt-shift-e": "herdr-nvim.reveal",
+    "ctrl-alt-b": "mod.open:herdr-web-browser"
   },
   "terminal": {
     "ctrl-backspace": "send:\u0017",
