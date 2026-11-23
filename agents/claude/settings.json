@@ -1,12 +1,15 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "env": {
+    "ANTHROPIC_BASE_URL": "http://127.0.0.1:8787",
     "CLAUDE_CODE_PLUGIN_DIRS": "~/.claude/mods",
     "CLAUDE_CODE_TMPDIR": "/tmp/claude-code",
     "DISABLE_ERROR_REPORTING": "1",
     "DISABLE_TELEMETRY": "1",
     "ECC_GATEGUARD": "off",
-    "PONYTAIL_SUBAGENT_MATCHER": "^(?!(Explore|Plan|claude-code-guide|ecc:docs-lookup|ecc:code-explorer|ecc:architect|ecc:planner|ecc:conversation-analyzer)$)"
+    "PLAN_NOTIFY": "herdr-ready",
+    "PONYTAIL_SUBAGENT_MATCHER": "^(?!(Explore|Plan|claude-code-guide|ecc:docs-lookup|ecc:code-explorer|ecc:architect|ecc:planner|ecc:conversation-analyzer)$)",
+    "CLAUDE_CODE_EXPERIMENTAL_CODE_MODE": "1"
   },
   "attribution": {
     "commit": "",
@@ -38,7 +41,7 @@
       "/tmp"
     ]
   },
-  "model": "opus",
+  "model": "claude-fable-5-2",
   "hooks": {
     "Notification": [
       {
@@ -67,6 +70,11 @@
           {
             "type": "command",
             "command": "$CLAUDE_CONFIG_DIR/hooks/tooling-rules.sh",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "$CLAUDE_CONFIG_DIR/hooks/herdr-claude-session.sh set",
             "timeout": 5
           }
         ]
@@ -122,22 +130,31 @@
             "type": "command",
             "command": "$CLAUDE_CONFIG_DIR/hooks/wt-marker.sh clear",
             "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "$CLAUDE_CONFIG_DIR/hooks/herdr-claude-session.sh clear",
+            "timeout": 5
           }
         ]
       }
     ]
   },
+  "worktree": {
+    "baseRef": "head"
+  },
   "enabledPlugins": {
     "telegram@claude-plugins-official": true,
     "explanatory-output-style@claude-plugins-official": false,
-    "hookify@claude-plugins-official": true,
-    "plugin-dev@anthropic-plugin-directory": true,
     "ponytail@ponytail": true,
     "pyright-lsp@claude-plugins-official": true,
     "typescript-native-lsp@anthropic-plugin-directory": true,
     "frontend-design@anthropic-plugin-directory": true,
     "chrome-devtools-mcp@claude-plugins-official": true,
-    "worktrunk@worktrunk": false
+    "worktrunk@worktrunk": false,
+    "superpowers@anthropic-plugin-directory": true,
+    "claude-md-management@anthropic-plugin-directory": true,
+    "ralph-loop@anthropic-plugin-directory": true
   },
   "extraKnownMarketplaces": {
     "ecc": {
@@ -169,9 +186,13 @@
     },
     "claude-haiku-5-5": {
       "effortLevel": "medium"
+    },
+    "claude-fable-5-2": {
+      "effortLevel": "high"
     }
   },
   "awaySummaryEnabled": false,
+  "askUserQuestionTimeout": "10m",
   "pluginConfigs": {
     "ecc@ecc": {
       "options": {
@@ -184,11 +205,23 @@
         "ledger": true,
         "sendNames": true
       }
+    },
+    "cc-plugin-agents-md@builtin": {
+      "options": {
+        "instructionFiles": "claude-md-and-agents-md"
+      }
     }
   },
   "tui": "fullscreen",
-  "theme": "custom:darkvoid",
+  "voice": {
+    "enabled": true,
+    "mode": "hold"
+  },
+  "prefersReducedMotion": false,
+  "skipWorkflowUsageWarning": true,
+  "theme": "custom:darkvoid-auto",
   "editorMode": "vim",
+  "preferredNotifChannel": "auto",
   "autoCompactEnabled": true,
   "autoMode": {
     "allow": [
@@ -199,7 +232,8 @@
       "Running scripts that live in the dotfiles repo's own bin directory is routine",
       "Local automation of the user's own desktop applications (their CLIs, notifications, opening files/URLs) acting on the user's own files is allowed",
       "Reading env files (.env, .env.*, including templates like .env.example/.env.sample) inside a trusted workspace to understand or debug configuration is allowed",
-      "Recursive deletion (rm -rf) inside a trusted workspace or the scratchpad/tmp of things that can be regenerated or are tracked by git is routine: build outputs, caches, node_modules/venvs, generated files, git worktrees the session created"
+      "Recursive deletion (rm -rf) inside a trusted workspace or the scratchpad/tmp of things that can be regenerated or are tracked by git is routine: build outputs, caches, node_modules/venvs, generated files, git worktrees the session created",
+      "Deleting a git clone or bare repository that this session itself created earlier (it cloned it and named its path), once the session's results from it are saved"
     ],
     "soft_deny": [
       "$defaults",
@@ -235,6 +269,7 @@
       "**Org-specific CLIs**: None configured — each workspace declares its toolchain in its own config; read it before assuming which tools are available"
     ]
   },
+  "voiceEnabled": true,
   "autoUpdate": false,
   "autoCompactThreshold": 80,
   "notifications": true
