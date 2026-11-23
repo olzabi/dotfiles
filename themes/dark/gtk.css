@@ -1,0 +1,31 @@
+/* darkvoid for GTK 4 / libadwaita apps (Nautilus, portal file dialogs). Palette: waybar/style.css.
+   libadwaita >= 1.6 reads these CSS variables; it only loads this file, not GTK themes. Dark mode comes from
+   gsettings color-scheme 'prefer-dark'. Restart an app to see changes. */
+:root {
+  --accent-bg-color: #83b7ad;
+  --accent-fg-color: #1c1c1c;
+  --accent-color: #83b7ad;
+
+  --window-bg-color: #1c1c1c;
+  --window-fg-color: #c0c0c0;
+  --view-bg-color: #1c1c1c;
+  --view-fg-color: #c0c0c0;
+  --headerbar-bg-color: #252525;
+  --headerbar-fg-color: #e1e1e1;
+  --headerbar-backdrop-color: #1c1c1c;
+  --sidebar-bg-color: #252525;
+  --sidebar-fg-color: #c0c0c0;
+  --sidebar-backdrop-color: #1c1c1c;
+  --secondary-sidebar-bg-color: #252525;
+  --secondary-sidebar-fg-color: #c0c0c0;
+  --card-bg-color: #252525;
+  --card-fg-color: #c0c0c0;
+  --dialog-bg-color: #252525;
+  --dialog-fg-color: #c0c0c0;
+  --popover-bg-color: #252525;
+  --popover-fg-color: #c0c0c0;
+  --thumbnail-bg-color: #303030;
+  --border-color: #404040;
+}
+
+@import url("noctalia.css");

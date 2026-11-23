@@ -41,9 +41,11 @@ end
 
 local function set_ref_hl()
   -- LspReference* specifically for darkvoid.nvim; re-applied on ColorScheme
-  vim.api.nvim_set_hl(0, "LspReferenceText", { bg = "#1c1c1c", underline = true })
-  vim.api.nvim_set_hl(0, "LspReferenceRead", { bg = "#1c1c1c", sp = "#707070", underline = true })
-  vim.api.nvim_set_hl(0, "LspReferenceWrite", { bg = "#1c1c1c", sp = "#aaaaaa", undercurl = true })
+  local c = require("darkvoid.colors").config.colors -- the light colours in light mode
+  local light = vim.o.background == "light"
+  vim.api.nvim_set_hl(0, "LspReferenceText", { bg = c.bg, underline = true })
+  vim.api.nvim_set_hl(0, "LspReferenceRead", { bg = c.bg, sp = light and c.comment or "#707070", underline = true })
+  vim.api.nvim_set_hl(0, "LspReferenceWrite", { bg = c.bg, sp = light and c.type or "#aaaaaa", undercurl = true })
 end
 
 local function cursor_highlight(buf)

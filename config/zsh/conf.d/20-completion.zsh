@@ -13,7 +13,9 @@ zstyle ':completion:*' cache-path "$XDG_CACHE_HOME/zsh/compcache"
 zstyle ':completion:*:descriptions' format '[%d]'
 zstyle ':completion:*:git-checkout:*' sort false
 
-zstyle ':fzf-tab:*' fzf-flags --color=bg:#1c1c1c,bg+:#303030,fg:#c0c0c0,fg+:#f1f1f1,hl:#1bfd9c,hl+:#bdfe58,prompt:#1bfd9c,pointer:#bdfe58,marker:#1bfd9c,border:#585858,label:#585858,info:#585858
+# colours: themes/current/fzf-tab.zsh (dark or light), re-read before each prompt so a mode switch reaches open shells
+_darkvoid_fzf_tab() { local s=$?; source "$DOTFILES_THEMES/current/fzf-tab.zsh" 2>/dev/null || source "$DOTFILES_THEMES/dark/fzf-tab.zsh"; return $s; }
+_darkvoid_fzf_tab; precmd_functions+=(_darkvoid_fzf_tab)
 zstyle ':fzf-tab:*' switch-group '<' '>'
 # Any completion that names a path: dirs as a tree, files through bat (darkvoid). Specific styles below win.
 zstyle ':fzf-tab:complete:*:*' fzf-preview '[[ -d $realpath ]] && eza --tree --level=2 --icons --color=always $realpath || { [[ -f $realpath ]] && bat --color=always --style=numbers --line-range=:200 $realpath; }'

@@ -89,6 +89,7 @@ python:
 symbolPreset: nerd
 theme:
   dark: darkvoid
+  light: darkvoid-light
 composer:
   shape: box
   tokenRate: true

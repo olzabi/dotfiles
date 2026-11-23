@@ -1,0 +1,110 @@
+* {
+    /* palette */
+    bg:          #d3ceca;
+    bg-alpha:    #d3ceca;   // opaque: rofi 2.0 on wayland lets text bleed through even at 96% alpha
+    fg:          #3a3633;
+    func:        #221e1b;
+    kw:          #120f0c;
+    comment:     #77736f;
+    visual:      #0f0c090d;
+    border:      #77736f99;
+
+    /* warm mint accent (replaces #005d2a / #345500) */
+    accent:      #005d23;
+    accent-dim:  #006a31;
+    glow:        #005d2326;
+
+    background-color: transparent;
+    text-color:       @fg;
+    spacing:          0;
+}
+
+window {
+    location:         center;
+    anchor:           center;
+    y-offset:         -6%;
+    width:            560px;
+    background-color: @bg-alpha;
+    border:           1px;
+    border-color:     @border;      /* try @glow for a faint halo, or @accent-dim for a stronger one */
+    border-radius:    12px;
+}
+
+mainbox {
+    padding:  12px;
+    spacing:  8px;
+    children: [ inputbar, listview, mode-switcher ];
+}
+
+inputbar {
+    padding:  10px 12px;
+    spacing:  12px;
+    children: [ prompt, entry ];
+}
+
+prompt {
+    str:              "";
+    text-color:       @func;
+    vertical-align:   0.5;
+}
+
+entry {
+    placeholder:       "Search...";
+    placeholder-color: @comment;
+    text-color:        @kw;
+    cursor-color:      @accent;     /* remove if your rofi version rejects it */
+    cursor-width:      2px;
+    vertical-align:    0.5;
+}
+
+listview {
+    lines:       5;
+    columns:     1;
+    scrollbar:   false;
+    fixed-height: true;    // keep 5 rows so the window never resizes between modes
+    spacing:     2px;
+    cycle:       true;
+}
+
+element {
+    padding:       9px 12px;
+    spacing:       12px;
+    border-radius: 8px;
+    orientation:   horizontal;
+}
+
+element-icon {
+    size:           1.3em;
+    vertical-align: 0.5;
+}
+
+element-text {
+    markup:         true;
+    text-color:     inherit;
+    vertical-align: 0.5;
+}
+
+element normal.normal,
+element alternate.normal { text-color: @fg; }
+
+element selected.normal {
+    background-color: @visual;
+    text-color:       @kw;
+    border:           0 0 0 2px;     /* thin mint marker on the left; delete for pure subtle highlight */
+    border-color:     @accent-dim;
+}
+
+mode-switcher {
+    spacing: 4px;
+}
+
+button {
+    padding:       6px 10px;
+    border-radius: 8px;
+    text-color:    @comment;
+}
+
+button selected {
+    background-color: @visual;
+    text-color:       @accent;
+}

@@ -1,0 +1,24 @@
+# darkvoid: same palette as herdr's [theme.custom] (config/herdr/config.toml)
+background = "none"
+border_fg = "#a6a19d"
+text_fg = "#3a3633"
+dimmed_text_fg = "#77736f"
+
+input_text_fg = "#00695d"
+result_count_fg = "#77736f"
+
+result_name_fg = "#3a3633"
+result_line_number_fg = "#4e4900"
+result_value_fg = "#433f3c"
+selection_fg = "#120f0c"
+selection_bg = "#bab6b1"
+match_fg = "#005d2a"
+
+preview_title_fg = "#326493"
+
+channel_mode_fg = "#d3ceca"
+channel_mode_bg = "#00695d"
+remote_control_mode_fg = "#d3ceca"
+remote_control_mode_bg = "#00581b"
+action_picker_mode_fg = "#d3ceca"
+action_picker_mode_bg = "#326493"

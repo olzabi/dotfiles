@@ -36,11 +36,11 @@ prepend_fetchers = [
   { url = "*/", run = "git", group = "git" },
 ]
 prepend_previewers = [
-  # bat: darkvoid theme (config/bat/themes), line numbers and git change marks. Markdown stays as source on purpose.
-  { mime = "text/*", run = 'piper -- COLORTERM=truecolor bat --color=always --theme=darkvoid --style=numbers,changes --paging=never --wrap=never --terminal-width="$w" "$1"' },
-  { mime = "application/json", run = 'piper -- COLORTERM=truecolor bat --color=always --theme=darkvoid --style=numbers,changes --paging=never --wrap=never --terminal-width="$w" "$1"' },
-  { mime = "application/*+json", run = 'piper -- COLORTERM=truecolor bat --color=always --theme=darkvoid --style=numbers,changes --paging=never --wrap=never --terminal-width="$w" "$1"' },
-  { mime = "application/{javascript,x-javascript,toml,yaml,x-yaml,x-ndjson}", run = 'piper -- COLORTERM=truecolor bat --color=always --theme=darkvoid --style=numbers,changes --paging=never --wrap=never --terminal-width="$w" "$1"' },
+  # bat: darkvoid-current, the dark or light theme by system mode (themes/mode.d/bat.sh), line numbers and git change marks. Markdown stays as source on purpose.
+  { mime = "text/*", run = 'piper -- COLORTERM=truecolor bat --color=always --theme=darkvoid-current --style=numbers,changes --paging=never --wrap=never --terminal-width="$w" "$1"' },
+  { mime = "application/json", run = 'piper -- COLORTERM=truecolor bat --color=always --theme=darkvoid-current --style=numbers,changes --paging=never --wrap=never --terminal-width="$w" "$1"' },
+  { mime = "application/*+json", run = 'piper -- COLORTERM=truecolor bat --color=always --theme=darkvoid-current --style=numbers,changes --paging=never --wrap=never --terminal-width="$w" "$1"' },
+  { mime = "application/{javascript,x-javascript,toml,yaml,x-yaml,x-ndjson}", run = 'piper -- COLORTERM=truecolor bat --color=always --theme=darkvoid-current --style=numbers,changes --paging=never --wrap=never --terminal-width="$w" "$1"' },
   { mime = "{audio,video,image}/*", run = "mediainfo --no-metadata" },
 ]
 prepend_preloaders = [

@@ -1,5 +1,5 @@
 # style name or JSON path (default "auto")
-style: "/home/chronica/.config/glow/darkvoid.json"
+style: "/home/chronica/.config/glow/darkvoid-current.json"
 # mouse support (TUI-mode only)
 mouse: false
 pager: true

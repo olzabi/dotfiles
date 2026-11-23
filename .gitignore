@@ -39,3 +39,6 @@ user.gitconfig
 packages/
 __pycache__/
 config/git/jj/conf.d/user.toml
+
+# darkvoid: the active mode, a link to themes/dark or themes/light (bin/darkvoid-mode)
+themes/current

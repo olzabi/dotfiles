@@ -1,0 +1,33 @@
+{
+  "enabled": true,
+  "fetchNews": false,
+  "changeBrowserTheme": false,
+  "detectDarkTheme": true,
+  "automation": {
+    "enabled": true,
+    "mode": "system",
+    "behavior": "OnOff"
+  },
+  "theme": {
+    "mode": 1,
+    "brightness": 100,
+    "contrast": 100,
+    "grayscale": 0,
+    "sepia": 0,
+    "engine": "dynamicTheme",
+    "darkSchemeBackgroundColor": "#1c1c1c",
+    "darkSchemeTextColor": "#c0c0c0",
+    "selectionColor": "auto",
+    "scrollbarColor": "auto",
+    "styleSystemControls": false,
+    "immediateModify": true,
+    "lightSchemeBackgroundColor": "#d3ceca",
+    "lightSchemeTextColor": "#3a3633"
+  },
+  "disabledFor": [
+    "github.com",
+    "claude.ai",
+    "youtube.com",
+    "twitch.tv"
+  ]
+}

@@ -1,0 +1,1 @@
+-- darkvoid.nvim keeps the dark palette in the plugin itself; themes/build writes light/nvim.lua from it.

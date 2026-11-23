@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# monitor-mode [lg|asus] <mode>: picture profile for the LG UltraFine 4K (main, text) and the ASUS VS229 (secondary, video) over DDC/CI.
+#   day, night   both (day: LG User 1 ~6000K at 38, for the dim-light paper); set by themes/mode.d/monitor.sh when the theme turns light / dark (Noctalia [theme] mode = "auto")
+#   srgb         both: accurate 6500K at a dim ~120 nits, for photos and colour work
+#   reader       LG only: warm, low blue, dim paper for long reading (LG's Reader mode)
+#   cinema       ASUS only: slightly warm, high contrast for films (ASUS Theater)
+#   night-view   ASUS only: lifted shadows for dark scenes (ASUS Night View)
+#   brighter, dimmer   needs lg or asus: brightness ±5, with Noctalia's OSD
+# With lg or asus, only that monitor changes. The Corne's Display layer sends these (config/niri/binds/display.kdl).
+# The monitors' own picture modes can't be selected over DDC/CI, so these rebuild them from what is writable:
+# VCP 14 color preset, 16/18/1A red/green/blue gain (User 1 preset only), 10 brightness, 12 contrast (0-100).
+# LG: 14 0x05 = 6500K, gains are neutral at 50, contrast is ignored (set ~65 once in its menu).
+# ASUS: 14 0x08 = 6500K (this unit swaps 0x05 and 0x08), gains are neutral at 100, Splendid mode stays "User defined".
+# Night warmth comes from Noctalia [nightlight] (gamma, all outputs), so night only trims brightness a little.
+set -u
+usage() { sed -n '2,9s/^# \{0,1\}//p' "$0" >&2; exit 2; }
+declare -A sn=([lg]=105NTFACM331 [asus]=D8LMTF028755)
+only=
+[[ ${1:-} == lg || ${1:-} == asus ]] && { only=$1; shift; }
+lg=() asus=()
+case ${1:-} in
+  day) lg=(14 0x0b 16 50 18 49 1A 46 10 38) asus=(14 0x08 10 70 12 80) ;;  # LG: User 1, ~6000K: neutral paper, a touch less blue than 6500K, never Reader-yellow
+  night) lg=(14 0x05 10 35) asus=(14 0x08 10 55 12 75) ;;
+  srgb) lg=(14 0x05 10 30) asus=(14 0x08 10 40 12 75) ;;
+  reader) lg=(14 0x0b 16 50 18 46 1A 36 10 32) ;;
+  cinema) asus=(14 0x0b 16 100 18 96 1A 90 10 60 12 80) ;;
+  night-view) asus=(14 0x08 10 65 12 70) ;;
+  brighter | dimmer)
+    [[ -n $only ]] || usage
+    # Relative DDC write, then read the real value back for the OSD: Noctalia's own brightness steps from a stale cache.
+    ddcutil --sn "${sn[$only]}" --noverify setvcp 10 "$([[ $1 == brighter ]] && echo +|| echo -)" 5 || exit 1
+    v=$(ddcutil --sn "${sn[$only]}" getvcp 10 --terse | awk '{print $4}')
+    command -v noctalia >/dev/null && noctalia msg brightness-osd "$v" >/dev/null 2>&1
+    exit 0 ;;
+  *) usage ;;
+esac
+[[ $only == lg ]] && asus=()
+[[ $only == asus ]] && lg=()
+((${#lg[@]} + ${#asus[@]})) || { echo "monitor-mode: $1 doesn't apply to $only" >&2; exit 2; }
+# One monitor after the other: parallel ddcutil runs lock each other's i2c bus.
+rc=0
+((${#lg[@]})) && { ddcutil --sn "${sn[lg]}" --noverify setvcp "${lg[@]}" || rc=1; }
+((${#asus[@]})) && { ddcutil --sn "${sn[asus]}" --noverify setvcp "${asus[@]}" || rc=1; }
+exit $rc

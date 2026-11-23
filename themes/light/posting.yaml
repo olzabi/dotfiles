@@ -1,0 +1,43 @@
+name: darkvoid
+author: Ported from darkvoid-theme/darkvoid.nvim
+description: A monochromatic dark theme for dark dwellers. Inspired by coding alone in a dark room where only the important stuff is highlighted.
+homepage: https://github.com/darkvoid-theme/darkvoid.nvim
+
+# Core palette derived from darkvoid.nvim
+background: '#d3ceca'   # bg
+surface: '#c9c5c1'      # slightly lighter than bg, used for panels
+primary: '#3a3633'      # fg — main foreground / buttons
+secondary: '#77736f'    # comment color — subdued labels
+accent: '#005d2a'       # operator/search_highlight — the iconic darkvoid green glow
+error: '#913948'        # removed (gitsigns red)
+success: '#00581b'      # added (gitsigns green)
+warning: '#4e4900'      # changed (gitsigns yellow)
+
+# Syntax highlighting
+text_area:
+  cursor: 'reverse'
+  cursor_line: 'bold'
+  selection: 'reverse'
+  gutter: '#a09b97'
+  matched_bracket: 'bold #005d2a'
+
+url:
+  base: '#433f3c'
+  protocol: 'bold #005d2a'
+
+syntax:
+  json_key: '#221e1b'
+  json_number: '#005d2a'
+  json_string: '#2e2a27'
+  json_boolean: '#006a6c'
+  json_null: 'italic #77736f'
+
+# HTTP method styles
+method:
+  get: 'bold #005d2a'
+  post: 'bold #345500'
+  put: 'bold #0f5d5f'
+  delete: 'bold #913948'
+  patch: 'bold #4e4900'
+  head: '#3a3633'
+  options: '#4c4845'

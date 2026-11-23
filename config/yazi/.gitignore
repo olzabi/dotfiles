@@ -1,5 +1,4 @@
 flavors/*
-!flavors/darkvoid.yazi/
-!flavors/darkvoid.yazi/**
+!flavors/darkvoid-current.yazi
 
 plugins/*

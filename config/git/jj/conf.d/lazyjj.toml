@@ -1,6 +1,5 @@
 # lazyjj reads its settings from jj config under [lazyjj].
 [lazyjj]
-highlight-color = "#303030"   # darkvoid selection bg
 diff-format = "git"           # same as ui.diff-formatter
 bookmark-prefix = "push-"     # name used by "create bookmark" in lazyjj
 layout = "horizontal"         # log | details side by side

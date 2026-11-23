@@ -1,0 +1,13 @@
+# darkvoid: same palette as config/herdr/config.toml [theme.custom]
+[theme]
+name = "darkvoid-current" # file is linked as themes/darkvoid-current.toml
+
+[colors]
+Base = "#3a3633"
+Title = "#00695d"
+Guidance = "#77736f"
+Important = "#005d2a"
+Annotation = "#326493"
+AlertInfo = "#00581b"
+AlertWarn = "#4e4900"
+AlertError = "#8e4742"

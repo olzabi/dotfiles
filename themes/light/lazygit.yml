@@ -38,34 +38,34 @@ gui:
     - [branches, worktrees, remotes, tags]
     - [commits, reflog]
     - [stash, submodules]
-  sidePanelWidth: 0.28 # 0.20 cut branch names, worktree paths and ↑↓ counts
+  sidePanelWidth: 0.20 # 0.20 cut branch names, worktree paths and ↑↓ counts
   expandFocusedSidePanel: true
   shrinkSidePanelsToContent: true
   showDivergenceFromBaseBranch: arrowAndNumber
   statusPanelView: allBranchesLog
   # Darkvoid, matched to herdr-app's theme (config/herdr-app/themes/darkvoid.json) so the popup blends in.
   theme:
-    activeBorderColor: ['#83b7ad', bold] # herdr accent
-    inactiveBorderColor: ['#404040'] # herdr border
-    searchingActiveBorderColor: ['#bdfe58', bold] # darkvoid cursor/title lime
-    optionsTextColor: ['#858585'] # herdr muted
-    selectedLineBgColor: ['#303030']
+    activeBorderColor: ['#00695d', bold] # herdr accent
+    inactiveBorderColor: ['#a09b97'] # herdr border
+    searchingActiveBorderColor: ['#345500', bold] # darkvoid cursor/title lime
+    optionsTextColor: ['#5c5954'] # herdr muted
+    selectedLineBgColor: ['#bab6b1']
     selectedLineFgColor: [bold]
-    inactiveViewSelectedLineBgColor: ['#262626']
-    defaultFgColor: ['#c0c0c0']
-    unstagedChangesColor: ['#ffb3ba']
-    cherryPickedCommitBgColor: ['#303030']
-    cherryPickedCommitFgColor: ['#83b7ad']
-    markedBaseCommitBgColor: ['#303030']
-    markedBaseCommitFgColor: ['#ffffba']
+    inactiveViewSelectedLineBgColor: ['#c7c2be']
+    defaultFgColor: ['#3a3633']
+    unstagedChangesColor: ['#913948']
+    cherryPickedCommitBgColor: ['#bab6b1']
+    cherryPickedCommitFgColor: ['#00695d']
+    markedBaseCommitBgColor: ['#bab6b1']
+    markedBaseCommitFgColor: ['#4e4900']
     # Agent branches by prefix, so a list of 10 worktrees reads at a glance.
     branchColorPatterns:
-      '^(feat|feature)/': '#8cc9a0'
-      '^fix/': '#ffb3ba'
-      '^plan/': '#b2d8d8'
-      '^verify/': '#7fa1c3'
-      '^(docs|chore)/': '#858585'
-      '^(agent/|worktree-)': '#ffffba' # worktree-<name>: Claude's own (claude --worktree, isolated subagents)
+      '^(feat|feature)/': '#006737'
+      '^fix/': '#913948'
+      '^plan/': '#0f5d5f'
+      '^verify/': '#326493'
+      '^(docs|chore)/': '#5c5954'
+      '^(agent/|worktree-)': '#4e4900' # worktree-<name>: Claude's own (claude --worktree, isolated subagents)
 # Worktrees go through worktrunk (editor/worktrunk/config.toml), so path, hooks and
 # repo setup match Claude's and herdr's; bin/herdr-wt shows each as a herdr-app space.
 keybinding:

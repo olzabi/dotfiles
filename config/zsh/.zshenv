@@ -25,7 +25,8 @@ export LANG=en_US.UTF-8
 
 export YAZI_CONFIG_HOME="$DOTFILES_CONFIG/yazi"
 export BAT_CONFIG_DIR="$DOTFILES_CONFIG/bat"
-export STARSHIP_CONFIG="$DOTFILES_CONFIG/starship.toml"
+export STARSHIP_CONFIG="$DOTFILES_THEMES/current/starship.toml" # dark or light (bin/darkvoid-mode)
+[[ -e $STARSHIP_CONFIG ]] || STARSHIP_CONFIG="$DOTFILES_THEMES/dark/starship.toml"
 
 _prepend_path "$XDG_LOCAL_HOME/bin"
 _prepend_path "$DOTFILES/bin"
@@ -60,7 +61,7 @@ export MYSQL_HISTFILE="$HIST_DIR/.mysql_history"
 export PYTHON_HISTORY="$HIST_DIR/.python_history"
 export PSYSH_CONFIG="$HIST_DIR/psysh_history"
 
-export EZA_CONFIG_DIR="$DOTFILES_THEMES/eza"
+export EZA_CONFIG_DIR="$DOTFILES_THEMES/current/eza"
 export EZA_COLORS="di=1;34:ln=36:ex=1;32"
 
 export RIPGREP_CONFIG_PATH="$DOTFILES/home/.ripgreprc"

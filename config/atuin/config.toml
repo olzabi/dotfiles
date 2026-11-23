@@ -17,7 +17,7 @@ history_filter = [
 cwd_filter = ["^/tmp"]
 
 [theme]
-name = "darkvoid"
+name = "darkvoid-current" # themes/current/atuin.toml: dark or light (bin/darkvoid-mode)
 
 [search]
 filters = ["workspace", "directory", "session", "global", "host"]

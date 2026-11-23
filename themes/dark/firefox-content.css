@@ -1,0 +1,11 @@
+/* darkvoid for Firefox's own pages (new tab, about:*). Websites are untouched. */
+@-moz-document url-prefix("about:") {
+  :root {
+    --newtab-background-color: #1c1c1c !important;
+    --newtab-background-color-secondary: #252525 !important;
+    --background-color-canvas: #1c1c1c !important;
+    --background-color-box: #252525 !important;
+    --color-accent-primary: #83b7ad !important;
+  }
+
+}

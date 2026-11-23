@@ -1,5 +1,5 @@
 {
-  "theme": "obsidian",
+  "theme": "system",
   "cssTheme": "Darkvoid",
   "baseFontSize": 18,
   "showRibbon": false,
@@ -10,6 +10,7 @@
   "interfaceFontFamily": "JetBrainsMono Nerd Font,Iosevka Nerd Font,FiraCode Nerd Font",
   "enabledCssSnippets": [
     "hover-preview",
-    "editor"
+    "editor",
+    "tables"
   ]
 }

@@ -1,0 +1,62 @@
+// Look: colors, shadows, corners, cursor. niri merges these into layout/overview from layout.kdl.
+layout {
+    background-color "transparent"
+    focus-ring {
+        width 1.5
+        active-color "#83b7ad"
+        inactive-color "#585858"
+    }
+    shadow {
+        on
+        softness 30
+        spread 5
+        offset x=0 y=5
+        color "#0000009a"
+    }
+}
+overview {
+    workspace-shadow {
+        softness 40
+        spread 10
+        offset x=0 y=10
+        color "#1c1c1c"
+    }
+}
+cursor {
+    xcursor-theme "KleinCat"
+    // xcursor-theme "SungJinWoo"
+    xcursor-size 64
+}
+
+// Window corners, borders and shadows; before rules.kdl so its specific rules win.
+window-rule {
+    match is-floating=true
+    tiled-state false
+    geometry-corner-radius 10
+    clip-to-geometry true
+    border {
+        on
+        width 1
+        active-color "#343438"
+        inactive-color "#28282C"
+        urgent-color "#ffb86b"
+    }
+    shadow {
+        on
+        softness 10
+        spread 6
+        offset x=1 y=1
+        color "rgba(14,14,14,0.6)"
+    }
+}
+window-rule {
+    tiled-state true
+    clip-to-geometry true
+    geometry-corner-radius 10
+    draw-border-with-background false
+}
+window-rule {
+    match is-floating=false
+    tiled-state true
+    geometry-corner-radius 10
+}

@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# darkvoid-mode [dark|light]: switch every app between darkvoid and darkvoid dim-light (themes/README.md).
+# Noctalia runs it on theme_mode_changed and at start (config/noctalia/config.toml [hooks]).
+# With no argument it follows the system color-scheme.
+#   1. points themes/current at themes/dark or themes/light (apps that can't follow the system read from there)
+#   2. runs themes/mode.d/*.sh: the side effects a link can't do (reload a running app, rebuild a cache)
+set -u
+mode=${1:-${NOCTALIA_THEME_MODE:-}}
+if [[ -z $mode ]]; then
+  [[ $(gsettings get org.gnome.desktop.interface color-scheme 2>/dev/null) == *light* ]] && mode=light || mode=dark
+fi
+[[ $mode == dark || $mode == light ]] || { echo "usage: darkvoid-mode [dark|light]" >&2; exit 2; }
+root=$(realpath "$(dirname "$(realpath "$0")")/..")
+export DARKVOID_MODE=$mode DOTFILES=${DOTFILES:-$root}
+ln -sfn "$mode" "$root/themes/current.tmp" && mv -T "$root/themes/current.tmp" "$root/themes/current"
+rc=0
+for s in "$root"/themes/mode.d/*.sh; do
+  [[ -x $s ]] || continue
+  "$s" "$mode" || { echo "darkvoid-mode: ${s##*/} failed" >&2; rc=1; }
+done
+exit $rc

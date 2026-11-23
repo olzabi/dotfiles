@@ -1,0 +1,207 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+format = """
+[╭─](fg:line_nr)\
+$os\
+$username\
+$hostname\
+$directory\
+$git_branch\
+$git_status\
+$git_state\
+$fill\
+$nodejs\
+$python\
+$rust\
+$golang\
+$lua\
+$docker_context\
+$terraform\
+$package\
+$nix_shell\
+$cmd_duration\
+$jobs\
+$battery\
+$time\
+[─╮](fg:line_nr)
+[╰─](fg:line_nr)\
+$character"""
+
+right_format = ""
+
+add_newline = true
+
+palette = "darkvoid"
+
+[palettes.darkvoid]
+bg        = "#d3ceca"
+fg        = "#3a3633"
+fg_bright = "#221e1b"
+fg_dim    = "#433f3c"
+comment   = "#5c5954"
+line_nr   = "#a09b97"
+visual    = "#bab6b1"
+border    = "#77736f"
+focus     = "#00695d"   # main accent (cursor / operator)
+const     = "#0f5d5f"
+added     = "#00581b"
+changed   = "#4e4900"
+removed   = "#913948"
+error     = "#a1413c"
+warning   = "#784a00"
+info      = "#006a6c"
+
+# Requires a Nerd Font (see kitty font_family / symbol_map)
+[os]
+disabled = false
+format = "[$symbol]($style) "
+style = "fg:fg_dim"
+
+[os.symbols]
+Alpine      = ""
+Arch        = ""
+CentOS      = ""
+Debian      = ""
+EndeavourOS = ""
+Fedora      = ""
+Gentoo      = ""
+Linux       = ""
+Manjaro     = ""
+Mint        = ""
+NixOS       = ""
+openSUSE    = ""
+Pop         = ""
+Ubuntu      = ""
+Void        = ""
+Unknown     = ""
+
+[username]
+show_always = false
+format      = "[$user]($style)[@](fg:border)"
+style_user  = "bold fg:fg_bright"
+style_root  = "bold fg:error"
+
+[hostname]
+ssh_only = true
+format   = "[$hostname]($style) "
+style    = "fg:const"
+
+[directory]
+format            = "[ ](fg:comment)[$path](bold fg:fg_bright)[$read_only](fg:warning) "
+truncation_length = 3
+truncate_to_repo  = true
+read_only         = " "
+
+[directory.substitutions]
+"~" = " "
+
+[git_branch]
+format = "[ ](fg:border)[$branch(:$remote_branch)](bold fg:focus) "
+
+[git_status]
+format     = "([$all_status$ahead_behind](fg:fg_dim) )"
+style      = "fg:fg_dim"
+ahead      = "[⇡${count}](fg:focus)"
+behind     = "[⇣${count}](fg:info)"
+diverged   = "[⇕⇡${ahead_count}⇣${behind_count}](fg:warning)"
+conflicted = "[ ${count}](fg:error)"
+untracked  = "[?${count}](fg:comment)"
+stashed    = "[\\$$count](fg:const)"
+modified   = "[!${count}](fg:changed)"
+staged     = "[+${count}](fg:added)"
+deleted    = "[-${count}](fg:removed)"
+renamed    = "[»${count}](fg:const)"
+
+[git_state]
+format = "[$state( $progress_current/$progress_total)](fg:warning) "
+
+[fill]
+symbol = "─"
+style  = "fg:line_nr"
+
+[cmd_duration]
+min_time          = 2_000
+format            = "[ $duration]($style) "
+style             = "fg:fg_dim"
+show_milliseconds = false
+
+[jobs]
+symbol    = ""
+format    = "[$symbol $number]($style) "
+style     = "fg:info"
+threshold = 1
+
+[time]
+disabled    = false
+format      = "[ $time](fg:comment) "
+time_format = "%H:%M"
+
+[character]
+success_symbol = "[❯](bold fg:focus)"
+error_symbol   = "[❯](bold fg:error)"
+vimcmd_symbol  = "[❮](bold fg:const)"
+
+# ── Language / Tool Versions ───────────────────────────────────────────────
+[nodejs]
+symbol = " "
+format = "[$symbol$version](fg:fg_dim) "
+
+[python]
+symbol = " "
+format = "[$symbol${pyenv_prefix}${version}( \\($virtualenv\\))](fg:fg_dim) "
+
+[rust]
+symbol = " "
+format = "[$symbol$version](fg:fg_dim) "
+
+[golang]
+symbol = " "
+format = "[$symbol$version](fg:fg_dim) "
+
+[lua]
+symbol = " "
+format = "[$symbol$version](fg:fg_dim) "
+
+[ruby]
+symbol = " "
+format = "[$symbol$version](fg:fg_dim) "
+
+[java]
+symbol = " "
+format = "[$symbol$version](fg:fg_dim) "
+
+[kotlin]
+symbol = " "
+format = "[$symbol$version](fg:fg_dim) "
+
+[swift]
+symbol = " "
+format = "[$symbol$version](fg:fg_dim) "
+
+[c]
+symbol = " "
+format = "[$symbol$version](fg:fg_dim) "
+
+[zig]
+symbol = " "
+format = "[$symbol$version](fg:fg_dim) "
+
+[docker_context]
+symbol = " "
+format = "[$symbol$context](fg:info) "
+
+[terraform]
+symbol = " "
+format = "[$symbol$version $workspace](fg:fg_dim) "
+
+[kubernetes]
+format   = "[$symbol$context](fg:info) "
+disabled = false
+
+[package]
+symbol = " "
+format = "[$symbol$version](fg:fg_dim) "
+
+[nix_shell]
+symbol = "󱄅"
+format = "[ $symbol$state( \\($name\\))](fg:info) "

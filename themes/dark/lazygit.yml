@@ -1,0 +1,126 @@
+git:
+  # `|` toggles hunk split/stack in the preview. The full hunk TUI (commit header, file sidebar, notes):
+  # Enter on a commit or on a file of a commit; I on the file list, a branch or a stash (customCommands below).
+  diffRenderers:
+    - colorArg: always
+      command: hunk pager --mode split
+    - colorArg: always
+      command: hunk pager --mode stack
+  mainBranches: [dev, main, master] # init.defaultBranch is dev: divergence, auto-forward and "rebase onto base" need it
+  autoFetch: true
+  autoRefresh: true # agents edit sibling worktrees; without it lazygit shows stale files/branches
+  disableForcePushing: false # lazygit force-pushes with --force-with-lease; rebase.updateRefs stacks need it
+  commit:
+    autoWrapCommitMessage: true
+    autoWrapWidth: 90
+  log:
+    showWholeGraph: false
+promptToReturnFromSubprocess: false
+gui:
+  language: en
+  border: single
+  nerdFontsVersion: "3"
+  showRandomTip: false
+  showCommandLog: false
+  showIcons: true
+  showListFooter: true
+  commitLength:
+    show: true
+  tabWidth: 2
+  filterMode: fuzzy
+  splitDiff: auto
+  portraitMode: never
+  skipStashWarning: true
+  # Manual-work layout: files alone, branches with their worktrees, history, then the rarely used rest.
+  sidePanels:
+    - [status]
+    - [files]
+    - [branches, worktrees, remotes, tags]
+    - [commits, reflog]
+    - [stash, submodules]
+  sidePanelWidth: 0.20 # 0.20 cut branch names, worktree paths and ↑↓ counts
+  expandFocusedSidePanel: true
+  shrinkSidePanelsToContent: true
+  showDivergenceFromBaseBranch: arrowAndNumber
+  statusPanelView: allBranchesLog
+  # Darkvoid, matched to herdr-app's theme (config/herdr-app/themes/darkvoid.json) so the popup blends in.
+  theme:
+    activeBorderColor: ['#83b7ad', bold] # herdr accent
+    inactiveBorderColor: ['#404040'] # herdr border
+    searchingActiveBorderColor: ['#bdfe58', bold] # darkvoid cursor/title lime
+    optionsTextColor: ['#858585'] # herdr muted
+    selectedLineBgColor: ['#303030']
+    selectedLineFgColor: [bold]
+    inactiveViewSelectedLineBgColor: ['#262626']
+    defaultFgColor: ['#c0c0c0']
+    unstagedChangesColor: ['#ffb3ba']
+    cherryPickedCommitBgColor: ['#303030']
+    cherryPickedCommitFgColor: ['#83b7ad']
+    markedBaseCommitBgColor: ['#303030']
+    markedBaseCommitFgColor: ['#ffffba']
+    # Agent branches by prefix, so a list of 10 worktrees reads at a glance.
+    branchColorPatterns:
+      '^(feat|feature)/': '#8cc9a0'
+      '^fix/': '#ffb3ba'
+      '^plan/': '#b2d8d8'
+      '^verify/': '#7fa1c3'
+      '^(docs|chore)/': '#858585'
+      '^(agent/|worktree-)': '#ffffba' # worktree-<name>: Claude's own (claude --worktree, isolated subagents)
+# Worktrees go through worktrunk (editor/worktrunk/config.toml), so path, hooks and
+# repo setup match Claude's and herdr's; bin/herdr-wt shows each as a herdr-app space.
+keybinding:
+  universal:
+    # Enter on a commit opens hunk (customCommands); custom commands win over built-ins, so
+    # Shift+Enter is the way into lazygit's own commit file list (Space to build a custom patch).
+    # Needs a terminal that reports Shift+Enter (herdr-app, kitty); tmux strips it.
+    goInto: [<enter>, <shift+enter>]
+customCommands:
+  - key: N
+    context: worktrees,localBranches
+    description: New worktree (wt) as a herdr space
+    prompts:
+      - {type: input, title: New worktree branch, key: Branch}
+    command: herdr-wt --create {{.Form.Branch | quote}}
+    loadingText: Creating worktree
+  - key: O
+    context: worktrees
+    description: Open this worktree as a herdr space
+    command: herdr-wt {{.SelectedWorktree.Branch | quote}}
+  - key: X
+    context: worktrees
+    description: Remove worktree and its branch if merged (wt remove)
+    prompts:
+      - {type: confirm, title: wt remove, body: 'Remove {{.SelectedWorktree.Path}}?'}
+    command: wt-rm {{.SelectedWorktree.Branch | quote}} # wt remove; first drops a dead Claude session's lock
+    output: log
+  # hunk TUI. I = inspect (unbound in lazygit; Ctrl-v is herdr-app's paste, so it never reaches lazygit).
+  - key: <enter>
+    context: commits,subCommits,reflogCommits
+    description: Commit in hunk (Shift+Enter still opens lazygit's file list, see keybinding.universal.goInto)
+    command: hunk show {{.SelectedCommit.Hash}}
+    output: terminal
+  - key: <enter>
+    context: commitFiles
+    description: This file of the commit in hunk (replaces line-by-line custom-patch mode; Space still adds files)
+    command: hunk show {{.SelectedCommit.Hash}} -- {{.SelectedCommitFile.Name | quote}}
+    output: terminal
+  - key: I
+    context: commitFiles
+    description: Whole commit in hunk
+    command: hunk show {{.SelectedCommit.Hash}}
+    output: terminal
+  - key: I
+    context: files
+    description: Working-tree changes in hunk (live)
+    command: hunk diff --watch
+    output: terminal
+  - key: I
+    context: localBranches
+    description: What this branch adds since it left the checked-out one, in hunk
+    command: hunk diff "$(git merge-base HEAD {{.SelectedLocalBranch.Name | quote}})" {{.SelectedLocalBranch.Name | quote}}
+    output: terminal
+  - key: I
+    context: stash
+    description: Stash entry in hunk
+    command: hunk stash show stash@{ {{- .SelectedStashEntry.Index -}} }
+    output: terminal

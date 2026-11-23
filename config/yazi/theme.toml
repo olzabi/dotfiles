@@ -1,8 +1,8 @@
 # "$schema" = "https://yazi-rs.github.io/schemas/theme.json"
 
 [flavor]
-dark = "darkvoid"
-light = "darkvoid"
+dark = "darkvoid-current" # themes/current/yazi: the dark or light flavor (bin/darkvoid-mode); yazi's own switch needs OSC 11, which herdr popups lack
+light = "darkvoid-current"
 
 # git.yazi >= 26.9 reads status signs from the theme.
 [git]

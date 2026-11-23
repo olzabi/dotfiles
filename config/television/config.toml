@@ -2,7 +2,7 @@
 default_channel = "paths"
 
 [ui]
-theme = "darkvoid"
+theme = "darkvoid-current" # themes/current/television.toml: dark or light (bin/darkvoid-mode)
 
 [ui.input_bar]
 prompt = "❯"

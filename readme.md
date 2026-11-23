@@ -12,7 +12,7 @@ git clone https://github.com/olzabi/dotfiles ~/Dotfiles
 | `home/`   | files that live directly in `$HOME`    | `~/<same name>`           |
 | `agents/` | Claude, omp, pi, skills                | see `symlinks.conf`       |
 | `system/` | packages and `/etc` (aconfmgr), pacman |                           |
-| `themes/` | shared darkvoid palette per tool       | see `symlinks.conf`       |
+| `themes/` | darkvoid dark/ + generated light/, per tool | see `themes/README.md`    |
 | `bin/`    | scripts, on `$PATH` via `.zshenv`      |                           |
 | `infra/`  | dev containers (`mise tasks | grep infra:`) |                           |
 | `assets/` | source artwork (cursors)               |                           |
