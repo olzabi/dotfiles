@@ -1,0 +1,1 @@
+{"name": "roles", "version": "0.1.0", "description": "Picks each subagent's model by its type from roles.json (like OMP's modelRoles): an Agent call that names no model gets its role's."}

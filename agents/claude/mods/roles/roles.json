@@ -1,0 +1,12 @@
+{
+  "_": "Subagent type \u2192 model (alias or full id). An Agent call that names a model keeps it; a type not listed falls to \"*\", then to the agent's own model and CLAUDE_CODE_SUBAGENT_MODEL. Read on every spawn: edits apply at once. \"*\" mirrors CLAUDE_CODE_SUBAGENT_MODEL=sonnet, which this harness did not apply to Explore (it ran on the parent model).",
+  "Explore": "haiku",
+  "claude-code-guide": "haiku",
+  "statusline-setup": "haiku",
+  "hookify:conversation-analyzer": "haiku",
+  "general-purpose": "sonnet",
+  "plugin-dev:plugin-validator": "sonnet",
+  "plugin-dev:skill-reviewer": "sonnet",
+  "Plan": "opus",
+  "*": "sonnet"
+}
