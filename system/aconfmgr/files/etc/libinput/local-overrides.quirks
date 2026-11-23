@@ -1,0 +1,5 @@
+# Sunshine's virtual pen (Apple Pencil via a Moonlight fork with native pen): pressure 0-4096.
+# libinput's default tip threshold needs a firm press; tip down at ~1%, up at ~0.5%.
+[Sunshine virtual pen]
+MatchName=libvirtualhid Pen Tablet
+AttrPressureRange=40:20
