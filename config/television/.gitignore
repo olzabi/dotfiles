@@ -1,3 +1,4 @@
 # community channels come from `tv update-channels` (mise run tv:update); own channels are tracked
 cable/*
 !cable/paths.toml
+!cable/yazi-bookmarks.toml

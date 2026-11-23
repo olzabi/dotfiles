@@ -44,11 +44,6 @@ rev = "991501f"
 hash = "6124e6e367675c4e7f0125e509bea41"
 
 [[plugin.deps]]
-use = "dedukun/bookmarks"
-rev = "9ef1254"
-hash = "92fbb5483657fa7976cdf4e0104e18e0"
-
-[[plugin.deps]]
 use = "yazi-rs/plugins:piper"
 rev = "1ef5fe0"
 hash = "d1e0499cae5f3aeb628c267616d4b682"
@@ -64,9 +59,19 @@ rev = "1ef5fe0"
 hash = "d368d5a6a72657e1c0e7ee7340dcea8c"
 
 [[plugin.deps]]
-use = "dedukun/relative-motions"
-rev = "a603d9e"
-hash = "e02a788e5b8ae0fb47fd0193dda589cc"
+use = "uhs-robert/sshfs"
+rev = "24a3c46"
+hash = "3021508e0a3ad98d865fc3c3a6d1439f"
+
+[[plugin.deps]]
+use = "WhoSowSee/whoosh"
+rev = "cad8079"
+hash = "f6c11dc58d674764a4dd20e644138534"
+
+[[plugin.deps]]
+use = "magnustymoteus/motions"
+rev = "15fcce5"
+hash = "897de6200f2ca657e670165709463a8f"
 
 [flavor]
 deps = []

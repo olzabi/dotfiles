@@ -1,0 +1,14 @@
+# Own channel (tracked): yazi bookmarks saved by whoosh.yazi (tag<TAB>path<TAB>key per line); yazi `b /` opens it.
+[metadata]
+name = "yazi-bookmarks"
+description = "Bookmarks saved in yazi (whoosh.yazi)"
+requirements = ["eza", "bat"]
+
+[source]
+# no ${VAR:-default}: tv reads {...} as its own template
+command = "d=$XDG_STATE_HOME; [ -n \"$d\" ] || d=$HOME/.local/state; cat \"$d/yazi/whoosh-bookmarks\" 2>/dev/null"
+display = "{split:\t:0}  {split:\t:1}"
+output = "{split:\t:1}"
+
+[preview]
+command = "p='{split:\t:1}'; if [ -d \"$p\" ]; then eza --tree --level=2 --icons --color=always \"$p\"; else bat -n --color=always \"$p\"; fi"

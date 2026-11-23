@@ -1,0 +1,13 @@
+# Linked to ~/.ssh/config (symlinks.conf). Hosts live untracked in ~/.ssh/config.d/
+# (this repo is public). Give a VPN-only host `Tag <nm-profile>` and add a block like the one
+# below to an untracked ~/.ssh/config.d/zz-vpn (sorted after the host files); it brings that
+# NetworkManager VPN up before ssh connects: ssh, herdr machines, scp, rsync.
+#
+#   Host db1
+#     HostName 10.0.0.5
+#     User deploy
+#     Tag my-vpn
+#
+#   Match tagged my-vpn exec "%d/Dotfiles/bin/vpn-up my-vpn"
+
+Include config.d/*

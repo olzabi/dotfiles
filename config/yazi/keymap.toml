@@ -2,14 +2,17 @@
 
 [mgr]
 prepend_keymap = [
-    { on = [ "m" ], run = "plugin bookmarks save", desc = "Save current position as a bookmark" },
-    { on = [ "'" ], run = "plugin bookmarks jump", desc = "Jump to a bookmark" },
-    { on = [ "b", "d" ], run = "plugin bookmarks delete", desc = "Delete a bookmark" },
-    { on = [ "b", "D" ], run = "plugin bookmarks delete_all", desc = "Delete all bookmarks" },
+    { on = [ "m" ],      run = "plugin whoosh save",          desc = "Bookmark the hovered path" },
+    { on = [ "'" ],      run = "plugin whoosh jump_by_key",   desc = "Jump to a bookmark (menu: Tab history, - repo root)" },
+    { on = [ "b", "/" ], run = 'shell --block -- p=$(tv yazi-bookmarks) && [ -e "$p" ] && { [ -d "$p" ] && ya emit cd "$p" || ya emit reveal "$p"; }', desc = "Find a bookmark (tv)" },
+    { on = [ "b", "r" ], run = "plugin whoosh rename_by_key", desc = "Rename a bookmark" },
+    { on = [ "b", "d" ], run = "plugin whoosh delete_by_key", desc = "Delete a bookmark" },
+    { on = [ "b", "D" ], run = "plugin whoosh delete_all",    desc = "Delete all bookmarks" },
 
     # Plugin
     { on = ['c', 'm'], run = "plugin chmod",                      desc = "Chmod on selected files" },
     { on = ["g", "l"], run = "plugin lazygit",                    desc = "Run Lazygit" },
+    { on = ["M", "s"], run = "plugin sshfs -- menu",              desc = "SSHFS: mount, unmount or ssh into a host" },
     { on = ["d", "u"], run = "plugin restore",                    desc = "Restore last deleted files/folders" },
     { on = ["d", "U"], run = "plugin restore -- --interactive",   desc = "Restore deleted files/folders (Interactive)" },
     { on = "l",        run = "plugin smart-enter",         desc = "Enter the child directory, or open the file" },
@@ -17,7 +20,7 @@ prepend_keymap = [
     { on = "<S-Enter>", run = 'shell -- case %h in *.md|*.markdown) ob %h ;; *) ya emit open --interactive ;; esac', desc = "Markdown: open in Obsidian; others: choose how to open" },
 
     { on = ["<Space>", "j"],        run = [ "toggle", "arrow next" ],  desc = "Toggle the current selection state" },
-    { on = ["<Space>", "<Space>"],  run = "plugin relative-motions",   desc = "Relative Motions" },
+    { on = ["<Space>", "<Space>"],  run = "plugin motions",            desc = "Start a counted motion (5j, 3yy, 2gt)" },
     { on = "f",                     run = "plugin jump-to-char",       desc = "Jump to char" },
     { on = "F",                     run = "plugin smart-filter",       desc = "Smart filter" },
 

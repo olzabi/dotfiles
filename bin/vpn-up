@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# vpn-up <nm-profile>: bring a NetworkManager VPN up unless it is already up.
+# ssh calls it from `Match tagged ... exec` (config/ssh/config), so a VPN-only host just works.
+set -euo pipefail
+name=${1:?usage: vpn-up <nm-profile>}
+nmcli -t -f NAME connection show --active | grep -qxF "$name" && exit 0
+# Any password/OTP prompt comes from the desktop's NM secret agent, as from the tray.
+nmcli --wait 60 connection up id "$name" >&2
