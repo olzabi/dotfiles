@@ -126,5 +126,5 @@ async function getHeavyModule(): Promise<HeavyModule> {
 
 ## Related
 
-- [caching.md](./caching.md) - Caching patterns and libraries
-- [profiling.md](./profiling.md) - Profiling and benchmarking tools
+- [caching.md](caching.md) - Caching patterns and libraries
+- [profiling.md](profiling.md) - Profiling and benchmarking tools

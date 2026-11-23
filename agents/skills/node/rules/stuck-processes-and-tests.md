@@ -120,5 +120,5 @@ it('serves requests', async (t) => {
 ## Related rules
 
 - [flaky-tests.md](flaky-tests.md)
-- [testing.md](testing.md)
+- [testing.md](skills/node/rules/testing.md)
 - [graceful-shutdown.md](graceful-shutdown.md)

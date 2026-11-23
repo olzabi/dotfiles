@@ -46,25 +46,25 @@ start()
 
 Read individual rule files for detailed explanations and code examples:
 
-- [rules/plugins.md](rules/plugins.md) - Plugin development and encapsulation
-- [rules/routes.md](rules/routes.md) - Route organization and handlers
-- [rules/schemas.md](rules/schemas.md) - JSON Schema validation
-- [rules/error-handling.md](rules/error-handling.md) - Error handling patterns
-- [rules/hooks.md](rules/hooks.md) - Hooks and request lifecycle
-- [rules/authentication.md](rules/authentication.md) - Authentication and authorization
-- [rules/testing.md](rules/testing.md) - Testing with inject()
-- [rules/performance.md](rules/performance.md) - Performance optimization
-- [rules/logging.md](rules/logging.md) - Logging with Pino
-- [rules/typescript.md](rules/typescript.md) - TypeScript integration
-- [rules/decorators.md](rules/decorators.md) - Decorators and extensions
-- [rules/content-type.md](rules/content-type.md) - Content type parsing
-- [rules/serialization.md](rules/serialization.md) - Response serialization
-- [rules/cors-security.md](rules/cors-security.md) - CORS and security headers
-- [rules/websockets.md](rules/websockets.md) - WebSocket support
-- [rules/database.md](rules/database.md) - Database integration patterns
-- [rules/configuration.md](rules/configuration.md) - Application configuration
-- [rules/deployment.md](rules/deployment.md) - Production deployment
-- [rules/http-proxy.md](rules/http-proxy.md) - HTTP proxying and reply.from()
+- [rules/plugins.md](plugins.md) - Plugin development and encapsulation
+- [rules/routes.md](routes.md) - Route organization and handlers
+- [rules/schemas.md](schemas.md) - JSON Schema validation
+- [rules/error-handling.md](skills/fastify/rules/error-handling.md) - Error handling patterns
+- [rules/hooks.md](hooks.md) - Hooks and request lifecycle
+- [rules/authentication.md](authentication.md) - Authentication and authorization
+- [rules/testing.md](skills/fastify/rules/testing.md) - Testing with inject()
+- [rules/performance.md](skills/fastify/rules/performance.md) - Performance optimization
+- [rules/logging.md](skills/fastify/rules/logging.md) - Logging with Pino
+- [rules/typescript.md](skills/fastify/rules/typescript.md) - TypeScript integration
+- [rules/decorators.md](decorators.md) - Decorators and extensions
+- [rules/content-type.md](content-type.md) - Content type parsing
+- [rules/serialization.md](serialization.md) - Response serialization
+- [rules/cors-security.md](cors-security.md) - CORS and security headers
+- [rules/websockets.md](websockets.md) - WebSocket support
+- [rules/database.md](database.md) - Database integration patterns
+- [rules/configuration.md](configuration.md) - Application configuration
+- [rules/deployment.md](deployment.md) - Production deployment
+- [rules/http-proxy.md](http-proxy.md) - HTTP proxying and reply.from()
 
 ## Core Principles
 
