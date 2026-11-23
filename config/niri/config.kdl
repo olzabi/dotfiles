@@ -1,6 +1,7 @@
 include "startup.kdl"
 include "general.kdl"
 include "layout.kdl"
+include "theme.kdl"
 include "rules.kdl"
 include "workspaces.kdl"
 
@@ -10,3 +11,6 @@ include "binds/scroll.kdl"
 include "binds/ws.kdl"
 include "binds/custom.kdl"
 include "binds/audio.kdl"
+include "binds/display.kdl"
+
+include "noctalia.kdl"

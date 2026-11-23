@@ -4,6 +4,7 @@ environment {
     XDG_SESSION_TYPE "wayland"
     MOZ_DISABLE_RDD_SANDBOX "1" // Firefox's sandboxed decoder can't open /dev/nvidia*, so nvidia-vaapi-driver silently falls back to CPU
     NVD_BACKEND "direct"        // nvidia-vaapi-driver's EGL backend is broken on driver 525+
+    QT_QPA_PLATFORMTHEME "xdgdesktopportal" // Qt apps (Telegram) get light/dark from the portal; the default theme on niri reports "unknown", so auto-night never fires
  // XDG_DATA_DIRS "/usr/local/share:/usr/share"
     // MOZ_ENABLE_WAYLAND "1"
     // ELECTRON_OZONE_PLATFORM_HINT "auto"      // Electron apps (Discord, VS Code, etc.) run native Wayland, no blurry scaling
@@ -12,11 +13,6 @@ environment {
     // QT_QPA_PLATFORMTHEME "gtk3"
     // QT_QPA_PLATFORMTHEME "qt6ct"
     // QT_WAYLAND_DISABLE_WINDOWDECORATION "1"  // avoids Qt drawing its own title bars
-}
-cursor {
-    xcursor-theme "KleinCat"
-    // xcursor-theme "SungJinWoo"
-    xcursor-size 64
 }
 input {
     keyboard {
@@ -31,8 +27,12 @@ input {
     touchpad {
         tap
     }
+    // Moonlight pen (Apple Pencil) and direct touch land on the iPad's Extend output; the mouse stays a separate pointer
     tablet {
-
+        map-to-output "DP-1"
+    }
+    touch {
+        map-to-output "DP-1"
     }
     mouse {
         accel-speed -0.5
@@ -53,12 +53,29 @@ output "HDMI-A-1" {
     position x=-1920 y=442
     scale 1
 }
-// iPad via Sunshine: fake-EDID connector on the AMD iGPU, toggled by sunshine global_prep_cmd
+// iPad 11" via the tablet-display plugin (Extend, port method). Only exists while Extend is on.
+// mode/scale/position repeat what the plugin applies, so a niri config reload doesn't move it.
 output "DP-1" {
-    off
-    mode custom=true "2388x1668@60"
+    mode "2778x1940@119.998"
     scale 2
-    position x=3490 y=0
+    position x=5411 y=0
+    hot-corners {
+        off // stray touches in the corner shouldn't open the overview
+    }
+    layout {
+        gaps 6
+        default-column-width { proportion 1.0; } // 1389px logical: one window per screen
+        preset-column-widths {
+            proportion 0.5
+            proportion 1.0
+        }
+        struts {
+            left 0
+            right 0
+            top 0
+            bottom 0
+        }
+    }
 }
 recent-windows {
     debounce-ms 750

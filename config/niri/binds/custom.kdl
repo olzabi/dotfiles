@@ -1,6 +1,9 @@
 binds {
-  Mod+B { spawn "~/.config/waybar/scripts/bt-menu.sh"; }
+    Mod+B { spawn "~/.config/waybar/scripts/bt-menu.sh"; }
 
-  Mod+R { spawn "~/Dotfiles/bin/rofi-menu"; }              // drun, with all mode tabs available
-  Mod+Y { spawn "~/Dotfiles/bin/rofi-menu" "cliphist"; }  // jump straight into a mode
+    Mod+R { spawn "~/Dotfiles/bin/rofi-menu"; }              // drun, with all mode tabs available
+    Mod+Y { spawn "~/Dotfiles/bin/rofi-menu" "cliphist"; }  // jump straight into a mode
+    Mod+Return { spawn "kitten" "quick-access-terminal"; }  // kitty quick terminal (re-run toggles it)
+    // iPad (tablet-display Extend on DP-1): flip between landscape and portrait; use 270 if portrait comes out upside down
+    Mod+Alt+R { spawn-sh "niri msg -j outputs | jq -e '.\"DP-1\".logical.transform == \"Normal\"' >/dev/null && niri msg output DP-1 transform 90 || niri msg output DP-1 transform normal"; }
 }

@@ -1,7 +1,4 @@
 binds {
-    // Mod+Ctrl+J { move-column-to-workspace-down; }
-    // Mod+Ctrl+K { move-column-to-workspace-up; }
-
     // Focus and move windows/columns with either arrows or Vim keys.
     Mod+Left  { focus-column-left; }
     Mod+Down  { focus-window-or-workspace-down; }
@@ -38,6 +35,4 @@ binds {
     Mod+Shift+Ctrl+J     { move-column-to-monitor-down; }
     Mod+Shift+Ctrl+K     { move-column-to-monitor-up; }
     Mod+Shift+Ctrl+L     { move-column-to-monitor-right; }
-
-
 }

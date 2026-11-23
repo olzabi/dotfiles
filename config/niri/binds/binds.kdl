@@ -1,6 +1,6 @@
 binds {
     Mod+X repeat=false { close-window; }
-    Mod+A repeat=false { spawn "herdr-side" "toggle"; }   // herdr sidebar (bin/herdr-side): open/close it whole
+    Mod+A { spawn "sh" "-c" "mkdir -p ~/.config/mozilla/firefox/side && exec firefox --profile ~/.config/mozilla/firefox/side --name firefox-side"; }   // side browser (videos), lands on HDMI-A-1
     Mod+D repeat=false { toggle-overview; }
     Mod+T { toggle-column-tabbed-display; }   // the tmux-tabs replacement
     Mod+V { toggle-window-floating; }
@@ -9,8 +9,7 @@ binds {
     Mod+C { center-column; }
 
     Mod+Q { spawn "kitty" "-e" "tmux" "new-session" "-A" "-s" "main"; }
-    Mod+Shift+Q { spawn "sh" "-c" "herdr-side restore & exec kitty --class herdr -e herdr"; }   // herdr; reopens its sidebar if it was open
-    Mod+Ctrl+A repeat=false { spawn "herdr-side" "pick"; }         // pick which herdr sidebar sections are shown
+    Mod+Shift+Q { spawn "herdr-app"; }   // opens or raises the herdr-app window
     Mod+Shift+Slash { show-hotkey-overlay; }
     Mod+Shift+P { power-off-monitors; }
     Mod+Shift+A { screenshot; }

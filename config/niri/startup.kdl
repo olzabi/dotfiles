@@ -1,9 +1,8 @@
 // niri is started directly (not niri-session): hand the Wayland env to systemd/dbus so portals (dark mode, file picker, screencast) can start.
-spawn-at-startup "dbus-update-activation-environment" "--systemd" "WAYLAND_DISPLAY" "DISPLAY" "XDG_CURRENT_DESKTOP" "NIRI_SOCKET"
-spawn-at-startup "~/.config/waybar/launch.sh"
+spawn-at-startup "dbus-update-activation-environment" "--systemd" "WAYLAND_DISPLAY" "DISPLAY" "XDG_CURRENT_DESKTOP" "NIRI_SOCKET" "QT_QPA_PLATFORMTHEME"
+spawn-at-startup "noctalia" // bar, notifications, launcher (config/noctalia); replaces waybar + mako
 // still frame of workshop 3411797914 (Mac Baconai), extracted from its scene.pkg; live wpe cost ~1.5 GB VRAM
 spawn-sh-at-startup "swaybg -c '#1c1c1c' -o HDMI-A-2 -i ~/Media/Wallpapers/mac-baconai.jpg -m fill"
-spawn-at-startup "mako"
 spawn-at-startup "chromium"
 spawn-at-startup "sh" "-c" "wl-paste --watch cliphist store"
 spawn-at-startup "kitty" "-e" "tmux" "new-session" "-A" "-s" "main"

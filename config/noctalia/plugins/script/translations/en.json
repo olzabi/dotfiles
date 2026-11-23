@@ -1,0 +1,5 @@
+{
+  "settings.command.label": "Command",
+  "settings.interval.label": "Refresh seconds",
+  "settings.interval.description": "0 = the command keeps running and prints one JSON line per update."
+}

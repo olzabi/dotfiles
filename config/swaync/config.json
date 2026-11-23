@@ -1,0 +1,58 @@
+{
+  "$schema": "/etc/xdg/swaync/configSchema.json",
+  "positionX": "center",
+  "positionY": "top",
+  "layer": "overlay",
+  "control-center-layer": "top",
+  "layer-shell": true,
+  "cssPriority": "user",
+  "notification-window-width": 480,
+  "notification-icon-size": 48,
+  "notification-body-image-height": 120,
+  "notification-body-image-width": 240,
+  "timeout": 3,
+  "timeout-low": 2,
+  "timeout-critical": 0,
+  "transition-time": 150,
+  "fit-to-screen": true,
+  "control-center-width": 480,
+  "control-center-margin-top": 10,
+  "control-center-margin-right": 10,
+  "control-center-margin-bottom": 10,
+  "control-center-positionX": "right",
+  "control-center-positionY": "top",
+  "keyboard-shortcuts": true,
+  "image-visibility": "when-available",
+  "hide-on-clear": true,
+  "hide-on-action": true,
+  "script-fail-notify": false,
+  "scripts": {
+    "sound": {
+      "exec": "mpv --no-terminal /usr/share/sounds/freedesktop/stereo/message.oga",
+      "urgency": "Low|Normal"
+    },
+    "bell": {
+      "exec": "sh -c 'pkill -RTMIN+9 waybar'",
+      "app-name": ".*"
+    }
+  },
+  "widgets": [
+    "title",
+    "dnd",
+    "notifications",
+    "mpris"
+  ],
+  "widget-config": {
+    "title": {
+      "text": "Notifications",
+      "clear-all-button": true,
+      "button-text": "Clear"
+    },
+    "dnd": {
+      "text": "Do Not Disturb"
+    },
+    "mpris": {
+      "image-size": 64
+    }
+  }
+}

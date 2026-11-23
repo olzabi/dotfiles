@@ -1,0 +1,25 @@
+id         = "chronica/script"
+name       = "Script"
+version    = "1.0.0"
+plugin_api = 3
+author     = "chronica"
+
+# Bar widget fed by a waybar-style script: each JSON line {text, tooltip, class} updates it.
+[[widget]]
+id    = "script"
+entry = "widget.luau"
+
+  [[widget.setting]]
+  key       = "command"
+  type      = "string"
+  label_key = "settings.command.label"
+  default   = ""
+
+  [[widget.setting]]
+  key             = "interval"
+  type            = "int"
+  label_key       = "settings.interval.label"
+  description_key = "settings.interval.description"
+  default         = 5
+  min             = 0
+  max             = 3600

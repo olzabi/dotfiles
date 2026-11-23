@@ -1,40 +1,25 @@
 #!/usr/bin/env bash
+# Waybar bell for swaync: status JSON, and click actions (refresh via signal 9).
 set -euo pipefail
 
-refresh_waybar() {
-  pkill -RTMIN+9 waybar 2>/dev/null || true
-}
+refresh_waybar() { pkill -RTMIN+9 waybar 2>/dev/null || true; }
 
 case "${1:-status}" in
-  toggle)
-    makoctl mode -t do-not-disturb
-    refresh_waybar
-    exit 0
-    ;;
-  restore)
-    makoctl restore || true
-    refresh_waybar
-    exit 0
-    ;;
-  dismiss)
-    makoctl dismiss --all
-    refresh_waybar
-    exit 0
-    ;;
+  panel) swaync-client -t -sw ;;
+  toggle) swaync-client -d -sw >/dev/null; refresh_waybar ;;
+  dismiss) swaync-client -C -sw; refresh_waybar ;;
   status)
-    if ! command -v makoctl >/dev/null 2>&1; then
-      printf '{"text":"","tooltip":"makoctl is unavailable","class":"error"}\n'
+    if ! n=$(swaync-client -c -sw 2>/dev/null); then
+      printf '{"text":"","tooltip":"swaync is not running","class":"error"}\n'
       exit 0
     fi
-
-    if makoctl mode 2>/dev/null | grep -Fxq 'do-not-disturb'; then
-      printf '{"text":"","tooltip":"Do Not Disturb is on\\nLeft click: resume notifications\\nMiddle click: restore last notification\\nRight click: dismiss all","class":"dnd"}\n'
+    text=""; [ "$n" -gt 0 ] && text=" $n"
+    help='Left click: notification center\\nRight click: Do Not Disturb\\nMiddle click: clear all'
+    if [ "$(swaync-client -D -sw)" = true ]; then
+      printf '{"text":"%s","tooltip":"Do Not Disturb is on (%s waiting)\\n%s","class":"dnd"}\n' "$text" "$n" "$help"
     else
-      printf '{"text":"","tooltip":"Notifications are enabled\\nLeft click: pause notifications\\nMiddle click: restore last notification\\nRight click: dismiss all","class":"enabled"}\n'
+      printf '{"text":"%s","tooltip":"%s notifications\\n%s","class":"enabled"}\n' "$text" "$n" "$help"
     fi
     ;;
-  *)
-    printf 'Usage: %s [status|toggle|restore|dismiss]\n' "$0" >&2
-    exit 2
-    ;;
+  *) printf 'Usage: %s [status|panel|toggle|dismiss]\n' "$0" >&2; exit 2 ;;
 esac

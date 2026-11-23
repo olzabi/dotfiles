@@ -1,0 +1,31 @@
+// Noctalia shell: its keybinds and window rules. Included last in config.kdl, so these binds
+// replace the rofi/wpctl ones; delete the include line to go back to waybar + mako.
+binds {
+    Mod+R hotkey-overlay-title="Launcher" { spawn "noctalia" "msg" "panel-toggle" "launcher"; }
+    Mod+Y hotkey-overlay-title="Clipboard history" { spawn "noctalia" "msg" "panel-toggle" "clipboard"; }
+    // Status kept off the bar: resources/network graphs and notifications live in the control center.
+    Mod+S hotkey-overlay-title="System status" { spawn "noctalia" "msg" "panel-toggle" "control-center" "system"; }
+    Mod+Shift+S hotkey-overlay-title="Wi-Fi" { spawn "noctalia" "msg" "panel-toggle" "control-center" "network"; }
+    // Mod+W was switch-preset-column-width, a no-op with the single 0.5 preset in layout.kdl.
+    Mod+W hotkey-overlay-title="Notifications" { spawn "noctalia" "msg" "panel-toggle" "control-center" "notifications"; }
+
+    // Same keys as binds/audio.kdl, but with Noctalia's on-screen volume/brightness popup.
+    XF86AudioRaiseVolume  allow-when-locked=true { spawn "noctalia" "msg" "volume-up"; }
+    XF86AudioLowerVolume  allow-when-locked=true { spawn "noctalia" "msg" "volume-down"; }
+    XF86AudioMute         allow-when-locked=true { spawn "noctalia" "msg" "volume-mute"; }
+    XF86AudioMicMute      allow-when-locked=true { spawn "noctalia" "msg" "mic-mute"; }
+    XF86MonBrightnessUp   allow-when-locked=true { spawn "noctalia" "msg" "brightness-up"; }
+    XF86MonBrightnessDown allow-when-locked=true { spawn "noctalia" "msg" "brightness-down"; }
+}
+
+window-rule {
+    match app-id=r#"^dev\.noctalia\.Noctalia$"#
+    open-floating true
+    default-column-width { fixed 1080; }
+    default-window-height { fixed 920; }
+}
+
+// Lets notification actions focus their app.
+debug {
+    honor-xdg-activation-with-invalid-serial
+}

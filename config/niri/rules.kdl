@@ -1,35 +1,4 @@
 window-rule {
-    match is-floating=true
-    tiled-state false
-    geometry-corner-radius 10
-    clip-to-geometry true
-    border {
-        on
-        width 1
-        active-color "#343438"
-        inactive-color "#28282C"
-        urgent-color "#ffb86b"
-    }
-    shadow {
-        on
-        softness 10
-        spread 6
-        offset x=1 y=1
-        color "rgba(14,14,14,0.6)"
-    }
-}
-window-rule {
-    tiled-state true
-    clip-to-geometry true
-    geometry-corner-radius 10
-    draw-border-with-background false
-}
-window-rule {
-    match is-floating=false
-    tiled-state true
-    geometry-corner-radius 10
-}
-window-rule {
     match app-id="^popup-"
     open-floating true
     default-column-width {
@@ -81,15 +50,25 @@ window-rule {
     default-window-height { fixed 700; }
 }
 window-rule {
-    match app-id="^org\\.telegram\\.desktop$" title="^Media viewer$"
+    match app-id=r#"^org\.telegram\.desktop"# title="^Media viewer$" // app-id carries a per-install suffix
     open-fullscreen false
+    open-floating true
+    default-column-width { proportion 0.6; }
+    default-window-height { proportion 0.7; }
 }
 window-rule {
     match app-id="org.remmina.Remmina"
     open-maximized true
 }
+// Small settings tools and prompts: float instead of taking a column.
 window-rule {
     match app-id="nm-connection-editor"
+    match app-id="^blueman-manager$"
+    match app-id=r#"^com\.github\.wwmm\.easyeffects$"#
+    match app-id="^(nwg-look|nvidia-settings|qopenvpn|zenity)$"
+    match app-id="pinentry"
+    match app-id="^xdg-desktop-portal-gtk$"
+    match app-id="^discord$" title="^Discord Updater$"
     open-floating true
 }
 window-rule {
@@ -100,5 +79,21 @@ window-rule {
 }
 window-rule {
     match app-id="^herdr-app$"
-    opacity 0.965 // herdr-app has no see-through window of its own; matches kitty's background_opacity
+    opacity 0.99 // herdr-app has no see-through window of its own; matches kitty's background_opacity
+}
+window-rule {
+    match app-id="^kitty$"
+    background-effect { blur true; } // acrylic: blur what shows through background_opacity
+}
+// Quick-access kitty is a layer surface: niri has no border/focus-ring for layers, so shadow + corners only (same as floating windows in theme.kdl).
+layer-rule {
+    match namespace="quick-access"
+    geometry-corner-radius 10
+    shadow {
+        on
+        softness 10
+        spread 6
+        offset x=1 y=1
+        color "rgba(14,14,14,0.6)"
+    }
 }

@@ -1,0 +1,335 @@
+# Noctalia shell (preview): replaces waybar + mako, darkvoid palette. Keybinds: config/niri/noctalia.kdl.
+# GUI changes land in ~/.local/state/noctalia/settings.toml and override this file.
+# Native widgets where Noctalia has one; waybar scripts with no equivalent run through plugins/script.
+[shell]
+telemetry_enabled = false
+font_family = "JetBrainsMono Nerd Font" # waybar's font; the remaining scripts print Nerd Font glyphs
+time_format = "{:%H:%M}"
+polkit_agent = true                         # nothing else answers pkexec/polkit prompts in this niri session
+niri_overview_type_to_launch_enabled = true # start typing in niri's overview to open the launcher
+
+# "attached" panels take the bar's background, which is transparent here.
+[shell.panel]
+control_center_placement = "floating"
+wallpaper_placement = "floating"
+session_placement = "floating"
+open_near_click_control_center = true
+
+[shell.launcher]
+pinned = ["firefox", "kitty", "herdr-app", "obsidian", "org.gnome.Nautilus"]
+compact = true
+
+[shell.launcher.providers.session]
+global = true # "reboot", "shutdown" without the /session prefix
+
+# Control-center dashboard buttons; right-click opens each one's tab.
+[[control_center.shortcuts]]
+type = "notification" # DND
+[[control_center.shortcuts]]
+type = "nightlight"
+[[control_center.shortcuts]]
+type = "bluetooth"
+[[control_center.shortcuts]]
+type = "mic_mute"
+[[control_center.shortcuts]]
+type = "caffeine"
+[[control_center.shortcuts]]
+type = "screen_recorder"
+[[control_center.shortcuts]]
+type = "dark_mode" # dark / light / auto theme switcher
+
+[control_center.calendar]
+show_week_numbers = true
+
+# Sampling for the control-center System tab (Mod+S); disks barely change.
+# Thresholds tint any sysmon widget (bar or desktop) toward red.
+[system.monitor]
+cpu_poll_seconds = 2.0
+gpu_poll_seconds = 5.0
+memory_poll_seconds = 4.0
+network_poll_seconds = 3.0
+disk_poll_seconds = 60.0
+# Ryzen 7 7700 idles warm and boosts to 95 °C by design; RTX 4070 Ti (12 GB); 62 GB RAM.
+cpu_usage_activity_threshold = 60
+cpu_usage_critical_threshold = 95
+cpu_temp_activity_threshold = 75
+cpu_temp_critical_threshold = 92
+cpu_freq_critical_threshold = 0 # clocks jump all the time; no tint
+gpu_usage_activity_threshold = 60
+gpu_usage_critical_threshold = 97
+gpu_temp_activity_threshold = 70
+gpu_temp_critical_threshold = 84
+gpu_vram_activity_threshold = 70
+gpu_vram_critical_threshold = 95
+ram_pct_activity_threshold = 70
+ram_pct_critical_threshold = 92
+swap_pct_activity_threshold = 25
+swap_pct_critical_threshold = 75
+
+# Warm screen from sunset to sunrise (one-hour fade), times from [location].
+[nightlight]
+enabled = true
+temperature_day = 6500
+temperature_night = 3800
+
+# Real monitor backlight over DDC/CI (ddcutil + i2c-dev, see system/aconfmgr/20-tuning.sh).
+[brightness]
+enable_ddcutil = true
+minimum_brightness = 0.05
+
+[osd]
+position = "top_center"
+follow_focused_output = true # show on the monitor you're working on
+hide_delay_ms = 1200
+
+[osd.kinds]
+lock_keys = false # no lock-key widget; stops the polling
+
+[theme]
+mode = "auto" # light from sunrise, dark from sunset ([location]); themes/mode.d/monitor.sh follows with the LG backlight
+source = "custom"
+custom_palette = "darkvoid"
+
+# swaybg keeps drawing the wallpaper (niri startup.kdl).
+[wallpaper]
+enabled = false
+
+[notification]
+layer = "overlay"
+background_opacity = 1.0
+border = true
+border_color = "primary"
+offset_y = 10
+follow_focused_output = true # toasts open on the monitor you're working on
+
+# Calendar events (Google account: Settings → Calendar → Accounts); a toast 10 min before each.
+[calendar]
+enabled = true
+
+[calendar.reminders]
+enabled = true
+default_lead_minutes = 10
+all_day_digest_time = "09:00"
+
+# Notification and volume sounds, replacing mako's mpv on-notify.
+[audio]
+enable_sounds = true
+enable_overdrive = true # volume up to 150%
+
+# Weather in the control center; location comes from the IP address.
+[weather]
+enabled = true
+unit = "celsius"
+
+[location]
+auto_locate = true
+
+[plugins]
+enabled = ["chronica/script", "luochen1990/niri-ribbon", "alexander/screen-toolkit", "adam-gassem/pomodoro-heatmap", "iwasironman/tablet-display"]
+
+[[plugins.source]]
+name     = "dotfiles"
+kind     = "path"
+location = "~/.config/noctalia/plugins"
+enabled  = true
+
+[[plugins.source]]
+name     = "community"
+kind     = "git"
+location = "https://github.com/noctalia-dev/community-plugins"
+enabled  = true
+
+# Two bars, one per monitor: "main" (work: the old waybar set) on the LG, "fun" (media, timers, toys) on the ASUS.
+# Both are transparent strips of bordered pills, like waybar; bars don't inherit, so the style is repeated.
+[bar]
+order = ["main", "fun", "ipad"]
+
+[bar.main]
+position = "top"
+thickness = 46
+scale = 1.1
+margin_edge = 4
+margin_ends = 12
+padding = 0
+widget_spacing = 6
+background_opacity = 0.0
+shadow = false
+capsule = true
+capsule_fill = "surface"
+capsule_border = "outline_variant"
+capsule_border_width = 1.0
+capsule_radius = 7.0
+start = ["workspaces", "ribbon", "active_window"]
+center = ["clock", "aibar", "volume"]
+end = ["screentools", "splitkb", "bluetooth"]
+
+[bar.main.monitor.asus]
+match = "HDMI-A-1"
+enabled = false
+
+[bar.main.monitor.ipad]
+match = "DP-1"
+enabled = false
+
+[bar.fun]
+position = "top"
+thickness = 46
+scale = 1.1
+margin_edge = 4
+margin_ends = 12
+padding = 0
+widget_spacing = 6
+background_opacity = 0.0
+shadow = false
+capsule = true
+capsule_fill = "surface"
+capsule_border = "outline_variant"
+capsule_border_width = 1.0
+capsule_radius = 7.0
+start = ["workspaces", "neko", "media"]
+center = ["clock", "audio_vis", "mic_viz"]
+end = ["pomodoro", "weather", "tablet"]
+
+[bar.fun.monitor.lg]
+match = "HDMI-A-2"
+enabled = false
+
+[bar.fun.monitor.ipad]
+match = "DP-1"
+enabled = false
+
+# iPad (tablet-display Extend on DP-1): fewer, larger touch targets; only on DP-1.
+[bar.ipad]
+position = "top"
+thickness = 52
+scale = 1.0
+margin_edge = 4
+margin_ends = 10
+padding = 0
+widget_spacing = 8
+background_opacity = 0.0
+shadow = false
+capsule = true
+capsule_fill = "surface"
+capsule_border = "outline_variant"
+capsule_border_width = 1.0
+capsule_radius = 7.0
+start = ["workspaces"]
+center = ["clock"]
+end = ["volume", "tablet"]
+
+[bar.ipad.monitor.lg]
+match = "HDMI-A-2"
+enabled = false
+
+[bar.ipad.monitor.asus]
+match = "HDMI-A-1"
+enabled = false
+
+[widget.workspaces]
+focused_color = "primary"
+occupied_color = "on_surface_variant"
+empty_color = "outline_variant"
+
+[widget.active_window]
+display = "text_only"
+max_length = 300
+title_scroll = "on_hover"
+
+[widget.clock]
+format = "{:%a %d %b  %H:%M}"
+tooltip_format = "{:%A, %d %B %Y}"
+
+# CPU/GPU/RAM, Wi-Fi and notifications stay off the bar: Mod+S, Mod+Shift+S, Mod+W (niri/noctalia.kdl).
+[widget.bluetooth]
+show_label = true
+hide_when_adapter_off = true
+
+# waybar scripts with no Noctalia equivalent; interval 0 = the script streams one JSON line per update.
+# Where the screen sits on niri's scrolling strip; gaps/model match niri/layout.kdl.
+[widget.ribbon]
+type = "luochen1990/niri-ribbon:ribbon"
+gaps = 8.0
+viewport_model = "center"     # was picked in the Settings GUI
+show_active_window = true     # mark the focused column inside the viewport
+active_window_color = "secondary"
+
+[widget.screentools]
+type = "alexander/screen-toolkit:widget"
+
+[widget.neko]
+type = "chronica/script:script"
+command = "~/.config/waybar/scripts/neko.sh"
+interval = 0
+[widget.neko.actions]
+left = "exec pkill -USR1 -f waybar/scripts/neko.sh"
+
+[widget.aibar]
+type = "chronica/script:script"
+command = "ai-usagebar --format '{session_pct}% · {session_reset}'"
+interval = 300
+[widget.aibar.actions]
+left = "exec kitty --class popup-aibar -e ai-usagebar-tui"
+scroll_up = "exec ai-usagebar --cycle-next"
+scroll_down = "exec ai-usagebar --cycle-prev"
+
+# Mic input spectrum (the native audio_visualizer only shows output); needs cava.
+[widget.mic_viz]
+type = "chronica/script:script"
+command = "~/.config/noctalia/mic-viz.sh"
+interval = 0
+
+[widget.splitkb]
+type = "chronica/script:script"
+command = "~/.config/waybar/scripts/splits.sh"
+interval = 0
+[widget.splitkb.actions]
+left = "panel-toggle control-center bluetooth"
+
+[hooks]
+session_locked = "playerctl --all-players pause" # stop music when the screen locks
+# darkvoid / darkvoid dim-light for every app ([theme] mode = "light" or "auto" to use it)
+theme_mode_changed = "$HOME/Dotfiles/bin/darkvoid-mode"
+started = "$HOME/Dotfiles/bin/darkvoid-mode"
+
+# ── fun bar (ASUS) ──
+[widget.media]
+hide_when_no_media = true
+title_scroll = "on_hover"
+max_length = 300
+
+[widget.audio_vis]
+type = "audio_visualizer"
+bands = 16
+color_1 = "primary"
+color_2 = "secondary"
+
+[widget.weather]
+show_condition = true
+
+[widget.pomodoro]
+type = "adam-gassem/pomodoro-heatmap:widget"
+
+# iPad as a second screen via Sunshine → Moonlight. Extend borrows the AMD iGPU's free DP-1 (port helper, undone on reboot); Mirror streams the focused monitor.
+[widget.tablet]
+type = "iwasironman/tablet-display:status"
+
+# ── plugin-level settings (also editable under Settings → Plugins) ──
+[plugin_settings."alexander/screen-toolkit"]
+record-audio-out = true          # recordings carry desktop sound
+record-copy-to-clipboard = true
+
+[plugin_settings."adam-gassem/pomodoro-heatmap"]
+work-minutes = 25
+short-break-minutes = 5
+long-break-minutes = 15
+daily-goal-minutes = 180
+auto-start-breaks = true
+auto-start-work = false
+
+[plugin_settings."iwasironman/tablet-display"]
+device = "auto"                  # Moonlight reports the iPad's resolution
+custom_resolution = "2778x1940"  # what the iPad's Moonlight asks for (Automatic); builds the right EDID before the first connect
+refresh_rates = "60,120"         # 60 for Wi-Fi, 120 if Moonlight is set to 120 fps on a ProMotion iPad
+audio = true                     # computer sound plays on the iPad while streaming
+custom_diagonal = 11.0           # iPad 11": picks the automatic scale

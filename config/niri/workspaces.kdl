@@ -1,23 +1,7 @@
-// Named workspaces come first on their monitor, so Mod+1.. still map to them.
-workspace "dev"   { open-on-output "HDMI-A-2"; }
-workspace "web"   { open-on-output "HDMI-A-2"; }
+// The two monitors are the split: HDMI-A-2 (big) holds dev and the main browser side by side,
+// HDMI-A-1 (small) holds the side stuff. Only games get a workspace of their own.
 workspace "games" { open-on-output "HDMI-A-2"; }
-workspace "chat"  { open-on-output "HDMI-A-1"; }
-workspace "notes" { open-on-output "HDMI-A-1"; }
 
-// Terminals and browser: only place them at login, so new ones open where you are.
-window-rule {
-    match at-startup=true app-id="^(kitty|com\\.mitchellh\\.ghostty)$"
-    exclude app-id="^popup-"
-    open-on-workspace "dev"
-}
-window-rule {
-    match at-startup=true app-id="^(chromium|firefox)$"
-    exclude title="^(Picture in picture|Picture-in-Picture)$"
-    open-on-workspace "web"
-}
-
-// Single-purpose apps always go to their home.
 window-rule {
     match app-id="^steam$"
     match app-id=r#"^steam_app_\d+$"#
@@ -25,13 +9,26 @@ window-rule {
     exclude title=r#"^notificationtoasts_\d+_desktop$"#
     open-on-workspace "games"
 }
+
+// Side monitor: the side browser (Mod+A, its own profile so niri can tell it apart), video players, chat.
 window-rule {
+    match app-id="^firefox-side$"
+    match app-id="^(mpv|vlc)$"
     match app-id=r#"^org\.telegram\.desktop"#
     match app-id="^discord$"
-    exclude title="^Media viewer$"
-    open-on-workspace "chat"
+    exclude title="^(Media viewer|Picture-in-Picture)$"
+    open-on-output "HDMI-A-1"
 }
+
+// Rnote (pen notes) on the iPad when Extend is on; otherwise niri opens it where you are.
 window-rule {
-    match app-id="^obsidian$"
-    open-on-workspace "notes"
+    match app-id=r#"^com\.github\.flxzt\.rnote$"#
+    open-on-output "DP-1"
+    open-maximized true
+}
+
+// Obsidian (notes, ob previews) on the big monitor.
+window-rule {
+    match app-id=r#"^(obsidian|md\.obsidian\.Obsidian)$"#
+    open-on-output "HDMI-A-2"
 }

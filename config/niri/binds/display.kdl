@@ -1,0 +1,31 @@
+binds {
+    // Monitor picture (bin/monitor-mode) and theme, all on Mod+Ctrl+Alt. The keys mirror the screens:
+    // left hand = ASUS (left screen), right hand = LG (right screen), inner columns = both / theme.
+    //   top row  W E R | U I O   day  night  sRGB
+    //   home row S D   | J       cinema  night-view | reader
+    //   bottom   X C   | M ,     dimmer  brighter
+    //   inner    T G B           both: day  night  sRGB
+    //            Y H N           theme dark/light, theme auto, night light
+    // The Corne sends these from its Display layer (hold Num + Sym thumbs; zmk-config).
+    Mod+Ctrl+Alt+W hotkey-overlay-title="ASUS: day" { spawn-sh "~/Dotfiles/bin/monitor-mode asus day && notify-send -t 1500 ASUS day"; }
+    Mod+Ctrl+Alt+E hotkey-overlay-title="ASUS: night" { spawn-sh "~/Dotfiles/bin/monitor-mode asus night && notify-send -t 1500 ASUS night"; }
+    Mod+Ctrl+Alt+R hotkey-overlay-title="ASUS: sRGB" { spawn-sh "~/Dotfiles/bin/monitor-mode asus srgb && notify-send -t 1500 ASUS sRGB"; }
+    Mod+Ctrl+Alt+S hotkey-overlay-title="ASUS: cinema" { spawn-sh "~/Dotfiles/bin/monitor-mode asus cinema && notify-send -t 1500 ASUS cinema"; }
+    Mod+Ctrl+Alt+D hotkey-overlay-title="ASUS: night view" { spawn-sh "~/Dotfiles/bin/monitor-mode asus night-view && notify-send -t 1500 ASUS 'night view'"; }
+    Mod+Ctrl+Alt+X hotkey-overlay-title="ASUS: dimmer" { spawn "~/Dotfiles/bin/monitor-mode" "asus" "dimmer"; }
+    Mod+Ctrl+Alt+C hotkey-overlay-title="ASUS: brighter" { spawn "~/Dotfiles/bin/monitor-mode" "asus" "brighter"; }
+
+    Mod+Ctrl+Alt+U hotkey-overlay-title="LG: day" { spawn-sh "~/Dotfiles/bin/monitor-mode lg day && notify-send -t 1500 LG day"; }
+    Mod+Ctrl+Alt+I hotkey-overlay-title="LG: night" { spawn-sh "~/Dotfiles/bin/monitor-mode lg night && notify-send -t 1500 LG night"; }
+    Mod+Ctrl+Alt+O hotkey-overlay-title="LG: sRGB" { spawn-sh "~/Dotfiles/bin/monitor-mode lg srgb && notify-send -t 1500 LG sRGB"; }
+    Mod+Ctrl+Alt+J hotkey-overlay-title="LG: reader" { spawn-sh "~/Dotfiles/bin/monitor-mode lg reader && notify-send -t 1500 LG reader"; }
+    Mod+Ctrl+Alt+M hotkey-overlay-title="LG: dimmer" { spawn "~/Dotfiles/bin/monitor-mode" "lg" "dimmer"; }
+    Mod+Ctrl+Alt+Comma hotkey-overlay-title="LG: brighter" { spawn "~/Dotfiles/bin/monitor-mode" "lg" "brighter"; }
+
+    Mod+Ctrl+Alt+T hotkey-overlay-title="Both monitors: day" { spawn-sh "~/Dotfiles/bin/monitor-mode day && notify-send -t 1500 Monitors day"; }
+    Mod+Ctrl+Alt+G hotkey-overlay-title="Both monitors: night" { spawn-sh "~/Dotfiles/bin/monitor-mode night && notify-send -t 1500 Monitors night"; }
+    Mod+Ctrl+Alt+B hotkey-overlay-title="Both monitors: sRGB" { spawn-sh "~/Dotfiles/bin/monitor-mode srgb && notify-send -t 1500 Monitors sRGB"; }
+    Mod+Ctrl+Alt+Y hotkey-overlay-title="Theme: dark / light" { spawn "noctalia" "msg" "theme-mode-toggle"; }
+    Mod+Ctrl+Alt+H hotkey-overlay-title="Theme: back to auto (sunrise / sunset)" { spawn "noctalia" "msg" "theme-mode-set" "auto"; }
+    Mod+Ctrl+Alt+N hotkey-overlay-title="Night light on / off" { spawn "noctalia" "msg" "nightlight-force-toggle"; }
+}
