@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # gw2-alt [-o|-u|-x|-d] NAME...: run more Guild Wars 2 accounts beside the one Steam starts (app 1284210, Proton).
 #   NAME...   run these accounts, each waiting for the one before to load
-#   -o NAME   set an account up or change its settings: log in with "remember", set graphics, quit. One at a time.
+#   -o NAME   set an account up or change its settings: tick "Remember password", log in, set graphics, quit; later runs log in by themselves. One at a time.
 #   -u NAME...  after a game patch, update each account's Local.dat (the game runs -image and quits)
 #   -x NAME...  close running accounts;  -d NAME...  clean up a stuck mount
 #   (none)    list accounts
@@ -108,7 +108,7 @@ launch() {
   [[ -f $data/$name.dat ]] || die "$name has no saved login; run gw2-alt -o $name first"
   [[ -f $run/$name.pid ]] && kill -0 "$(<"$run/$name.pid")" 2>/dev/null && { echo "$name is running"; return; }
   mount_ "$name"
-  start "$name" -shareArchive "${flags[@]}"
+  start "$name" -shareArchive -autologin "${flags[@]}"
   local sess n=0 pid=
   sess=$(ps -o sess= -p $! | tr -d ' ')
   until pid=$(pgrep -s "$sess" -xi "$exe" | head -1) && [[ -n $pid ]]; do
