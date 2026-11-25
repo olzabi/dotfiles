@@ -1,7 +1,17 @@
 -- Mounts ~/.ssh/config hosts under /mnt/ssh (M s); goes through ssh, so VPN-tagged hosts bring their VPN up.
 -- /mnt/ssh is owned by the user (FUSE mounts need that; system/aconfmgr/files/etc/tmpfiles.d/mnt-ssh.conf).
 -- Host lists stay in yazi's own menu up to its 36-key limit; past that sshfs falls back to fzf (it can't call tv).
-require("sshfs"):setup({ mount_dir = "/mnt/ssh", ui = { picker = "menu", menu_max = 36 } })
+require("sshfs"):setup({
+  mount_dir = "/mnt/ssh",
+  -- The plugin merges this list with its defaults by index, so the 5 defaults come first.
+  -- idmap=user: remote owner shows as me; follow_symlinks: absolute server links (e.g. /var/www/current) resolve remotely.
+  sshfs_options = {
+    "reconnect", "ConnectTimeout=5", "compression=yes", "ServerAliveInterval=15", "ServerAliveCountMax=3",
+    "idmap=user", "follow_symlinks",
+  },
+  connections = { control_persist = "1h" },
+  ui = { picker = "menu", menu_max = 36 }
+})
 
 -- Vim counts (5j, 3yy, 2gt) with hybrid relative numbers; replaces the unmaintained relative-motions.yazi.
 require("motions"):setup({ show_numbers = true, show_motion = true })
