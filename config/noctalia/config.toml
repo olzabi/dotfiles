@@ -160,7 +160,7 @@ capsule_border = "outline_variant"
 capsule_border_width = 1.0
 capsule_radius = 7.0
 start = ["workspaces", "ribbon", "active_window"]
-center = ["clock", "aibar", "volume"]
+center = ["aibar", "clock", "volume"]
 end = ["screentools", "splitkb", "bluetooth"]
 
 [bar.main.monitor.asus]
