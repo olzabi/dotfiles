@@ -1,6 +1,31 @@
-// The two monitors are the split: HDMI-A-2 (big) holds dev and the main browser side by side,
-// HDMI-A-1 (small) holds the side stuff. Only games get a workspace of their own.
+// Big monitor (HDMI-A-2) holds the named workspaces in priority order, under niri's empty one at the top:
+// secondary (podman), dev (everything without a rule), chat, games. Unnamed ones appear above and below as needed;
+// Mod+2..5 reach the named ones by name, so dev stays Mod+3 however many there are (binds/ws.kdl).
+// Small monitor (HDMI-A-1) is for videos only.
+workspace "secondary" { open-on-output "HDMI-A-2"; }
+workspace "dev" { open-on-output "HDMI-A-2"; }
+workspace "chat" { open-on-output "HDMI-A-2"; }
 workspace "games" { open-on-output "HDMI-A-2"; }
+
+window-rule {
+    match app-id=r#"^io\.podman_desktop\.PodmanDesktop$"#
+    open-on-workspace "secondary"
+}
+
+window-rule {
+    match app-id=r#"^org\.telegram\.desktop"#
+    match app-id="^discord$"
+    exclude title="^Media viewer$"
+    open-on-workspace "chat"
+}
+
+// At login they open in the background; opened later (tray, launcher) they take focus as usual.
+window-rule {
+    match app-id=r#"^io\.podman_desktop\.PodmanDesktop$"# at-startup=true
+    match app-id=r#"^org\.telegram\.desktop"# at-startup=true
+    match app-id="^discord$" at-startup=true
+    open-focused false
+}
 
 window-rule {
     match app-id="^steam$"
@@ -10,13 +35,11 @@ window-rule {
     open-on-workspace "games"
 }
 
-// Side monitor: the side browser (Mod+A, its own profile so niri can tell it apart), video players, chat.
+// Small monitor: the video browser (bin/firefox-side, its own profile so niri can tell it apart) and video players.
 window-rule {
     match app-id="^firefox-side$"
     match app-id="^(mpv|vlc)$"
-    match app-id=r#"^org\.telegram\.desktop"#
-    match app-id="^discord$"
-    exclude title="^(Media viewer|Picture-in-Picture)$"
+    exclude title="^Picture-in-Picture$"
     open-on-output "HDMI-A-1"
 }
 

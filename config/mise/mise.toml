@@ -85,6 +85,7 @@ jj = "latest"
 "github:pythops/impala" = "latest"
 "github:pythops/bluetui" = "latest"
 "pipx:isd-tui" = "latest"
+"pipx:headroom-ai" = { version = "latest", extras = "all" }  # also the Claude proxy (headroom-default.service) and MCP, via ~/.local/bin/headroom
 lazyjournal = "latest"
 btop = "latest"
 shellcheck = "latest"

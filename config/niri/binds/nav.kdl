@@ -35,4 +35,9 @@ binds {
     Mod+Shift+Ctrl+J     { move-column-to-monitor-down; }
     Mod+Shift+Ctrl+K     { move-column-to-monitor-up; }
     Mod+Shift+Ctrl+L     { move-column-to-monitor-right; }
+    // Whole workspace: to the other monitor, or swap with its neighbour (dev 3 <-> 2 / 3 <-> 4).
+    Mod+Alt+Shift+Left  { move-workspace-to-monitor-left; }
+    Mod+Alt+Shift+Right { move-workspace-to-monitor-right; }
+    Mod+Alt+Shift+Up    { move-workspace-up; }
+    Mod+Alt+Shift+Down  { move-workspace-down; }
 }

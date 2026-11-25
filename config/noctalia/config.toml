@@ -227,6 +227,7 @@ match = "HDMI-A-1"
 enabled = false
 
 [widget.workspaces]
+label_source = "id" # numbers, even for named niri workspaces (secondary, dev, chat, games)
 focused_color = "primary"
 occupied_color = "on_surface_variant"
 empty_color = "outline_variant"

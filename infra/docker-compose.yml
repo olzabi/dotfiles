@@ -5,7 +5,7 @@ services:
   postgres:
     image: postgres:${POSTGRES_VERSION:-18}-alpine
     container_name: postgres
-    restart: unless-stopped
+    restart: always # podman-restart.service starts it at boot
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
@@ -49,7 +49,7 @@ services:
   searxng:
     image: docker.io/searxng/searxng:${SEARXNG_VERSION:-latest}
     container_name: searxng
-    restart: unless-stopped
+    restart: always # podman-restart.service starts it at boot
     env_file:
       - ${SEARXNG_ENV_FILE:-./searxng/.env}
     environment:

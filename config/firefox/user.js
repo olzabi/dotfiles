@@ -47,3 +47,6 @@ user_pref("browser.display.background_color.dark", "#1c1c1c");
 user_pref("browser.display.foreground_color.dark", "#c0c0c0");
 // The built-in "System theme — auto": a Firefox colour theme (e.g. Nova Ash) overrides userChrome.css colours.
 user_pref("extensions.activeThemeID", "default-theme@mozilla.org");
+
+// Reopen last session's windows and tabs, in both profiles (main and bin/firefox-side).
+user_pref("browser.startup.page", 3);

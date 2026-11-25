@@ -1,0 +1,4 @@
+#!/bin/sh
+# Video browser: its own Firefox profile with app-id firefox-side, so niri puts it on the small monitor
+# (config/niri/workspaces.kdl). Shares user.js and chrome/ with the main profile (symlinks.conf).
+mkdir -p ~/.config/mozilla/firefox/side && exec firefox --profile ~/.config/mozilla/firefox/side --name firefox-side "$@"

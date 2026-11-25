@@ -1,6 +1,6 @@
 binds {
     Mod+X repeat=false { close-window; }
-    Mod+A { spawn "sh" "-c" "mkdir -p ~/.config/mozilla/firefox/side && exec firefox --profile ~/.config/mozilla/firefox/side --name firefox-side"; }   // side browser (videos), lands on HDMI-A-1
+    Mod+A { spawn-sh "~/Dotfiles/bin/firefox-side"; }   // side browser (videos), lands on HDMI-A-1
     Mod+D repeat=false { toggle-overview; }
     Mod+T { toggle-column-tabbed-display; }   // the tmux-tabs replacement
     Mod+V { toggle-window-floating; }

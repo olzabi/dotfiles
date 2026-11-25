@@ -23,6 +23,7 @@ export HEADROOM_BACKEND="anthropic"
 export HEADROOM_EMBEDDER_RUNTIME="cpu"
 export HEADROOM_KOMPRESS_BACKEND="onnx"
 export HEADROOM_TELEMETRY="off"
-export ANTHROPIC_BASE_URL="http://127.0.0.1:8787"
+# headroom turned off 2026-11-25 for Code Mode; uncomment to route through it again
+# export ANTHROPIC_BASE_URL="http://127.0.0.1:8787"
 export ENABLE_TOOL_SEARCH="true"
 # <<< headroom persistent env <<<

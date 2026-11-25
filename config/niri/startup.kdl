@@ -3,9 +3,17 @@ spawn-at-startup "dbus-update-activation-environment" "--systemd" "WAYLAND_DISPL
 spawn-at-startup "noctalia" // bar, notifications, launcher (config/noctalia); replaces waybar + mako
 // still frame of workshop 3411797914 (Mac Baconai), extracted from its scene.pkg; live wpe cost ~1.5 GB VRAM
 spawn-sh-at-startup "swaybg -c '#1c1c1c' -o HDMI-A-2 -i ~/Media/Wallpapers/mac-baconai.jpg -m fill"
-spawn-at-startup "chromium"
 spawn-at-startup "sh" "-c" "wl-paste --watch cliphist store"
-spawn-at-startup "kitty" "-e" "tmux" "new-session" "-A" "-s" "main"
+
+// Apps. Dev is focused first so the apps without a rule (firefox, herdr-app) open there; the others
+// go to their own workspace without taking focus (workspaces.kdl).
+spawn-sh-at-startup "niri msg action focus-workspace dev"
+spawn-at-startup "firefox"
+spawn-at-startup "herdr-app"
+spawn-sh-at-startup "~/Dotfiles/bin/firefox-side"
+spawn-at-startup "Telegram"
+spawn-at-startup "discord"
+spawn-at-startup "podman-desktop"
 
 // niri exports XCURSOR_THEME/XCURSOR_SIZE from its cursor block; mirror them for GTK apps
 // and for X11 apps (xwayland-satellite), which fall back to the "default" icon theme.
