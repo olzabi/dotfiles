@@ -41,7 +41,7 @@
       "/tmp"
     ]
   },
-  "model": "claude-fable-5-2",
+  "model": "opus",
   "hooks": {
     "Notification": [
       {
@@ -163,7 +163,9 @@
         "source": "github",
         "repo": "olzabi/dotfiles",
         "path": "agents/claude/marketplace/.claude-plugin/marketplace.json",
-        "sparsePaths": ["agents/claude/marketplace"]
+        "sparsePaths": [
+          "agents/claude/marketplace"
+        ]
       }
     },
     "ecc": {
