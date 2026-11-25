@@ -75,7 +75,9 @@ remove() {
 # Start the game in the account's overlay; the caller waits.
 start() {
   local name=$1; shift
-  local cmd=("$proton/proton" run "$game/$exe" "$@")
+  # -provider Portal: ArenaNet login, as in the Steam launch options; Proton looks like Steam to the game, which
+  # would otherwise use Steam login and ignore the remembered password.
+  local cmd=("$proton/proton" run "$game/$exe" -provider Portal "$@")
   if [[ -n ${GW2_MEMORY_MAX:-} ]]; then
     cmd=(systemd-run --user --scope --slice gw2-alts --unit "gw2-$name-$$" -p "MemoryMax=$GW2_MEMORY_MAX"
       ${GW2_MEMORY_HIGH:+-p "MemoryHigh=$GW2_MEMORY_HIGH"} -- "${cmd[@]}")
