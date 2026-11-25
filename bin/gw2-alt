@@ -1,0 +1,162 @@
+#!/usr/bin/env bash
+# gw2-alt [-o|-u|-x|-d] NAME...: run more Guild Wars 2 accounts beside the one Steam starts (app 1284210, Proton).
+#   NAME...   run these accounts, each waiting for the one before to load
+#   -o NAME   set an account up or change its settings: log in with "remember", set graphics, quit. One at a time.
+#   -u NAME...  after a game patch, update each account's Local.dat (the game runs -image and quits)
+#   -x NAME...  close running accounts;  -d NAME...  clean up a stuck mount
+#   (none)    list accounts
+# Adapted from Iiridayn's gw2-linux-multibox-launcher (WTFPL, github.com/Iiridayn/gw2-linux-multibox-launcher).
+# Each Wine prefix has its own game mutex, so every account runs in a copy-on-write fuse-overlayfs view of
+# Steam's GW2 prefix and Proton starts the game there with -shareArchive (one Gw2.dat for all). The game
+# folder itself is shared, so Nexus and arcdps load in every client with the same settings; Blish HUD only
+# runs in the Steam one. Logins (Local.dat) and graphics (GFXSettings) per account live in $GW2_ALT_DATA_DIR,
+# outside Dotfiles: Local.dat holds the remembered login. Env: GW2_FLAGS (extra game args), GW2_PROTON
+# (Proton folder, default Proton - Experimental), GW2_MEMORY_MAX/GW2_MEMORY_HIGH (cap each client, e.g. 4G).
+# Needs fuse-overlayfs (sudo pacman -S fuse-overlayfs); xdotool and xprop for load detection and window names.
+set -uo pipefail
+app=1284210
+data=${GW2_ALT_DATA_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/gw2alts}
+run=${GW2_ALT_RUNTIME_DIR:-${XDG_CACHE_HOME:-$HOME/.cache}/gw2alts}
+read -ra flags <<< "${GW2_FLAGS:-}"
+die() { echo "gw2-alt: $*" >&2; exit 1; }
+usage() { sed -n '2,7s/^# \{0,1\}//p' "$0" >&2; exit 2; }
+
+steam=
+for d in "${STEAM_DIR:-}" ~/.local/share/Steam ~/.steam/steam ~/.var/app/com.valvesoftware.Steam/data/Steam; do
+  [[ -n $d && -f $d/steamapps/libraryfolders.vdf ]] && { steam=$d; break; }
+done
+[[ -n $steam ]] || die "no Steam install found; set STEAM_DIR"
+libs=$(grep -oP '^\s*"path"\s*"\K[^"]+' "$steam/steamapps/libraryfolders.vdf"; echo "$steam")
+lib=
+while read -r p; do [[ -f $p/steamapps/appmanifest_$app.acf ]] && { lib=$p; break; }; done <<< "$libs"
+[[ -n $lib ]] || die "Guild Wars 2 is not installed in any Steam library of $steam"
+game=$lib/steamapps/common/$(grep -oP '"installdir"\s*"\K[^"]+' "$lib/steamapps/appmanifest_$app.acf")
+base=$lib/steamapps/compatdata/$app
+[[ -f $base/pfx/user.reg ]] || die "no Proton prefix at $base; launch the game from Steam once first"
+proton=${GW2_PROTON:-}
+if [[ -z $proton ]]; then
+  while read -r p; do [[ -x "$p/steamapps/common/Proton - Experimental/proton" ]] && { proton="$p/steamapps/common/Proton - Experimental"; break; }; done <<< "$libs"
+fi
+[[ -x $proton/proton ]] || die "no Proton found; set GW2_PROTON to a Proton folder"
+appdata="pfx/drive_c/users/steamuser/AppData/Roaming/Guild Wars 2"
+gfx=GFXSettings.Gw2-64.exe.xml
+exe=Gw2-64.exe
+mkdir -p "$data" "$run"
+# On another filesystem, the overlay's first write copies whole files across, slowly and unkillably.
+[[ $(stat -c %d "$base") == $(stat -c %d "$run") ]] || die "$run is not on the filesystem of $base; set GW2_ALT_RUNTIME_DIR"
+
+# Proton outside Steam: the same env Steam gives it, plus GW2's launch options (bin/gw2-fix, Nexus's d3d11).
+export STEAM_COMPAT_CLIENT_INSTALL_PATH=$steam STEAM_COMPAT_INSTALL_PATH=$game
+export SteamAppId=$app SteamGameId=$app STEAM_COMPAT_APP_ID=$app
+export WINEDLLOVERRIDES="d3d11=n,b" __GL_SHADER_DISK_CACHE_SKIP_CLEANUP=1
+wineserver() { WINEPREFIX=$run/$1/pfx "$proton/files/bin/wineserver" "${@:2}"; }
+
+mount_() {
+  [[ -d $run/$1 ]] && mountpoint -q "$run/$1" && return
+  command -v fuse-overlayfs >/dev/null || die "fuse-overlayfs is missing: sudo pacman -S fuse-overlayfs"
+  mkdir -p "$run/upper-$1" "$run/work-$1" "$run/$1"
+  fuse-overlayfs -o "lowerdir=$base,upperdir=$run/upper-$1,workdir=$run/work-$1" "$run/$1" ||
+    { rm -rf "${run:?}/upper-$1" "${run:?}/work-$1" "${run:?}/$1"; die "fuse-overlayfs could not mount $1"; }
+  # The account's own login and graphics over the base ones (none yet on its first -o: the game asks).
+  if [[ -f $data/$1.dat ]]; then cp "$data/$1.dat" "$run/$1/$appdata/Local.dat"; else rm -f "$run/$1/$appdata/Local.dat"; fi
+  [[ -f $data/$1.xml ]] && cp "$data/$1.xml" "$run/$1/$appdata/$gfx"
+  return 0
+}
+remove() {
+  [[ -d $run/$1 ]] || { echo "$1 is not mounted"; return 1; }
+  wineserver "$1" -k 2>/dev/null
+  local n=0
+  until ! mountpoint -q "$run/$1" || fusermount3 -u "$run/$1" 2>>"$run/$1.log"; do
+    (( ++n >= 30 )) && { echo "could not unmount $1; find what holds it: lsof +D $run/$1, then gw2-alt -d $1"; return 1; }
+    sleep 1
+  done
+  rm -rf "${run:?}/upper-$1" "${run:?}/work-$1" "${run:?}/$1" "$run/$1.pid"
+}
+# Start the game in the account's overlay; the caller waits.
+start() {
+  local name=$1; shift
+  local cmd=("$proton/proton" run "$game/$exe" "$@")
+  if [[ -n ${GW2_MEMORY_MAX:-} ]]; then
+    cmd=(systemd-run --user --scope --slice gw2-alts --unit "gw2-$name-$$" -p "MemoryMax=$GW2_MEMORY_MAX"
+      ${GW2_MEMORY_HIGH:+-p "MemoryHigh=$GW2_MEMORY_HIGH"} -- "${cmd[@]}")
+  fi
+  STEAM_COMPAT_DATA_PATH=$run/$name setsid "${cmd[@]}" &>"$run/$name.log" &
+}
+
+# -o and -u: the only client running, without -shareArchive so it can patch; keep the Local.dat (and graphics) it leaves.
+solo() {
+  local name=$1; shift
+  pgrep -xi "$exe" >/dev/null && die "close every Guild Wars 2 client first (Steam's too)"
+  mount_ "$name"
+  trap 'remove "$name"; exit 1' INT TERM
+  start "$name" "$@"
+  wait $!; wineserver "$name" -w
+  if [[ -f $run/$name/$appdata/Local.dat ]]; then
+    cp "$run/$name/$appdata/Local.dat" "$data/$name.dat"
+    [[ -f $run/$name/$appdata/$gfx ]] && cp "$run/$name/$appdata/$gfx" "$data/$name.xml"
+    echo "saved $name"
+  else echo "$name left no Local.dat; did the game start? see $run/$name.log"; fi
+  trap - INT TERM
+  remove "$name"
+}
+
+window() { local pid; pid=$(<"$run/$1.pid") && xdotool search --all --onlyvisible --pid "$pid" 2>/dev/null | head -1; }
+# Run alongside others: wait until its game window (resizable, unlike the fixed-size launcher) shows, then
+# name it "Guild Wars 2 - NAME" in the background so a crashed client is easy to spot.
+launch() {
+  local name=$1
+  [[ -f $data/$name.dat ]] || die "$name has no saved login; run gw2-alt -o $name first"
+  [[ -f $run/$name.pid ]] && kill -0 "$(<"$run/$name.pid")" 2>/dev/null && { echo "$name is running"; return; }
+  mount_ "$name"
+  start "$name" -shareArchive "${flags[@]}"
+  local sess n=0 pid=
+  sess=$(ps -o sess= -p $! | tr -d ' ')
+  until pid=$(pgrep -s "$sess" -xi "$exe" | head -1) && [[ -n $pid ]]; do
+    (( ++n >= 60 )) && { echo "$name did not start; see $run/$name.log"; remove "$name"; return 1; }
+    sleep 1
+  done
+  echo "$pid" > "$run/$name.pid"
+  # Unmount once the client and its wineserver are gone.
+  ( trap "" HUP; wineserver "$name" -w; remove "$name" >/dev/null ) &
+  echo "started $name"
+  command -v xdotool >/dev/null || return 0
+  local w hints n=0
+  while kill -0 "$pid" 2>/dev/null && (( n++ < 180 )); do
+    w=$(window "$name")
+    if [[ -n $w ]]; then
+      hints=$(xprop -id "$w" WM_NORMAL_HINTS 2>/dev/null)
+      [[ $(grep -oP 'minimum size: \K.*' <<< "$hints") != "$(grep -oP 'maximum size: \K.*' <<< "$hints")" ]] && break
+    fi
+    sleep 1
+  done
+  ( trap "" HUP; for _ in $(seq 60); do [[ $(xdotool getwindowname "$w" 2>/dev/null) == "Guild Wars 2" ]] &&
+      { xdotool set_window --name "Guild Wars 2 - $name" "$w"; break; }; sleep 1; w=$(window "$name"); done ) &
+  echo "loaded $name"
+}
+close() {
+  [[ -f $run/$1.pid ]] || { echo "$1 is not running"; return 1; }
+  local pid n=0; pid=$(<"$run/$1.pid")
+  kill -INT "$pid" 2>/dev/null
+  while kill -0 "$pid" 2>/dev/null && (( n++ < 30 )); do sleep 1; done
+  wineserver "$1" -k 2>/dev/null; echo "closed $1"
+}
+
+mode=run
+case ${1:-} in -o) mode=config ;; -u) mode=update ;; -x) mode=close ;; -d) mode=remove ;; -h) usage ;; -*) usage ;; esac
+[[ $mode == run ]] || shift
+if (( $# == 0 )); then
+  [[ $mode == run ]] || usage
+  echo "accounts: $(find "$data" -maxdepth 1 -name '*.dat' -printf '%f\n' | sed 's/\.dat$//' | sort | paste -sd' ')"
+  exit
+fi
+[[ $mode == config ]] && (( $# > 1 )) && die "-o takes one account"
+for name in "$@"; do
+  [[ $name =~ ^[A-Za-z0-9_.-]+$ ]] || die "account names are letters, digits, . _ -: $name"
+  case $mode in
+    run) launch "$name" || exit 1 ;;
+    config) solo "$name" "${flags[@]}" ;;
+    update) solo "$name" -image ;;
+    close) close "$name" ;;
+    remove) remove "$name" ;;
+  esac
+done
