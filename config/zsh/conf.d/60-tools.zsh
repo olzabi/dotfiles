@@ -18,3 +18,19 @@ _eval atuin init zsh --disable-up-arrow # after fzf --zsh so atuin owns ctrl-r; 
 _yazi_widget() { zle -I; yy </dev/tty; zle reset-prompt; }
 zle -N _yazi_widget
 bindkey '^O' _yazi_widget
+
+# gw2-alt (bin/gw2-alt): complete account names from the saved logins, or the running ones for -x/-d
+_gw2_alt() {
+  local data=${GW2_ALT_DATA_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/gw2alts}
+  local run=${GW2_ALT_RUNTIME_DIR:-${XDG_CACHE_HOME:-$HOME/.cache}/gw2alts}
+  if (( CURRENT == 2 )) && [[ $PREFIX == -* ]]; then
+    _describe option '(-o:"set up an account" -u:"update after a patch" -x:"close accounts" -d:"clean up a stuck mount" -h:help)'
+  elif [[ ${words[2]} == -[xd] ]]; then
+    local mounts=($run/*(N/:t)); local -U names=($run/*.pid(N:t:r) ${mounts:#(upper|work)-*})
+    compadd -- $names
+  else
+    [[ ${words[2]} == -o ]] && (( CURRENT > 3 )) && return # -o takes one
+    compadd -- $data/*.dat(N:t:r)
+  fi
+}
+compdef _gw2_alt gw2-alt
