@@ -4,6 +4,8 @@ spawn-at-startup "noctalia" // bar, notifications, launcher (config/noctalia); r
 // still frame of workshop 3411797914 (Mac Baconai), extracted from its scene.pkg; live wpe cost ~1.5 GB VRAM
 spawn-sh-at-startup "swaybg -c '#1c1c1c' -o HDMI-A-2 -i ~/Media/Wallpapers/mac-baconai.jpg -m fill"
 spawn-at-startup "sh" "-c" "wl-paste --watch cliphist store"
+// Puts named workspaces back on their monitor after a monitor drops and reconnects (bin/niri-home-workspaces).
+spawn-sh-at-startup "~/Dotfiles/bin/niri-home-workspaces"
 
 // Apps. Dev is focused first so the apps without a rule (firefox, herdr-app) open there; the others
 // go to their own workspace without taking focus (workspaces.kdl).

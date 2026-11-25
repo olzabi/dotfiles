@@ -1,0 +1,20 @@
+#!/bin/sh
+# Keeps named niri workspaces on the output config/niri/workspaces.kdl gives them. open-on-output only applies
+# when a workspace is created; when a monitor drops (both GPUs re-link at boot) niri moves its workspaces away
+# and on reconnect doesn't always bring them all back (games stayed on HDMI-A-1). So each time an output
+# (re)appears in the event stream, move the named workspaces declared for it back. Manual moves later are kept.
+# Started from config/niri/startup.kdl.
+conf=${NIRI_WORKSPACES:-$HOME/.config/niri/workspaces.kdl}
+seen=""
+niri msg -j event-stream | jq --unbuffered -c '.WorkspacesChanged.workspaces // empty' |
+while read -r ws; do
+  now=$(printf '%s' "$ws" | jq -r '[.[].output // empty] | unique | join(" ")')
+  for out in $now; do
+    case " $seen " in *" $out "*) continue ;; esac
+    sed -n "s/^workspace \"\([^\"]*\)\" *{ *open-on-output \"$out\".*/\1/p" "$conf" | while read -r name; do
+      cur=$(printf '%s' "$ws" | jq -r --arg n "$name" '.[] | select(.name == $n) | .output')
+      [ -n "$cur" ] && [ "$cur" != "$out" ] && niri msg action move-workspace-to-monitor --reference "$name" "$out"
+    done
+  done
+  seen=$now
+done
