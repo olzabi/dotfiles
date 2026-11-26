@@ -1,7 +1,7 @@
 {
   "defaultViewMode": "preview",
   "livePreview": true,
-  "readableLineLength": true,
+  "readableLineLength": false,
   "showUnsupportedFiles": true,
   "alwaysUpdateLinks": true,
   "promptDelete": false,
