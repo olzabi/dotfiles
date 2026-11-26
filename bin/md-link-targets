@@ -24,10 +24,12 @@ def targets(root, mds):
             if not path or re.match(r"^[a-z][a-z0-9+.-]*:", path, re.I) or MIRRORED.search(path):
                 continue
             base = root if path.startswith("/") else os.path.join(root, os.path.dirname(md))
-            full = os.path.realpath(os.path.join(base, path.lstrip("/")))
+            # lexical path, not realpath: a link through a symlinked folder (.claude/skills/x -> .agents/skills/x)
+            # must be mirrored under the name the note uses
+            full = os.path.abspath(os.path.join(base, path.lstrip("/")))
             if raw.startswith("/") and not os.path.isfile(full):  # wikilink: next to the note, else from the root
-                full = os.path.realpath(os.path.join(root, os.path.dirname(md), path.lstrip("/")))
-            if full.startswith(root + os.sep) and os.path.isfile(full):
+                full = os.path.abspath(os.path.join(root, os.path.dirname(md), path.lstrip("/")))
+            if full.startswith(root + os.sep) and os.path.isfile(full) and os.path.realpath(full).startswith(root + os.sep):
                 out.add(os.path.relpath(full, root))
     return sorted(out)
 
@@ -35,15 +37,16 @@ def targets(root, mds):
 def test():
     import tempfile
     with tempfile.TemporaryDirectory() as d:
-        os.makedirs(f"{d}/docs/plan/scripts"); os.makedirs(f"{d}/src/dir")
+        os.makedirs(f"{d}/docs/plan/scripts"); os.makedirs(f"{d}/src/dir"); os.makedirs(f"{d}/.agents/s"); os.makedirs(f"{d}/.claude/skills")
+        open(f"{d}/.agents/s/ref.txt", "w").close(); os.symlink("../../.agents/s", f"{d}/.claude/skills/s")
         for f in ("docs/plan/scripts/a.py", "src/b.ts", "docs/plan/x y.json", "docs/plan/c.txt"):
             open(f"{d}/{f}", "w").close()
         open(f"{d}/docs/plan/README.md", "w").write(
             "[a](scripts/a.py) [b](../../src/b.ts#L3) [c](<x%20y.json>) [d](phase-1.md) [e](https://x.y/z.py)"
             " [f](../../src/dir) [g](../../../etc/passwd) [h](/src/b.ts \"t\") [i](#anchor)"
-            " ![[c.txt|alias]] [[scripts/a.py]] [[nope.py]] [[phase-1]]")
+            " ![[c.txt|alias]] [[scripts/a.py]] [[nope.py]] [[phase-1]] [k](../../.claude/skills/s/ref.txt)")
         got = targets(d, ["docs/plan/README.md"])
-        assert got == ["docs/plan/c.txt", "docs/plan/scripts/a.py", "docs/plan/x y.json", "src/b.ts"], got
+        assert got == [".claude/skills/s/ref.txt", "docs/plan/c.txt", "docs/plan/scripts/a.py", "docs/plan/x y.json", "src/b.ts"], got
     print("ok")
 
 

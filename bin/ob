@@ -30,7 +30,11 @@ list_docs() {
   else
     find "$root" \( -name .git -o -name node_modules -o -name .venv -o -name vendor -o -name target -o -name dist -o -name build \) -prune \
       -o -type f -printf '%P\0'
-  fi | grep -zaiE '\.(md|markdown|png|jpe?g|gif|svg|webp)$' || true
+  fi | while IFS= read -r -d '' p; do
+    # git lists a symlinked folder (.claude/skills/x -> ../../.agents/skills/x) as one entry; list what is inside
+    # it under the linked name, so links through it (.claude/skills/x/SKILL.md) resolve in the mirror
+    if [ -L "$root/$p" ] && [ -d "$root/$p" ]; then find -L "$root/$p" -type f -printf "$p/%P\0" 2>/dev/null; else printf '%s\0' "$p"; fi
+  done | grep -zaiE '\.(md|markdown|png|jpe?g|gif|svg|webp)$' || true
 }
 
 # Sync mirror: link new docs (and the other files they link to, e.g. a plan's scripts/x.py, so those links work),
