@@ -1,10 +1,10 @@
 {
   "defaultViewMode": "preview",
   "livePreview": true,
-  "readableLineLength": false,
+  "readableLineLength": true,
   "showUnsupportedFiles": true,
   "alwaysUpdateLinks": true,
-  "promptDelete": true,
+  "promptDelete": false,
   "userIgnoreFilters": [
     "node_modules/",
     ".venv/",

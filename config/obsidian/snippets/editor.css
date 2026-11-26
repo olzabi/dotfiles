@@ -1,6 +1,7 @@
 /* Tighter, steadier editor: less dead space around the text and line numbers. */
 body {
   --file-margins: 8px 16px; /* default 32px on every side, also used by Reading view */
+  --file-line-width: 120ch;
 }
 /* Wrap prose at 120 characters, left-aligned; tables and code keep the full pane. Unlike "Readable line length"
    (keep it off), this caps each text line, not the whole note, and does not center it. */

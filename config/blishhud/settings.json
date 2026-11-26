@@ -118,7 +118,532 @@
           {
             "T": "System.Collections.Generic.Dictionary`2[[System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[Blish_HUD.Modules.ModuleState, Blish HUD, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], mscorlib",
             "Key": "ModuleStates",
-            "Value": {}
+            "Value": {
+              "bh.community.pathing": {
+                "Enabled": true,
+                "UserEnabledPermissions": [
+                  1,
+                  6
+                ],
+                "IgnoreDependencies": false,
+                "Settings": {
+                  "Lazy": true,
+                  "Entries": [
+                    {
+                      "T": "Blish_HUD.Settings.SettingCollection, Blish HUD",
+                      "Key": "global-settings",
+                      "Value": {
+                        "Entries": [
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "GlobalPathablesEnabled",
+                            "Value": true
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "T": "Blish_HUD.Settings.SettingCollection, Blish HUD",
+                      "Key": "pack-settings",
+                      "Value": {
+                        "Entries": [
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "PackWorldPathablesEnabled",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Single, mscorlib",
+                            "Key": "PackMaxOpacityOverride",
+                            "Value": 1.0
+                          },
+                          {
+                            "T": "System.Single, mscorlib",
+                            "Key": "PackMaxViewDistance",
+                            "Value": 25000.0
+                          },
+                          {
+                            "T": "System.Single, mscorlib",
+                            "Key": "PackMaxTrailAnimationSpeed",
+                            "Value": 10.0
+                          },
+                          {
+                            "T": "System.Single, mscorlib",
+                            "Key": "PackMarkerScale",
+                            "Value": 1.0
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "PackFadeTrailsAroundCharacter",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "PackFadePathablesDuringCombat",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "PackFadeMarkersBetweenCharacterAndCamera",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "PackAllowMarkersToAutomaticallyHide",
+                            "Value": true
+                          },
+                          {
+                            "T": "BhModule.Community.Pathing.MarkerClipboardConsentLevel, Pathing",
+                            "Key": "PackMarkerConsentToClipboard",
+                            "Value": 0
+                          },
+                          {
+                            "T": "BhModule.Community.Pathing.MarkerInfoDisplayMode, Pathing",
+                            "Key": "PackInfoDisplayMode",
+                            "Value": 0
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "PackAllowInteractIcon",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "PackAllowMarkersToAnimate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "PackEnableSmartCategoryFilter",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "PackShowWhenCategoriesAreFiltered",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "PackShowTooltipsOnAchievements",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "PackTruncateLongCategoryNames",
+                            "Value": false
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "PackShowHiddenMarkersReducedOpacity",
+                            "Value": false
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "T": "Blish_HUD.Settings.SettingCollection, Blish HUD",
+                      "Key": "map-settings",
+                      "Value": {
+                        "Entries": [
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "MapPathablesEnabled",
+                            "Value": true
+                          },
+                          {
+                            "T": "BhModule.Community.Pathing.MapVisibilityLevel, Pathing",
+                            "Key": "MapMarkerVisibilityLevel",
+                            "Value": 0
+                          },
+                          {
+                            "T": "BhModule.Community.Pathing.MapVisibilityLevel, Pathing",
+                            "Key": "MapTrailVisibilityLevel",
+                            "Value": 0
+                          },
+                          {
+                            "T": "System.Single, mscorlib",
+                            "Key": "MapDrawOpacity",
+                            "Value": 1.0
+                          },
+                          {
+                            "T": "BhModule.Community.Pathing.MapVisibilityLevel, Pathing",
+                            "Key": "MiniMapMarkerVisibilityLevel",
+                            "Value": 0
+                          },
+                          {
+                            "T": "BhModule.Community.Pathing.MapVisibilityLevel, Pathing",
+                            "Key": "MiniMapTrailVisibilityLevel",
+                            "Value": 0
+                          },
+                          {
+                            "T": "System.Single, mscorlib",
+                            "Key": "MiniMapDrawOpacity",
+                            "Value": 1.0
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "MapShowAboveBelowIndicators",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "MapFadeVerticallyDistantTrailSegments",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "MapShowTooltip",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Single, mscorlib",
+                            "Key": "MapTrailWidth",
+                            "Value": 2.0
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "T": "Blish_HUD.Settings.SettingCollection, Blish HUD",
+                      "Key": "script-settings",
+                      "Value": {
+                        "Entries": [
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "ScriptsEnabled",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "ScriptsConsoleEnabled",
+                            "Value": false
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "T": "Blish_HUD.Settings.SettingCollection, Blish HUD",
+                      "Key": "keybind-settings",
+                      "Value": {
+                        "Entries": [
+                          {
+                            "T": "Blish_HUD.Input.KeyBinding, Blish HUD",
+                            "Key": "KeyBindTogglePathables",
+                            "Value": {
+                              "PrimaryKey": 0,
+                              "ModifierKeys": 0,
+                              "Enabled": true,
+                              "IgnoreWhenInTextField": true
+                            }
+                          },
+                          {
+                            "T": "Blish_HUD.Input.KeyBinding, Blish HUD",
+                            "Key": "KeyBindToggleWorldPathables",
+                            "Value": {
+                              "PrimaryKey": 0,
+                              "ModifierKeys": 0,
+                              "Enabled": true,
+                              "IgnoreWhenInTextField": true
+                            }
+                          },
+                          {
+                            "T": "Blish_HUD.Input.KeyBinding, Blish HUD",
+                            "Key": "KeyBindToggleMapPathables",
+                            "Value": {
+                              "PrimaryKey": 0,
+                              "ModifierKeys": 0,
+                              "Enabled": true,
+                              "IgnoreWhenInTextField": true
+                            }
+                          },
+                          {
+                            "T": "Blish_HUD.Input.KeyBinding, Blish HUD",
+                            "Key": "KeyBindReloadMarkerPacks",
+                            "Value": {
+                              "PrimaryKey": 0,
+                              "ModifierKeys": 0,
+                              "Enabled": true,
+                              "IgnoreWhenInTextField": true
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "T": "Blish_HUD.Settings.SettingCollection, Blish HUD",
+                      "Key": "PackToggleSettings",
+                      "Value": {
+                        "Entries": [
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "hero.blish.pack_AlwaysLoad",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "tw_ALL_IN_ONE_AlwaysLoad",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "markers_AlwaysLoad",
+                            "Value": true
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "T": "System.String, mscorlib",
+                      "Key": "PackRepoUrl",
+                      "Value": "https://mp-repo.blishhud.com/repo.json"
+                    },
+                    {
+                      "T": "Blish_HUD.Settings.SettingCollection, Blish HUD",
+                      "Key": "MarkerRepoSettings",
+                      "Value": {
+                        "Entries": [
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "[- uL Vias -]_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "[fast] TacO Markers_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "[FvD] Dungeon Markers_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "[MOAR] Marker Pack_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "[RACE] Beetle Racing Tracks_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Abaddon_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Aixxel's HP train guides_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Apo's Boss Markers_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Aurizara's HP Train Guides_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Automatic Arrows_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Convergence Corp Trails_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Czokalapik's Guides_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Emythiel's GW2 Markers_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Flooch's Friendly Collection Routes_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Haskha's Markers_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Heart Zones_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Hero's Marker Pack_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "HeroineDark's Guides_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Japyx's Trails_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "KevPack_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Lady Elyssa's Achievements & Collections_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Lady Elyssa's Guides_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Linus's VoE Chest Farm_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Mad King's Labyrinth - Commander Pack_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Mesmer Fractal Skips_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Metal Marker Myriad (MMM)_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Movement on the World [EN/FR]_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Nekres' Hoard of Lost 'n Forgotten Markers_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Neltisen's VoE Mirrors_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Nexploration_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Only Fish_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "PEAK Infallible Markers_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Pewpew's Power Paths_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "ReActif EN_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "ReActif FR_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Rediche's WvW Marker Pack_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "ShinysTrails_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Teh's Trails - Map Completion_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Teh's Trails - Hero Points_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Tekkit's All-In-One_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "The Tryhard Marker Pack_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Triple Trouble Markers_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Twisted Castle_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Tyria [DRFT]_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Tyria [DRFT] Grand Prix_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "VoE Mirrors and Obscure Chests_AutoUpdate",
+                            "Value": true
+                          },
+                          {
+                            "T": "System.Boolean, mscorlib",
+                            "Key": "Zippy Ziplines_AutoUpdate",
+                            "Value": true
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           },
           {
             "T": "System.Collections.Generic.List`1[[System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], mscorlib",
@@ -134,14 +659,32 @@
       "T": "Blish_HUD.Settings.SettingCollection, Blish HUD",
       "Key": "WindowSettings",
       "Value": {
-        "Entries": []
+        "Entries": [
+          {
+            "T": "Microsoft.Xna.Framework.Point, MonoGame.Framework",
+            "Key": "OverlayService_BlishHUD_38d37290-b5f9-447d-97ea-45b0b50e5f55",
+            "Value": {
+              "X": 935,
+              "Y": 148
+            }
+          }
+        ]
       }
     },
     {
       "T": "Blish_HUD.Settings.SettingCollection, Blish HUD",
       "Key": "WindowSettings2",
       "Value": {
-        "Entries": []
+        "Entries": [
+          {
+            "T": "Microsoft.Xna.Framework.Point, MonoGame.Framework",
+            "Key": "bh.community.pathing_SettingsWindow",
+            "Value": {
+              "X": 55,
+              "Y": 530
+            }
+          }
+        ]
       }
     },
     {
