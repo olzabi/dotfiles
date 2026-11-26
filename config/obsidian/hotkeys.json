@@ -1,0 +1,13 @@
+{
+  "app:toggle-left-sidebar": [{ "modifiers": ["Alt"], "key": "1" }],
+  "app:toggle-right-sidebar": [{ "modifiers": ["Alt"], "key": "2" }],
+  "file-explorer:reveal-active-file": [{ "modifiers": ["Alt"], "key": "E" }],
+  "outline:open": [{ "modifiers": ["Alt"], "key": "O" }],
+  "backlink:open": [{ "modifiers": ["Alt"], "key": "B" }],
+  "graph:open-local": [{ "modifiers": ["Alt"], "key": "G" }],
+  "bookmarks:bookmark-current-view": [{ "modifiers": ["Alt"], "key": "M" }],
+  "workspaces:load": [{ "modifiers": ["Alt"], "key": "W" }],
+  "obsidian-git:open-git-view": [{ "modifiers": ["Alt"], "key": "V" }],
+  "obsidian-git:commit": [{ "modifiers": ["Alt", "Shift"], "key": "C" }],
+  "obsidian-git:push": [{ "modifiers": ["Alt", "Shift"], "key": "P" }]
+}
