@@ -2,6 +2,12 @@
 body {
   --file-margins: 8px 16px; /* default 32px on every side, also used by Reading view */
 }
+/* Wrap prose at 120 characters, left-aligned; tables and code keep the full pane. Unlike "Readable line length"
+   (keep it off), this caps each text line, not the whole note, and does not center it. */
+.markdown-source-view.mod-cm6 .cm-line:not(.HyperMD-codeblock, .HyperMD-table-row),
+.markdown-rendered :is(p, ul, ol, blockquote, h1, h2, h3, h4, h5, h6) {
+  max-width: 120ch;
+}
 .markdown-source-view.mod-cm6 .cm-gutters {
   margin-inline-end: 8px; /* default 24px between line numbers and text */
 }
