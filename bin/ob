@@ -57,6 +57,28 @@ done
 # Plans dashboard (Bases view over plan front matter) for projects with the docs/plans layout.
 [ -d "$root/docs/plans" ] && ! [ -e "$vault/Plans.base" ] && ln -sfn "$shared/plans.base" "$vault/Plans.base"
 
+# Write-back: the mirror's paths are the truth. A note made in Obsidian is a real file in the mirror (lost with the
+# cache, and the next sync never sees it): move it into the project and link it back. A link renamed or moved in
+# Obsidian moves its target to match. Never overwrites a project file; .obsidian and .trash stay in the mirror.
+adopt() {
+  local p rel want t tmp
+  tmp="$(dirname "$vault")/adopt.tmp"  # same filesystem as the mirror, so the swap below is one atomic rename
+  find "$vault" \( -path "$vault/.obsidian" -o -path "$vault/.trash" \) -prune -o \
+    \( -type l -o -type f -not -newer "$stamp" \) -print0 | while IFS= read -r -d '' p; do
+    rel=${p#"$vault"/}; want="$root/$rel"
+    if [ -L "$p" ]; then
+      t=$(readlink "$p")
+      [ "$t" != "$want" ] && [ -e "$t" ] && ! [ -e "$want" ] || continue
+      case $t in "$root"/*) ;; *) continue ;; esac  # e.g. Plans.base links to dotfiles
+      mkdir -p "$(dirname "$want")" && mv -n "$t" "$want" || continue
+    else
+      # shortcut: a save landing between this copy and the swap is lost; files untouched for one poll (2s) only
+      ! [ -e "$want" ] && mkdir -p "$(dirname "$want")" && cp -p "$p" "$want" || continue
+    fi
+    ln -sfn "$want" "$tmp" && mv -fT "$tmp" "$p"
+  done
+}
+
 # Edits to link targets fire no watcher events inside the vault; touching the link does. Poll the ~hundreds of
 # targets (cheap) and stop once Obsidian quits. One poller per vault.
 pidf="$(dirname "$vault")/poll.pid"
@@ -64,6 +86,7 @@ pidf="$(dirname "$vault")/poll.pid"
 ( trap '' HUP  # survive the terminal closing
   stamp="$(dirname "$vault")/poll.stamp"; touch "$stamp"
   while sleep 2 && pgrep -f '/obsidian/app.asar' >/dev/null; do
+    adopt
     touch "$stamp.next"
     find -L "$vault" -path "$vault/.obsidian" -prune -o -type f -newer "$stamp" -print0 | xargs -0r touch -h
     mv "$stamp.next" "$stamp"
