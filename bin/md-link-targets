@@ -1,12 +1,13 @@
 #!/usr/bin/env -S python3 -I
 """Usage: md-link-targets ROOT < md-paths (NUL-separated, relative to ROOT)
 Prints (NUL-separated, relative to ROOT) the regular files inside ROOT that those markdown files link to with
-relative links ](path), minus .md files and images (bin/ob mirrors those already). Directories, URLs, anchors-only
+relative links ](path) and wikilinks [[path]] / ![[path]] (Obsidian's default style), minus .md files and images (bin/ob mirrors those already). Directories, URLs, anchors-only
 links and anything escaping ROOT are skipped. `md-link-targets --test` runs a self-check."""
 import os, re, sys
 from urllib.parse import unquote
 
 LINK = re.compile(r"\]\(\s*<?([^)>\s]+)>?(?:\s+\"[^\"]*\")?\s*\)")
+WIKI = re.compile(r"\[\[([^\]|#]+)")
 MIRRORED = re.compile(r"\.(md|markdown|png|jpe?g|gif|svg|webp)$", re.I)
 
 
@@ -18,12 +19,14 @@ def targets(root, mds):
             text = open(os.path.join(root, md), encoding="utf-8", errors="ignore").read()
         except OSError:
             continue
-        for raw in LINK.findall(text):
+        for raw in LINK.findall(text) + ["/" + w.strip() for w in WIKI.findall(text)]:
             path = unquote(raw.split("#", 1)[0].split("?", 1)[0])
             if not path or re.match(r"^[a-z][a-z0-9+.-]*:", path, re.I) or MIRRORED.search(path):
                 continue
             base = root if path.startswith("/") else os.path.join(root, os.path.dirname(md))
             full = os.path.realpath(os.path.join(base, path.lstrip("/")))
+            if raw.startswith("/") and not os.path.isfile(full):  # wikilink: next to the note, else from the root
+                full = os.path.realpath(os.path.join(root, os.path.dirname(md), path.lstrip("/")))
             if full.startswith(root + os.sep) and os.path.isfile(full):
                 out.add(os.path.relpath(full, root))
     return sorted(out)
@@ -33,13 +36,14 @@ def test():
     import tempfile
     with tempfile.TemporaryDirectory() as d:
         os.makedirs(f"{d}/docs/plan/scripts"); os.makedirs(f"{d}/src/dir")
-        for f in ("docs/plan/scripts/a.py", "src/b.ts", "docs/plan/x y.json"):
+        for f in ("docs/plan/scripts/a.py", "src/b.ts", "docs/plan/x y.json", "docs/plan/c.txt"):
             open(f"{d}/{f}", "w").close()
         open(f"{d}/docs/plan/README.md", "w").write(
             "[a](scripts/a.py) [b](../../src/b.ts#L3) [c](<x%20y.json>) [d](phase-1.md) [e](https://x.y/z.py)"
-            " [f](../../src/dir) [g](../../../etc/passwd) [h](/src/b.ts \"t\") [i](#anchor)")
+            " [f](../../src/dir) [g](../../../etc/passwd) [h](/src/b.ts \"t\") [i](#anchor)"
+            " ![[c.txt|alias]] [[scripts/a.py]] [[nope.py]] [[phase-1]]")
         got = targets(d, ["docs/plan/README.md"])
-        assert got == ["docs/plan/scripts/a.py", "docs/plan/x y.json", "src/b.ts"], got
+        assert got == ["docs/plan/c.txt", "docs/plan/scripts/a.py", "docs/plan/x y.json", "src/b.ts"], got
     print("ok")
 
 
